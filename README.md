@@ -1,4 +1,5 @@
-# R21 Projektin visio - Kuvapalvelu
+# 2021 Syksy - OTP R21 - Fotos
+Jüri Tihane, Petri Immonen, Kalle Voutilainen ja Janne Kaukua
 
 # Key product goals:
 Tuote tuo tuloja "yhtiölle", kun premium-käyttäjät maksavat tuotteesta kuukausimaksua (free-käyttäjille mainoksia? -> mainostulot / Rajallinen määrä tilaa).
