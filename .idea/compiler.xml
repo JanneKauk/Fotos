@@ -10,7 +10,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="otp-r21-fotos-demo" target="16" />
+      <module name="otp-r21-fotos-demo" target="11" />
     </bytecodeTargetLevel>
   </component>
 </project>
