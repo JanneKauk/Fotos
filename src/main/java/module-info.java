@@ -1,4 +1,4 @@
-module otp.otpr21fotosdemo {
+module otp1.otpr21fotosdemo {
     requires javafx.controls;
     requires javafx.fxml;
     requires java.sql;
