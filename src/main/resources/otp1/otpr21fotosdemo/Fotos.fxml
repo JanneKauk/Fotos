@@ -18,6 +18,22 @@
                      <buttons>
                         <Circle fill="DODGERBLUE" radius="17.0" stroke="BLACK" strokeType="INSIDE" ButtonBar.buttonData="LEFT" />
                         <Button mnemonicParsing="false" text="Omat kuvat" ButtonBar.buttonData="LEFT" />
+                        <GridPane>
+                          <columnConstraints>
+                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="200.0" />
+                          </columnConstraints>
+                          <rowConstraints>
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                          </rowConstraints>
+                           <children>
+                              <TextField alignment="CENTER" promptText="Hae" />
+                              <Label text="Tarkennettu haku" GridPane.rowIndex="1" GridPane.halignment="CENTER">
+                                 <font>
+                                    <Font name="System Bold" size="12.0" />
+                                 </font></Label>
+                           </children>
+                        </GridPane>
                         <Button mnemonicParsing="false" text="Julkiset kuvat" ButtonBar.buttonData="LEFT" />
                         <Button mnemonicParsing="false" text="Jaetut kuvat" />
                         <Circle fx:id="profile" fill="DODGERBLUE" onMouseEntered="#onProfileHover" radius="17.0" stroke="BLACK" strokeType="INSIDE" />
