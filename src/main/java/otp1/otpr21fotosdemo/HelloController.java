@@ -16,4 +16,9 @@ public class HelloController {
         //Tähän tullaa ku painetaan sinistä pluspallo-kuvaketta kuvan lisäämiseks.
         System.out.println ("Add image");
     }
+    @FXML
+    protected void onProfileHover() {
+        //Kun hiiri viedään proffilikuvan päälle
+        System.out.println("Hiiri profiilikuvan kohdalla");
+    }
 }
