@@ -9,7 +9,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Circle;
 
-public class HelloController {
+public class FotosController {
     @FXML
     private Label welcomeText;
     @FXML
