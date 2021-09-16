@@ -3,8 +3,10 @@
 <?import java.lang.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1080.0" prefWidth="1920.0" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="otp1.otpr21fotosdemo.HelloController">
    <children>
@@ -83,16 +85,42 @@
                            <children>
                               <SplitPane dividerPositions="0.10867293625914315" prefHeight="888.0" prefWidth="1916.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <items>
-                                    <AnchorPane prefHeight="200.0" prefWidth="200.0" />
+                                    <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                                       <children>
+                                          <Pane prefHeight="886.0" prefWidth="205.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                             <children>
+                                                <CheckBox layoutX="39.0" layoutY="131.0" mnemonicParsing="false" text="CheckBox" />
+                                                <Slider layoutX="33.0" layoutY="240.0" value="50.0" />
+                                                <RadioButton layoutX="39.0" layoutY="161.0" mnemonicParsing="false" text="RadioButton" />
+                                                <RadioButton layoutX="39.0" layoutY="188.0" mnemonicParsing="false" text="RadioButton" />
+                                                <SplitMenuButton layoutX="40.0" layoutY="92.0" mnemonicParsing="false" text="OrderBy">
+                                                  <items>
+                                                    <MenuItem mnemonicParsing="false" text="Date Ascending" />
+                                                    <MenuItem mnemonicParsing="false" text="Date Decending" />
+                                                  </items>
+                                                </SplitMenuButton>
+                                                <Label layoutX="58.0" layoutY="14.0" text="Filter Menu" textAlignment="CENTER">
+                                                   <font>
+                                                      <Font size="18.0" />
+                                                   </font>
+                                                </Label>
+                                                <Label layoutX="69.0" layoutY="220.0" text="Image Size" textAlignment="CENTER">
+                                                   <font>
+                                                      <Font size="14.0" />
+                                                   </font>
+                                                </Label>
+                                             </children>
+                                          </Pane>
+                                       </children></AnchorPane>
                                     <AnchorPane prefHeight="200.0" prefWidth="200.0">
                                        <children>
                                           <ScrollPane fitToWidth="true" layoutX="50.0" layoutY="50.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                              <content>
                                                 <GridPane prefHeight="886.0" prefWidth="1703.0">
                                                 <columnConstraints>
-                                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
-                                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                    <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" percentWidth="33.3" />
+                                                      <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" percentWidth="33.3" prefWidth="100.0" />
+                                                      <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" percentWidth="33.4" prefWidth="100.0" />
                                                 </columnConstraints>
                                                 <rowConstraints>
                                                       <RowConstraints minHeight="5.0" percentHeight="33.3" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -130,6 +158,15 @@
                                                         <Double fx:value="-5.0" />
                                                     </points>
                                                 </Polygon>
+                                                      <Button mnemonicParsing="false">
+                                                         <graphic>
+                                                            <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+                                                               <image>
+                                                                  <Image url="@../../../../src/main/resources/image/noimage.jpg" />
+                                                               </image>
+                                                            </ImageView>
+                                                         </graphic>
+                                                      </Button>
                                                 </children>
                                                 </GridPane>
                                              </content>
