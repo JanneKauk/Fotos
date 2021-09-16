@@ -18,7 +18,7 @@
                         <Button mnemonicParsing="false" text="Omat kuvat" ButtonBar.buttonData="LEFT" />
                         <Button mnemonicParsing="false" text="Julkiset kuvat" ButtonBar.buttonData="LEFT" />
                         <Button mnemonicParsing="false" text="Jaetut kuvat" />
-                        <Circle fx:id="profile" fill="DODGERBLUE" radius="17.0" stroke="BLACK" strokeType="INSIDE" />
+                        <Circle fx:id="profile" fill="DODGERBLUE" onMouseEntered="#onProfileHover" radius="17.0" stroke="BLACK" strokeType="INSIDE" />
                      </buttons>
                      <padding>
                         <Insets left="5.0" right="5.0" />
