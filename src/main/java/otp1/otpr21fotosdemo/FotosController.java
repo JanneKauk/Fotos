@@ -2,22 +2,36 @@ package otp1.otpr21fotosdemo;
 
 import javafx.animation.RotateTransition;
 import javafx.animation.TranslateTransition;
+import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Circle;
+import javafx.stage.Stage;
 import javafx.util.Duration;
+
+import java.io.IOException;
+import java.util.Objects;
 
 public class FotosController {
     @FXML
     private Label welcomeText;
     @FXML
     private Circle profile;
-
+    @FXML
+    private BorderPane rootborderpane;
 
     @FXML
     private void initialize() {
@@ -38,8 +52,19 @@ public class FotosController {
         System.out.println("Cursor on profile picture.");
         //Tehdään valikko, joka ilmestyy profiilikuvan alle.
         ContextMenu menu = new ContextMenu();
-        //Tehdään valikon valinnat.
+        //Tehdään valikon valinnat ja lisätään niille tarvittavat toiminnot.
         MenuItem settings = new MenuItem("Asetukset");
+        settings.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                System.out.println("Menty asetuksiin.");
+                try {
+                    switchToSettingsScene(event);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
         MenuItem logout = new MenuItem("Kirjaudu ulos");
         //Lisätään valinnat valikkoon.
         menu.getItems().addAll(settings, logout);
@@ -107,5 +132,17 @@ public class FotosController {
             });
 
         }
+    }
+    @FXML
+    public void switchToSettingsScene(ActionEvent event) throws IOException {
+        Stage stage;
+        Scene scene;
+        Parent root;
+        //Vaihdetaan asetukset-näkymään.
+        BorderPane borderpane = FXMLLoader.load(getClass().getResource("Settings.fxml"));
+        stage = (Stage)((Node)event.getSource()).getScene().getWindow();
+        scene = new Scene(borderpane);
+        stage.setScene(scene);
+        stage.show();
     }
 }
