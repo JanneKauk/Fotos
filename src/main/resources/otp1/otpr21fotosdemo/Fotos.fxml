@@ -14,8 +14,8 @@
          <children>
             <ButtonBar style="-fx-background-color: #ebebeb;">
                <buttons>
-                  <Circle fill="DODGERBLUE" radius="17.0" stroke="BLACK" strokeType="INSIDE" ButtonBar.buttonData="LEFT" />
-                  <Button mnemonicParsing="false" text="Omat kuvat" ButtonBar.buttonData="LEFT" />
+                  <Circle fill="DODGERBLUE" onMouseClicked="#switchToDefaultScene" radius="17.0" stroke="BLACK" strokeType="INSIDE" ButtonBar.buttonData="LEFT" />
+                  <Button mnemonicParsing="false" onMouseClicked="#switchToDefaultScene" text="Omat kuvat" ButtonBar.buttonData="LEFT" />
                   <GridPane>
                     <columnConstraints>
                       <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="200.0" />

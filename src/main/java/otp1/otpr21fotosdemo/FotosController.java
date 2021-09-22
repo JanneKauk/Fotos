@@ -134,14 +134,15 @@ public class FotosController {
     }
     @FXML
     public void switchToSettingsScene() {
-        folderMenu.setVisible(false);
-        folderMenuHideButton.setVisible(false);
-        fotosGridPane.setVisible(false);
-        filterMenuHbox.setVisible(false);
-        folderMenu.setManaged(false);
-        folderMenuHideButton.setManaged(false);
-        fotosGridPane.setManaged(false);
-        filterMenuHbox.setManaged(false);
+        //Laitetaan etusivun elementit pois näkyvistä.
+            folderMenu.setVisible(false);
+            folderMenuHideButton.setVisible(false);
+            fotosGridPane.setVisible(false);
+            filterMenuHbox.setVisible(false);
+            folderMenu.setManaged(false);
+            folderMenuHideButton.setManaged(false);
+            fotosGridPane.setManaged(false);
+            filterMenuHbox.setManaged(false);
 
         /*Stage stage;
         Scene scene;
@@ -152,5 +153,18 @@ public class FotosController {
         stage = (Stage) rootborderpane.getScene().getWindow();
         stage.setScene(scene);
         stage.show();*/
+    }
+
+    @FXML
+    public void switchToDefaultScene() {
+        //Laitetaan etusivun elementit takaisin näkyviin.
+        folderMenu.setVisible(true);
+        folderMenuHideButton.setVisible(true);
+        fotosGridPane.setVisible(true);
+        filterMenuHbox.setVisible(true);
+        folderMenu.setManaged(true);
+        folderMenuHideButton.setManaged(true);
+        fotosGridPane.setManaged(true);
+        filterMenuHbox.setManaged(true);
     }
 }
