@@ -111,7 +111,7 @@ public class FotosController {
         TranslateTransition transitionMenu = new TranslateTransition(new Duration(500), folderMenu);
         RotateTransition rotateButton = new RotateTransition(new Duration(500), folderButtonStackPane);
         if (folderMenu.getTranslateY() != 0){
-            //Avataan kiinni oleva filtermenu
+            //Avataan kiinni oleva foldermenu
             System.out.println("Folderit auki!");
             transitionMenu.setToY(0);
             transitionMenu.play();
@@ -119,7 +119,7 @@ public class FotosController {
             rotateButton.play();
             folderMenu.setManaged(true);
         } else {
-            //Suljetaan auki oleva filtermenu
+            //Suljetaan auki oleva foldermenu
             System.out.println("Folderit kiinni!");
             folderMenu.setViewOrder(1);
             transitionMenu.setToY(-(folderMenu.getHeight()*2));
