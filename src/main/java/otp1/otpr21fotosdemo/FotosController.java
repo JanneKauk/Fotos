@@ -15,9 +15,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.*;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -31,7 +29,15 @@ public class FotosController {
     @FXML
     private Circle profile;
     @FXML
-    private BorderPane rootborderpane;
+    private StackPane folderMenuHideButton;
+    @FXML
+    private ScrollPane folderMenu;
+    @FXML
+    private StackPane folderButtonStackPane;
+    @FXML
+    private GridPane fotosGridPane;
+    @FXML
+    private HBox filterMenuHbox;
 
     @FXML
     private void initialize() {
@@ -58,11 +64,7 @@ public class FotosController {
             @Override
             public void handle(ActionEvent event) {
                 System.out.println("Menty asetuksiin.");
-                try {
-                    switchToSettingsScene(event);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                    switchToSettingsScene();
             }
         });
         MenuItem logout = new MenuItem("Kirjaudu ulos");
@@ -103,10 +105,7 @@ public class FotosController {
 
         }
     }
-    @FXML
-    private ScrollPane folderMenu;
-    @FXML
-    private StackPane folderButtonStackPane;
+
     @FXML
     private void onFolderShowHidebuttonClick(){
         TranslateTransition transitionMenu = new TranslateTransition(new Duration(500), folderMenu);
@@ -134,15 +133,24 @@ public class FotosController {
         }
     }
     @FXML
-    public void switchToSettingsScene(ActionEvent event) throws IOException {
-        Stage stage;
+    public void switchToSettingsScene() {
+        folderMenu.setVisible(false);
+        folderMenuHideButton.setVisible(false);
+        fotosGridPane.setVisible(false);
+        filterMenuHbox.setVisible(false);
+        folderMenu.setManaged(false);
+        folderMenuHideButton.setManaged(false);
+        fotosGridPane.setManaged(false);
+        filterMenuHbox.setManaged(false);
+
+        /*Stage stage;
         Scene scene;
         Parent root;
         //Vaihdetaan asetukset-näkymään.
-        BorderPane borderpane = FXMLLoader.load(getClass().getResource("Settings.fxml"));
-        stage = (Stage)((Node)event.getSource()).getScene().getWindow();
-        scene = new Scene(borderpane);
+        FXMLLoader fxmlLoader = new FXMLLoader(Fotos.class.getResource("Settings.fxml"));
+        scene = new Scene(fxmlLoader.load(), 1280, 800);
+        stage = (Stage) rootborderpane.getScene().getWindow();
         stage.setScene(scene);
-        stage.show();
+        stage.show();*/
     }
 }
