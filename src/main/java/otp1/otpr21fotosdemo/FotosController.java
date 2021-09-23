@@ -1,6 +1,5 @@
 package otp1.otpr21fotosdemo;
 
-
 import javafx.animation.RotateTransition;
 import javafx.animation.TranslateTransition;
 import javafx.application.Application;
@@ -8,6 +7,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -23,7 +23,6 @@ import javafx.util.Duration;
 
 import java.io.IOException;
 import java.util.Objects;
-
 
 public class FotosController {
     @FXML
@@ -119,15 +118,17 @@ public class FotosController {
         TranslateTransition transitionMenu = new TranslateTransition(new Duration(500), folderMenu);
         RotateTransition rotateButton = new RotateTransition(new Duration(500), folderButtonStackPane);
         if (folderMenu.getTranslateY() != 0){
-            //Avataan kiinni oleva filtermenu
+            //Avataan kiinni oleva foldermenu
             System.out.println("Folderit auki!");
             transitionMenu.setToY(0);
             transitionMenu.play();
             rotateButton.setByAngle(180);
             rotateButton.play();
             folderMenu.setManaged(true);
+            //filterMenuHbox.setPadding(Insets.EMPTY);
+            rootborderpane.setMargin(filterMenuHbox, Insets.EMPTY);
         } else {
-            //Suljetaan auki oleva filtermenu
+            //Suljetaan auki oleva foldermenu
             System.out.println("Folderit kiinni!");
             folderMenu.setViewOrder(1);
             transitionMenu.setToY(-(folderMenu.getHeight()*2));
@@ -136,6 +137,8 @@ public class FotosController {
             rotateButton.play();
             transitionMenu.setOnFinished(event -> {
                 folderMenu.setManaged(false);
+                rootborderpane.setMargin(filterMenuHbox, new Insets(folderMenu.getHeight(), 0, 0, 0));
+                //filterMenuHbox.setPadding(new Insets(folderMenu.getHeight(), 0, 0, 0));
             });
 
         }
@@ -155,6 +158,7 @@ public class FotosController {
 */
         Stage stage;
         Scene scene;
+        Parent root;
         //Vaihdetaan asetukset-näkymään.
         System.out.println("Vaihdettu näkymä asetuksiin.");
         FXMLLoader fxmlLoader = new FXMLLoader(Fotos.class.getResource("Settings.fxml"));
