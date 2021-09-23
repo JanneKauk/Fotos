@@ -7,6 +7,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -25,7 +26,7 @@ import java.util.Objects;
 
 public class FotosController {
     @FXML
-    private Label welcomeText;
+    private BorderPane rootborderpane;
     @FXML
     private Circle profile;
     @FXML
@@ -43,10 +44,7 @@ public class FotosController {
     private void initialize() {
 
     }
-    @FXML
-    protected void onHelloButtonClick() {
-        welcomeText.setText("Welcome to JavaFX Application!");
-    }
+
     @FXML
     protected void onAddImgButtonClick() {
         //Tähän tullaa ku painetaan sinistä pluspallo-kuvaketta kuvan lisäämiseks.
@@ -118,6 +116,8 @@ public class FotosController {
             rotateButton.setByAngle(180);
             rotateButton.play();
             folderMenu.setManaged(true);
+            //filterMenuHbox.setPadding(Insets.EMPTY);
+            rootborderpane.setMargin(filterMenuHbox, Insets.EMPTY);
         } else {
             //Suljetaan auki oleva foldermenu
             System.out.println("Folderit kiinni!");
@@ -128,6 +128,8 @@ public class FotosController {
             rotateButton.play();
             transitionMenu.setOnFinished(event -> {
                 folderMenu.setManaged(false);
+                rootborderpane.setMargin(filterMenuHbox, new Insets(folderMenu.getHeight(), 0, 0, 0));
+                //filterMenuHbox.setPadding(new Insets(folderMenu.getHeight(), 0, 0, 0));
             });
 
         }
