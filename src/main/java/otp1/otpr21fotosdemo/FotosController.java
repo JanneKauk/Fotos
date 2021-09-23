@@ -1,5 +1,6 @@
 package otp1.otpr21fotosdemo;
 
+
 import javafx.animation.RotateTransition;
 import javafx.animation.TranslateTransition;
 import javafx.application.Application;
@@ -23,7 +24,10 @@ import javafx.util.Duration;
 import java.io.IOException;
 import java.util.Objects;
 
+
 public class FotosController {
+    @FXML
+    private BorderPane rootborderpane;
     @FXML
     private Label welcomeText;
     @FXML
@@ -64,7 +68,11 @@ public class FotosController {
             @Override
             public void handle(ActionEvent event) {
                 System.out.println("Menty asetuksiin.");
+                try {
                     switchToSettingsScene();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         });
         MenuItem logout = new MenuItem("Kirjaudu ulos");
@@ -133,7 +141,8 @@ public class FotosController {
         }
     }
     @FXML
-    public void switchToSettingsScene() {
+    public void switchToSettingsScene() throws IOException {
+        /*
         //Laitetaan etusivun elementit pois näkyvistä.
             folderMenu.setVisible(false);
             folderMenuHideButton.setVisible(false);
@@ -143,20 +152,22 @@ public class FotosController {
             folderMenuHideButton.setManaged(false);
             fotosGridPane.setManaged(false);
             filterMenuHbox.setManaged(false);
-
-        /*Stage stage;
+*/
+        Stage stage;
         Scene scene;
-        Parent root;
         //Vaihdetaan asetukset-näkymään.
+        System.out.println("Vaihdettu näkymä asetuksiin.");
         FXMLLoader fxmlLoader = new FXMLLoader(Fotos.class.getResource("Settings.fxml"));
         scene = new Scene(fxmlLoader.load(), 1280, 800);
         stage = (Stage) rootborderpane.getScene().getWindow();
+        stage.setMaximized(true);
         stage.setScene(scene);
-        stage.show();*/
+        stage.show();
     }
 
     @FXML
     public void switchToDefaultScene() {
+        /*
         //Laitetaan etusivun elementit takaisin näkyviin.
         folderMenu.setVisible(true);
         folderMenuHideButton.setVisible(true);
@@ -166,5 +177,9 @@ public class FotosController {
         folderMenuHideButton.setManaged(true);
         fotosGridPane.setManaged(true);
         filterMenuHbox.setManaged(true);
+        */
+
+
+
     }
 }
