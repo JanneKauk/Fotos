@@ -28,11 +28,10 @@ public class Database {
             // Connection statement
             conn = DriverManager.getConnection(url, userName, password);
             System.out.println("\nDatabase Connection Established...");
-
             PreparedStatement pstmt = null;
             try{
-                pstmt = conn.prepareStatement("SELECT COUNT(*) FROM Fotos.User WHERE userName=?;");
 
+                pstmt = conn.prepareStatement("SELECT COUNT(*) FROM Fotos.User WHERE userName=?;");
                 pstmt.setString(1, user);
                 ResultSet result = pstmt.executeQuery();
                 result.next();
@@ -40,8 +39,8 @@ public class Database {
                 //Tarkistetaan löytyikö yhtään kyseistä usernamea. (Ei pitäisi olla koskaan enempää kuin yksi)
                 if (result.getInt(1) > 0){
                     found = true;
-                    System.out.println("Found " + result.getInt(1) + " " + user);
                 }
+                System.out.println("Found " + result.getInt(1) + " " + user);
             } catch (Exception e) {
                 System.err.println("Error in query");
                 e.printStackTrace();

@@ -1,8 +1,12 @@
 package otp1.otpr21fotosdemo;
 
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -11,6 +15,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.util.Calendar;
 import java.util.Date;
+
+
 
 // TODO: Connect testing methods with values for correct testing
 // As of now, test methods generate their own data
@@ -233,5 +239,14 @@ public class DatabaseTest {
                 }
             }
         }
+    }
+
+
+    @DisplayName("Testataan userExists metodi useammalla käyttäjätunnuksella.")
+    @ParameterizedTest (name="Testataan loytyyko username {0}")
+    @CsvSource({"ppouta, true", "noexist, false", "8u34958u342985u89t3hf89ht298t48h, false","-1,false", "NULL, false" })
+    public void userExistsTest(String userName, boolean result){
+        Database base = new Database();
+        assertEquals(result, base.userExists(userName), "UserExiststest failed with username " + userName);
     }
 }
