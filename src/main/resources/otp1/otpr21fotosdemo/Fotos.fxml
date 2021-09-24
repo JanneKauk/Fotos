@@ -6,6 +6,7 @@
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Slider?>
@@ -29,11 +30,11 @@
 
 <StackPane xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="otp1.otpr21fotosdemo.FotosController">
    <children>
-      <BorderPane fx:id="rootborderpane" prefHeight="800.0" prefWidth="1280.0">
+      <BorderPane fx:id="rootborderpane" onMouseClicked="#onMainBorderPaneClick" prefHeight="800.0" prefWidth="1280.0">
          <top>
             <VBox BorderPane.alignment="CENTER">
                <children>
-                  <GridPane>
+                  <GridPane style="-fx-background-color: #ebebeb;">
                      <columnConstraints>
                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="40.0" />
                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="20.0" />
@@ -256,29 +257,42 @@
             </GridPane>
          </center>
       </BorderPane>
-      <VBox fx:id="loginVbox" blendMode="SRC_ATOP" maxHeight="200.0" maxWidth="160.0" prefHeight="200.0" prefWidth="100.0" style="-fx-background-color: white; -fx-border-width: 1; -fx-border-color: black; -fx-border-radius: 15;" StackPane.alignment="TOP_RIGHT">
+      <VBox fx:id="loginVbox" blendMode="SRC_ATOP" maxHeight="200.0" maxWidth="160.0" prefHeight="200.0" prefWidth="100.0" style="-fx-background-color: white; -fx-border-width: 1; -fx-border-color: black; -fx-border-radius: 15; -fx-background-radius: 15;" StackPane.alignment="TOP_RIGHT">
          <StackPane.margin>
             <Insets right="10.0" top="50.0" />
          </StackPane.margin>
          <children>
             <Label text="Käyttäjätunnus" />
-            <TextField />
+            <TextField fx:id="usernameField" />
             <Label text="Salasana">
                <VBox.margin>
                   <Insets top="10.0" />
                </VBox.margin>
             </Label>
-            <TextField>
+            <PasswordField fx:id="passwordField" />
+            <VBox fx:id="emailVbox">
+               <children>
+                  <Label text="Sähköposti">
+                     <VBox.margin>
+                        <Insets top="10.0" />
+                     </VBox.margin>
+                  </Label>
+                  <TextField fx:id="emailField1" />
+                  <Label text="Sähköposti uudelleen">
+                     <VBox.margin>
+                        <Insets top="10.0" />
+                     </VBox.margin>
+                  </Label>
+                  <TextField fx:id="emailField2" />
+               </children>
+            </VBox>
+            <Label fx:id="loginErrorLabel" />
+            <Button fx:id="loginButton" mnemonicParsing="false" onAction="#login" style="-fx-background-color: #59c3f4;" text="Kirjaudu">
                <VBox.margin>
                   <Insets />
                </VBox.margin>
-            </TextField>
-            <Button mnemonicParsing="false" onMouseClicked="#login" style="-fx-background-color: #59c3f4;" text="Kirjaudu">
-               <VBox.margin>
-                  <Insets top="10.0" />
-               </VBox.margin>
             </Button>
-            <Button mnemonicParsing="false" text="Rekisteröidy">
+            <Button mnemonicParsing="false" onAction="#registerMenu" text="Rekisteröidy">
                <VBox.margin>
                   <Insets top="20.0" />
                </VBox.margin>

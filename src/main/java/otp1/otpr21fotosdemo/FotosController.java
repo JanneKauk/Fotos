@@ -4,6 +4,7 @@ import javafx.animation.RotateTransition;
 import javafx.animation.TranslateTransition;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -37,29 +38,45 @@ public class FotosController {
     @FXML
     private HBox filterMenuHbox;
     @FXML
-    Button omatKuvatButton, julkisetKuvatButton, jaetutKuvatButton;
+    Button omatKuvatButton, julkisetKuvatButton, jaetutKuvatButton, loginButton;
     @FXML
     Label usernameLabel;
     @FXML
-    VBox loginVbox;
+    VBox loginVbox, emailVbox;
+    @FXML
+    TextField usernameField, emailField1, emailField2;
+    @FXML
+    PasswordField passwordField;
 
     private boolean loggedIn;
 
 
     @FXML
     private void initialize() {
+
         logout();
+        //Filtermenu piiloon alussa
         filterMenu.setTranslateX(-200);
         filterButtonStackPane.setRotate(180);
         filterMenu.setManaged(false);
+        //Login menu piiloo ja sen sisällä rekisteröitymiseen tarvittavat tekstikentät myös.
         loginVbox.setVisible(false);
+        emailVbox.setVisible(false);
+        emailVbox.setManaged(false);
     }
 
+    private void clearLoginFields(){
+        usernameField.setText("");
+        passwordField.setText("");
+        emailField1.setText("");
+        emailField2.setText("");
+    }
     private void logout(){
         loggedIn = false;
         omatKuvatButton.setVisible(false);
         jaetutKuvatButton.setVisible(false);
         usernameLabel.setText("Kirjaudu/Rekisteröidy");
+        switchToDefaultScene();
 
     }
     @FXML
@@ -67,8 +84,48 @@ public class FotosController {
         loggedIn = true;
         omatKuvatButton.setVisible(true);
         jaetutKuvatButton.setVisible(true);
-        usernameLabel.setText("Käyttäjä");
+        usernameLabel.setText("Käyttäjänimi");
         loginVbox.setVisible(false);
+        clearLoginFields();
+    }
+    @FXML
+    private void registerMenu(){
+        System.out.println("emailvbox: " + emailVbox.isVisible());
+        if (emailVbox.isVisible()) {
+            //Rekisteröidytään...
+
+            login();
+            loginButton.setVisible(true);
+            loginButton.setManaged(true);
+            emailVbox.setManaged(false);
+            emailVbox.setVisible(false);
+
+        } else {
+            //Näytetään rekisteröitymiseen tarvittavat tekstikentät. Piilotetaan login nappi (avattiin rekisteröitymismenu)
+            loginButton.setVisible(false);
+            loginButton.setManaged(false);
+            emailVbox.setManaged(true);
+            emailVbox.setVisible(true);
+        }
+
+    }
+    @FXML
+    private void onMainBorderPaneClick(Event event){
+       /* System.out.println("onMainBorderPaneClick: 1 " + loginVbox.isVisible());
+        System.out.println("event1: " + event.getSource());
+        System.out.println("event2: " + event.getTarget());
+        System.out.println("event3: " + event.getTarget().equals(usernameLabel));*/
+
+        //Jos klikattiin muualle kuin profiilipalloon niin suljetaan loginmenu. Tää tarvitaa ettei loginmenu sulkeudu heti auettuaan.
+        if (!(event.getTarget().equals(profile))) {
+            loginButton.setVisible(true);
+            loginButton.setManaged(true);
+            emailVbox.setManaged(false);
+            emailVbox.setVisible(false);
+            loginVbox.setVisible(false);
+            clearLoginFields();
+
+        }
     }
     @FXML
     protected void onAddImgButtonClick() {
@@ -77,6 +134,7 @@ public class FotosController {
     }
     @FXML
     protected void onProfileClick(){
+        //loginmenu auki
         loginVbox.setVisible(true);
     }
     @FXML
