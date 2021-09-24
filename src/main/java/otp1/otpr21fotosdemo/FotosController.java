@@ -7,6 +7,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.control.*;
 import javafx.scene.control.ContextMenu;
@@ -53,7 +54,6 @@ public class FotosController {
 
     @FXML
     private void initialize() {
-        System.out.println("Scrollp fit to width? " + scrollp.isFitToWidth());
         logout();
         filterMenu.setTranslateX(-200);
         filterButtonStackPane.setRotate(180);
@@ -72,32 +72,29 @@ public class FotosController {
         fotosGridPane.getColumnConstraints().clear();
         RowConstraints rc = new RowConstraints();
         ColumnConstraints cc = new ColumnConstraints();
-        rc.setMinHeight(200);
-        //rc.setPrefHeight(200);
-        rc.setMaxHeight(500);
-        rc.setValignment(VPos.CENTER);
-        rc.setVgrow(Priority.ALWAYS);
         cc.setMinWidth(200);
         cc.setMaxWidth(500);
         cc.setHalignment(HPos.CENTER);
         cc.setHgrow(Priority.ALWAYS);
+        rc.setMinHeight(200);
+        rc.setMaxHeight(500);
+        rc.setValignment(VPos.CENTER);
+        rc.setVgrow(Priority.ALWAYS);
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
-                Pane pane = new Pane();
+                Pane p = new Pane();
                 ImageView iv = new ImageView();
+                p.getChildren().add(iv);
                 iv.setImage(image);
                 iv.setSmooth(true);
                 iv.setPreserveRatio(true);
-                pane.getChildren().add(iv);
-                iv.fitWidthProperty().bind(pane.widthProperty());
-                iv.fitHeightProperty().bind(pane.heightProperty());
-                fotosGridPane.add(pane, j, i);
+                iv.fitWidthProperty().bind(p.widthProperty());
+                iv.fitHeightProperty().bind(p.heightProperty());
+                fotosGridPane.add(p, j, i);
                 if(i < 1) fotosGridPane.getColumnConstraints().add(cc);
             }
             fotosGridPane.getRowConstraints().add(rc);
         }
-        System.out.println(fotosGridPane.getRowCount());
-        System.out.println(fotosGridPane.getColumnCount());
         fotosGridPane.setGridLinesVisible(true);
     }
 
