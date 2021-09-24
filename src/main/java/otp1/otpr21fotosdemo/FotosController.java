@@ -11,10 +11,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.ScrollPane;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Circle;
@@ -39,39 +36,80 @@ public class FotosController {
     private GridPane fotosGridPane;
     @FXML
     private HBox filterMenuHbox;
+    @FXML
+    Button omatKuvatButton, julkisetKuvatButton, jaetutKuvatButton;
+    @FXML
+    Label usernameLabel;
+    @FXML
+    VBox loginVbox;
+
+    private boolean loggedIn;
+
 
     @FXML
     private void initialize() {
-
+        logout();
+        filterMenu.setTranslateX(-200);
+        filterButtonStackPane.setRotate(180);
+        filterMenu.setManaged(false);
+        loginVbox.setVisible(false);
     }
 
+    private void logout(){
+        loggedIn = false;
+        omatKuvatButton.setVisible(false);
+        jaetutKuvatButton.setVisible(false);
+        usernameLabel.setText("Kirjaudu/Rekisteröidy");
+
+    }
+    @FXML
+    private void login(){
+        loggedIn = true;
+        omatKuvatButton.setVisible(true);
+        jaetutKuvatButton.setVisible(true);
+        usernameLabel.setText("Käyttäjä");
+        loginVbox.setVisible(false);
+    }
     @FXML
     protected void onAddImgButtonClick() {
         //Tähän tullaa ku painetaan sinistä pluspallo-kuvaketta kuvan lisäämiseks.
         System.out.println ("Add image");
     }
     @FXML
+    protected void onProfileClick(){
+        loginVbox.setVisible(true);
+    }
+    @FXML
     protected void onProfileHover() {
-        //Kun hiiri viedään proffilikuvan päälle
-        System.out.println("Cursor on profile picture.");
-        //Tehdään valikko, joka ilmestyy profiilikuvan alle.
-        ContextMenu menu = new ContextMenu();
-        //Tehdään valikon valinnat ja lisätään niille tarvittavat toiminnot.
-        MenuItem settings = new MenuItem("Asetukset");
-        settings.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                System.out.println("Menty asetuksiin.");
+        if (loggedIn) {
+            //Kun hiiri viedään proffilikuvan päälle
+            System.out.println("Cursor on profile picture.");
+            //Tehdään valikko, joka ilmestyy profiilikuvan alle.
+            ContextMenu menu = new ContextMenu();
+            //Tehdään valikon valinnat ja lisätään niille tarvittavat toiminnot.
+            MenuItem settings = new MenuItem("Asetukset");
+            settings.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent event) {
+                    System.out.println("Menty asetuksiin.");
                     switchToSettingsScene();
-            }
-        });
-        MenuItem logout = new MenuItem("Kirjaudu ulos");
-        //Lisätään valinnat valikkoon.
-        menu.getItems().addAll(settings, logout);
-        //Näytetään valikko käyttäjälle.
-        double boundsInScenex = profile.localToScene(profile.getBoundsInLocal()).getMaxX();
-        double boundsInSceney = profile.localToScene(profile.getBoundsInLocal()).getMaxY();
-        menu.show(profile, boundsInScenex, boundsInSceney);
+                }
+            });
+            MenuItem logout = new MenuItem("Kirjaudu ulos");
+            logout.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent event) {
+                    System.out.println("Kirjauduttu ulos.");
+                    logout();
+                }
+            });
+            //Lisätään valinnat valikkoon.
+            menu.getItems().addAll(settings, logout);
+            //Näytetään valikko käyttäjälle.
+            double boundsInScenex = profile.localToScene(profile.getBoundsInLocal()).getMaxX();
+            double boundsInSceney = profile.localToScene(profile.getBoundsInLocal()).getMaxY();
+            menu.show(profile, boundsInScenex, boundsInSceney);
+        }
     }
 
     @FXML
@@ -90,6 +128,8 @@ public class FotosController {
             rotateButton.setByAngle(180);
             rotateButton.play();
             filterMenu.setManaged(true);
+            System.out.println("LayoutX: " + filterMenu.getLayoutX());
+            System.out.println("TranslateX: " + filterMenu.getTranslateX());
         } else {
             //Suljetaan auki oleva filtermenu
             System.out.println("Filterit kiinni!");
@@ -99,6 +139,8 @@ public class FotosController {
             rotateButton.play();
             transitionMenu.setOnFinished(event -> {
                 filterMenu.setManaged(false);
+                System.out.println("LayoutX: " + filterMenu.getLayoutX());
+                System.out.println("TranslateX: " + filterMenu.getTranslateX());
             });
 
         }
