@@ -2,17 +2,13 @@ package otp1.otpr21fotosdemo;
 
 import javafx.animation.RotateTransition;
 import javafx.animation.TranslateTransition;
-import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
+import javafx.geometry.VPos;
 import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
@@ -20,11 +16,9 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Circle;
-import javafx.stage.Stage;
 import javafx.util.Duration;
 
-import java.io.IOException;
-import java.util.Objects;
+import java.io.File;
 
 public class FotosController {
     @FXML
@@ -41,9 +35,12 @@ public class FotosController {
     private GridPane fotosGridPane;
     @FXML
     private HBox filterMenuHbox;
-    private int gridWidth = 5, gridHeight = 3;
-    private int imageTableCount = 0;
-    private String noImagePath = "/image/noimage.jpg";
+    private int columns = 5, rows = 5;
+    private int imageTableCount = 1;
+    File file = new File("src/main/resources/otp1/otpr21fotosdemo/image/noimage.jpg");
+    Image image = new Image(file.toURI().toString());
+    @FXML
+    ScrollPane scrollp;
     @FXML
     Button omatKuvatButton, julkisetKuvatButton, jaetutKuvatButton;
     @FXML
@@ -56,6 +53,7 @@ public class FotosController {
 
     @FXML
     private void initialize() {
+        System.out.println("Scrollp fit to width? " + scrollp.isFitToWidth());
         logout();
         filterMenu.setTranslateX(-200);
         filterButtonStackPane.setRotate(180);
@@ -68,20 +66,39 @@ public class FotosController {
     private void createPictureGrid(){
         //getPictureTable tableCount = getPictureTable.count
         //adjust gridHeight and width gridWidth/table.count
-
-        for (int i = 0; i < gridHeight; i++) {
-            for (int j = 0; j < gridWidth; j++) {
+        if(imageTableCount < 1) return;
+        fotosGridPane.getChildren().clear();
+        fotosGridPane.getRowConstraints().clear();
+        fotosGridPane.getColumnConstraints().clear();
+        RowConstraints rc = new RowConstraints();
+        ColumnConstraints cc = new ColumnConstraints();
+        rc.setMinHeight(200);
+        //rc.setPrefHeight(200);
+        rc.setMaxHeight(500);
+        rc.setValignment(VPos.CENTER);
+        rc.setVgrow(Priority.ALWAYS);
+        cc.setMinWidth(200);
+        cc.setMaxWidth(500);
+        cc.setHalignment(HPos.CENTER);
+        cc.setHgrow(Priority.ALWAYS);
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < columns; j++) {
                 Pane pane = new Pane();
                 ImageView iv = new ImageView();
-                //if(imageTableCount < 1) iv.setImage(new Image(noImagePath));
+                iv.setImage(image);
+                iv.setSmooth(true);
+                iv.setPreserveRatio(true);
                 pane.getChildren().add(iv);
-                pane.setCenterShape(true);
                 iv.fitWidthProperty().bind(pane.widthProperty());
                 iv.fitHeightProperty().bind(pane.heightProperty());
-                fotosGridPane.add(pane, i, j);
-                //fotosGridPane.getColumnConstraints()
+                fotosGridPane.add(pane, j, i);
+                if(i < 1) fotosGridPane.getColumnConstraints().add(cc);
             }
+            fotosGridPane.getRowConstraints().add(rc);
         }
+        System.out.println(fotosGridPane.getRowCount());
+        System.out.println(fotosGridPane.getColumnCount());
+        fotosGridPane.setGridLinesVisible(true);
     }
 
     private void logout(){
