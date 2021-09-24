@@ -2,27 +2,18 @@ package otp1.otpr21fotosdemo;
 
 import javafx.animation.RotateTransition;
 import javafx.animation.TranslateTransition;
-import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Circle;
-import javafx.stage.Stage;
 import javafx.util.Duration;
-
-import java.io.IOException;
-import java.util.Objects;
 
 public class FotosController {
     @FXML
@@ -39,10 +30,33 @@ public class FotosController {
     private GridPane fotosGridPane;
     @FXML
     private HBox filterMenuHbox;
+    private int gridWidth = 5, gridHeight = 3;
+    private int imageTableCount = 0;
+    private String noImagePath = "/image/noimage.jpg";
 
     @FXML
     private void initialize() {
+        createPictureGrid();
+    }
 
+    @FXML
+    private void createPictureGrid(){
+        //getPictureTable tableCount = getPictureTable.count
+        //adjust gridHeight and width gridWidth/table.count
+
+        for (int i = 0; i < gridHeight; i++) {
+            for (int j = 0; j < gridWidth; j++) {
+                Pane pane = new Pane();
+                ImageView iv = new ImageView();
+                //if(imageTableCount < 1) iv.setImage(new Image(noImagePath));
+                pane.getChildren().add(iv);
+                pane.setCenterShape(true);
+                iv.fitWidthProperty().bind(pane.widthProperty());
+                iv.fitHeightProperty().bind(pane.heightProperty());
+                fotosGridPane.add(pane, i, j);
+                //fotosGridPane.getColumnConstraints()
+            }
+        }
     }
 
     @FXML
