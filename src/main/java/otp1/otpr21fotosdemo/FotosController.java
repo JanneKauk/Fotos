@@ -8,7 +8,6 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.control.*;
 import javafx.scene.control.ContextMenu;
@@ -37,10 +36,6 @@ public class FotosController {
     private GridPane fotosGridPane;
     @FXML
     private HBox filterMenuHbox;
-    private int columns = 5, rows = 5;
-    private int imageTableCount = 1;
-    File file = new File("src/main/resources/otp1/otpr21fotosdemo/image/noimage.jpg");
-    Image image = new Image(file.toURI().toString());
     @FXML
     ScrollPane scrollp;
     @FXML
@@ -56,6 +51,13 @@ public class FotosController {
 
     private boolean loggedIn;
 
+    //Image Grid settings
+    private int columns = 5, rows = 5;
+    private int imageTableCount = 1;//How many images there are in the current location
+    RowConstraints rc = new RowConstraints();
+    ColumnConstraints cc = new ColumnConstraints();
+    File file = new File("src/main/resources/otp1/otpr21fotosdemo/image/noimage.jpg"); //Missing image picture
+    Image missingImage = new Image(file.toURI().toString());
 
     @FXML
     private void initialize() {
@@ -74,38 +76,49 @@ public class FotosController {
 
     @FXML
     private void createPictureGrid(){
-        //getPictureTable tableCount = getPictureTable.count
-        //adjust gridHeight and width gridWidth/table.count
-        if(imageTableCount < 1) return;
+        //TODO: getPictureTable, tableCount = getPictureTable.count
+        //TODO: adjust gridHeight and width, rows = gridWidth/table.count
+        //Reset the grid
         fotosGridPane.getChildren().clear();
         fotosGridPane.getRowConstraints().clear();
         fotosGridPane.getColumnConstraints().clear();
-        RowConstraints rc = new RowConstraints();
-        ColumnConstraints cc = new ColumnConstraints();
-        cc.setMinWidth(200);
-        cc.setMaxWidth(500);
-        cc.setHalignment(HPos.CENTER);
-        cc.setHgrow(Priority.ALWAYS);
-        rc.setMinHeight(200);
-        rc.setMaxHeight(500);
-        rc.setValignment(VPos.CENTER);
-        rc.setVgrow(Priority.ALWAYS);
+        setGridConstraints();
+        if(imageTableCount < 1) return; //Return if there are no pictures in this location
+        //For each row
         for (int i = 0; i < rows; i++) {
+            //For each column
             for (int j = 0; j < columns; j++) {
                 Pane p = new Pane();
                 ImageView iv = new ImageView();
                 p.getChildren().add(iv);
-                iv.setImage(image);
+                //ImageView settings
+                iv.setImage(missingImage);
                 iv.setSmooth(true);
                 iv.setPreserveRatio(true);
                 iv.fitWidthProperty().bind(p.widthProperty());
                 iv.fitHeightProperty().bind(p.heightProperty());
+                //Add the created element p to the grid in pos (j,i)
                 fotosGridPane.add(p, j, i);
+                //Add column constraints
                 if(i < 1) fotosGridPane.getColumnConstraints().add(cc);
             }
+            //Add row constraints
             fotosGridPane.getRowConstraints().add(rc);
         }
-        fotosGridPane.setGridLinesVisible(true);
+        fotosGridPane.setGridLinesVisible(true); //For debug
+    }
+
+    private void setGridConstraints(){
+        //Column
+        cc.setMinWidth(200);
+        cc.setMaxWidth(500);
+        cc.setHalignment(HPos.CENTER);
+        cc.setHgrow(Priority.ALWAYS);
+        //Row
+        rc.setMinHeight(200);
+        rc.setMaxHeight(500);
+        rc.setValignment(VPos.CENTER);
+        rc.setVgrow(Priority.ALWAYS);
     }
 
     private void clearLoginFields(){
