@@ -322,24 +322,11 @@ public class FotosController {
         scrollp.setVisible(false);
         filterMenuHbox.setManaged(false);
         filterMenuHbox.setVisible(false);
-        folderMenu.setManaged(false);
         folderMenu.setVisible(false);
         folderMenuHideButton.setManaged(false);
         folderMenuHideButton.setVisible(false);
 
         /*
-        //Laitetaan etusivun elementit pois näkyvistä.
-            folderMenu.setVisible(false);
-            folderMenuHideButton.setVisible(false);
-            fotosGridPane.setVisible(false);
-            filterMenuHbox.setVisible(false);
-            folderMenu.setManaged(false);
-            folderMenuHideButton.setManaged(false);
-            fotosGridPane.setManaged(false);
-            filterMenuHbox.setManaged(false);
-
-
-
         Stage stage;
         Scene scene;
         //Vaihdetaan asetukset-näkymään.
@@ -348,8 +335,7 @@ public class FotosController {
         stage = (Stage) rootborderpane.getScene().getWindow();
         stage.setScene(scene);
         stage.show();
-
- */
+        */
     }
 
     @FXML
@@ -361,12 +347,6 @@ public class FotosController {
         scrollp.setVisible(true);
         filterMenuHbox.setManaged(true);
         filterMenuHbox.setVisible(true);
-        filterMenu.setTranslateX(-200);
-        filterButtonStackPane.setRotate(180);
-        filterButtonStackPane.setManaged(true);
-        filterButtonStackPane.setVisible(true);
-        filterMenu.setManaged(false);
-        folderMenu.setManaged(true);
         folderMenu.setVisible(true);
         folderMenuHideButton.setManaged(true);
         folderMenuHideButton.setVisible(true);
