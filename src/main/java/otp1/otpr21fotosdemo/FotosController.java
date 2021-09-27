@@ -6,9 +6,12 @@ import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.VPos;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -18,13 +21,15 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Circle;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.io.File;
+import java.io.IOException;
 
 public class FotosController {
     @FXML
-    private BorderPane rootborderpane;
+    private BorderPane rootborderpane, settingsBorderPane;
     @FXML
     private Circle profile;
     @FXML
@@ -77,6 +82,8 @@ public class FotosController {
         loginVbox.setVisible(false);
         emailVbox.setVisible(false);
         emailVbox.setManaged(false);
+        settingsBorderPane.setManaged(false);
+        settingsBorderPane.setVisible(false);
         createPictureGrid();
 
         imageViewStackPane.setVisible(false);
@@ -204,11 +211,6 @@ public class FotosController {
     }
     @FXML
     protected void onProfileClick(){
-        //loginmenu auki
-        loginVbox.setVisible(true);
-    }
-    @FXML
-    protected void onProfileHover() {
         if (loggedIn) {
             //Kun hiiri viedään proffilikuvan päälle
             System.out.println("Cursor on profile picture.");
@@ -220,7 +222,11 @@ public class FotosController {
                 @Override
                 public void handle(ActionEvent event) {
                     System.out.println("Menty asetuksiin.");
-                    switchToSettingsScene();
+                    try {
+                        switchToSettingsScene();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             });
             MenuItem logout = new MenuItem("Kirjaudu ulos");
@@ -237,6 +243,9 @@ public class FotosController {
             double boundsInScenex = profile.localToScene(profile.getBoundsInLocal()).getMaxX();
             double boundsInSceney = profile.localToScene(profile.getBoundsInLocal()).getMaxY();
             menu.show(profile, boundsInScenex, boundsInSceney);
+        } else {
+            //loginmenu auki
+            loginVbox.setVisible(true);
         }
     }
 
@@ -305,7 +314,10 @@ public class FotosController {
         }
     }
     @FXML
-    public void switchToSettingsScene() {
+    public void switchToSettingsScene() throws IOException {
+        settingsBorderPane.setManaged(true);
+        settingsBorderPane.setVisible(true);
+        /*
         //Laitetaan etusivun elementit pois näkyvistä.
             folderMenu.setVisible(false);
             folderMenuHideButton.setVisible(false);
@@ -316,19 +328,23 @@ public class FotosController {
             fotosGridPane.setManaged(false);
             filterMenuHbox.setManaged(false);
 
-        /*Stage stage;
+
+
+        Stage stage;
         Scene scene;
-        Parent root;
         //Vaihdetaan asetukset-näkymään.
         FXMLLoader fxmlLoader = new FXMLLoader(Fotos.class.getResource("Settings.fxml"));
         scene = new Scene(fxmlLoader.load(), 1280, 800);
         stage = (Stage) rootborderpane.getScene().getWindow();
         stage.setScene(scene);
-        stage.show();*/
+        stage.show();
+
+ */
     }
 
     @FXML
     public void switchToDefaultScene() {
+
         //Laitetaan etusivun elementit takaisin näkyviin.
         folderMenu.setVisible(true);
         folderMenuHideButton.setVisible(true);
