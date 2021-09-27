@@ -301,8 +301,18 @@ public class FotosController {
     }
     @FXML
     public void switchToSettingsScene() throws IOException {
+        //Laitetaan asetusten elementit näkyviin ja poistetaan etusivun elementit pois näkyvistä.
         settingsBorderPane.setManaged(true);
         settingsBorderPane.setVisible(true);
+        scrollp.setManaged(false);
+        scrollp.setVisible(false);
+        filterMenuHbox.setManaged(false);
+        filterMenuHbox.setVisible(false);
+        folderMenu.setManaged(false);
+        folderMenu.setVisible(false);
+        folderMenuHideButton.setManaged(false);
+        folderMenuHideButton.setVisible(false);
+
         /*
         //Laitetaan etusivun elementit pois näkyvistä.
             folderMenu.setVisible(false);
@@ -330,7 +340,24 @@ public class FotosController {
 
     @FXML
     public void switchToDefaultScene() {
+        //Laitetaan etusivun elementit näkyviin ja poistetaan asetusten elementit pois näkyvistä.
+        settingsBorderPane.setManaged(false);
+        settingsBorderPane.setVisible(false);
+        scrollp.setManaged(true);
+        scrollp.setVisible(true);
+        filterMenuHbox.setManaged(true);
+        filterMenuHbox.setVisible(true);
+        filterMenu.setTranslateX(-200);
+        filterButtonStackPane.setRotate(180);
+        filterButtonStackPane.setManaged(true);
+        filterButtonStackPane.setVisible(true);
+        filterMenu.setManaged(false);
+        folderMenu.setManaged(true);
+        folderMenu.setVisible(true);
+        folderMenuHideButton.setManaged(true);
+        folderMenuHideButton.setVisible(true);
 
+        /*
         //Laitetaan etusivun elementit takaisin näkyviin.
         folderMenu.setVisible(true);
         folderMenuHideButton.setVisible(true);
@@ -340,5 +367,6 @@ public class FotosController {
         folderMenuHideButton.setManaged(true);
         fotosGridPane.setManaged(true);
         filterMenuHbox.setManaged(true);
+         */
     }
 }
