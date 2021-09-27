@@ -16,19 +16,7 @@ public class SettingsController {
     private Circle profile2;
 
     @FXML
-    protected void onProfileHover() {
-        //Kun hiiri viedään proffilikuvan päälle
-        System.out.println("Cursor on profile picture.");
-        //Tehdään valikko, joka ilmestyy profiilikuvan alle.
-        ContextMenu menu = new ContextMenu();
-        //Tehdään valikon valinnat ja lisätään niille tarvittavat toiminnot.
-        MenuItem settings = new MenuItem("Asetukset");
-        MenuItem logout = new MenuItem("Kirjaudu ulos");
-        //Lisätään valinnat valikkoon.
-        menu.getItems().addAll(settings, logout);
-        //Näytetään valikko käyttäjälle.
-        double boundsInScenex = profile2.localToScene(profile2.getBoundsInLocal()).getMaxX();
-        double boundsInSceney = profile2.localToScene(profile2.getBoundsInLocal()).getMaxY();
-        menu.show(profile2, boundsInScenex, boundsInSceney);
+    protected void onProfileClick(){
+
     }
 }
