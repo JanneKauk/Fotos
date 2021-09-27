@@ -13,6 +13,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
@@ -48,6 +49,10 @@ public class FotosController {
     TextField usernameField, emailField1, emailField2;
     @FXML
     PasswordField passwordField;
+    @FXML
+    private Region imageviewBackgroundRegion;
+    @FXML
+    private StackPane imageViewStackPane;
 
     private boolean loggedIn;
 
@@ -67,13 +72,22 @@ public class FotosController {
         filterMenu.setTranslateX(-200);
         filterButtonStackPane.setRotate(180);
         filterMenu.setManaged(false);
+
         //Login menu piiloo ja sen sisällä rekisteröitymiseen tarvittavat tekstikentät myös.
         loginVbox.setVisible(false);
         emailVbox.setVisible(false);
         emailVbox.setManaged(false);
         createPictureGrid();
+
+        imageViewStackPane.setVisible(false);
+        //openImageview();
     }
 
+    private void openImageview(){
+        rootborderpane.setEffect(new GaussianBlur());
+        loginVbox.setEffect(new GaussianBlur());
+        imageViewStackPane.setVisible(true);
+    }
     @FXML
     private void createPictureGrid(){
         //TODO: getPictureTable, tableCount = getPictureTable.count
