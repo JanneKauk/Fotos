@@ -57,7 +57,8 @@ public class FotosController {
     @FXML
     private Region imageviewBackgroundRegion;
     @FXML
-    private StackPane imageViewStackPane;
+    private StackPane imageViewStackPane, blurringStackPane;
+
 
     private boolean loggedIn;
 
@@ -91,8 +92,7 @@ public class FotosController {
     }
 
     private void openImageview(){
-        rootborderpane.setEffect(new GaussianBlur());
-        loginVbox.setEffect(new GaussianBlur());
+        blurringStackPane.setEffect(new GaussianBlur());
         imageViewStackPane.setVisible(true);
     }
     @FXML
