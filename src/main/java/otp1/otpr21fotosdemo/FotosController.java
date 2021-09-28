@@ -19,10 +19,12 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import org.w3c.dom.events.MouseEvent;
 
 import java.io.File;
 import java.io.IOException;
@@ -55,6 +57,8 @@ public class FotosController {
     @FXML
     PasswordField passwordField;
     @FXML
+    ImageView bigPicture;
+    @FXML
     private Region imageviewBackgroundRegion;
     @FXML
     private StackPane imageViewStackPane, blurringStackPane;
@@ -68,7 +72,9 @@ public class FotosController {
     RowConstraints rc = new RowConstraints();
     ColumnConstraints cc = new ColumnConstraints();
     File file = new File("src/main/resources/otp1/otpr21fotosdemo/image/noimage.jpg"); //Missing image picture
+    File file2 = new File("src/main/resources/otp1/otpr21fotosdemo/image/addition-icon.png");
     Image missingImage = new Image(file.toURI().toString());
+    Image additionImage = new Image(file2.toURI().toString());
 
     @FXML
     private void initialize() {
@@ -96,9 +102,15 @@ public class FotosController {
         imageViewStackPane.setVisible(true);
     }
     @FXML
+    private void closeImageview(){
+        imageViewStackPane.setVisible(false);
+        blurringStackPane.setEffect(null);
+    }
+    @FXML
     private void createPictureGrid(){
         //TODO: getPictureTable, tableCount = getPictureTable.count
         //TODO: adjust gridHeight and width, rows = gridWidth/table.count
+        //TODO: fills the whole grid currently, needs to leave some cells empty in some cases
         //Reset the grid
         fotosGridPane.getChildren().clear();
         fotosGridPane.getRowConstraints().clear();
@@ -113,11 +125,16 @@ public class FotosController {
                 ImageView iv = new ImageView();
                 p.getChildren().add(iv);
                 //ImageView settings
-                iv.setImage(missingImage);
+                if(j%2==0)iv.setImage(missingImage);//ifs for testing,TODO: set to next picture in iteration
+                if(j%2==1)iv.setImage(additionImage);
                 iv.setSmooth(true);
                 iv.setPreserveRatio(true);
                 iv.fitWidthProperty().bind(p.widthProperty());
                 iv.fitHeightProperty().bind(p.heightProperty());
+                iv.setOnMouseClicked(event -> {
+                    bigPicture.setImage(iv.getImage());
+                    openImageview();
+                });
                 //Add the created element p to the grid in pos (j,i)
                 fotosGridPane.add(p, j, i);
                 //Add column constraints
@@ -131,13 +148,13 @@ public class FotosController {
 
     private void setGridConstraints(){
         //Column
-        cc.setMinWidth(200);
-        cc.setMaxWidth(500);
+        cc.setMinWidth(250);
+        cc.setMaxWidth(250);
         cc.setHalignment(HPos.CENTER);
         cc.setHgrow(Priority.ALWAYS);
         //Row
-        rc.setMinHeight(200);
-        rc.setMaxHeight(500);
+        rc.setMinHeight(250);
+        rc.setMaxHeight(250);
         rc.setValignment(VPos.CENTER);
         rc.setVgrow(Priority.ALWAYS);
     }
