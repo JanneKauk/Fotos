@@ -220,7 +220,7 @@
                   <Insets />
                </VBox.margin>
             </Button>
-            <Button mnemonicParsing="false" onAction="#registerMenu" text="Rekisteröidy">
+            <Button fx:id="registerButton" mnemonicParsing="false" onAction="#registerMenu" text="Rekisteröidy">
                <VBox.margin>
                   <Insets top="20.0" />
                </VBox.margin>

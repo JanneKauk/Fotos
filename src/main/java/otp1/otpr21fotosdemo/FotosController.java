@@ -45,9 +45,11 @@ public class FotosController {
     @FXML
     VBox loginVbox, emailVbox;
     @FXML
-    TextField usernameField, emailField1, emailField2;
+    private TextField usernameField, emailField1, emailField2;
     @FXML
-    PasswordField passwordField;
+    private PasswordField passwordField;
+    @FXML
+    public Label loginErrorLabel;
 
     private boolean loggedIn;
 
@@ -133,22 +135,32 @@ public class FotosController {
         jaetutKuvatButton.setVisible(false);
         usernameLabel.setText("Kirjaudu/Rekisteröidy");
         switchToDefaultScene();
-
     }
+
     @FXML
     private void login(){
-        loggedIn = true;
-        omatKuvatButton.setVisible(true);
-        jaetutKuvatButton.setVisible(true);
-        usernameLabel.setText("Käyttäjänimi");
-        loginVbox.setVisible(false);
-        clearLoginFields();
+        if (Database.userAndPwExists(usernameField.getText(), passwordField.getText())) {
+            loggedIn = true;
+            omatKuvatButton.setVisible(true);
+            jaetutKuvatButton.setVisible(true);
+            usernameLabel.setText("Käyttäjänimi");
+            loginVbox.setVisible(false);
+            clearLoginFields();
+        } else {
+            loginErrorLabel.setText("Käyttäjänimi tai salasana väärin");
+        }
     }
+
     @FXML
     private void registerMenu(){
         System.out.println("emailvbox: " + emailVbox.isVisible());
         if (emailVbox.isVisible()) {
-            //Rekisteröidytään...
+            // Lähetetään pyyntö back-end koodin puolelle, jossa toteutetaan tarkistukset ja datan pusku palvelimelle
+            if (!Database.userExists(usernameField.getText())) {
+                new Database(usernameField.getText(), passwordField.getText(), emailField1.getText(), emailField2.getText(), loginErrorLabel);
+            } else {
+                loginErrorLabel.setText("Tämä käyttäjä on jo olemassa");
+            }
 
             login();
             loginButton.setVisible(true);
@@ -163,8 +175,8 @@ public class FotosController {
             emailVbox.setManaged(true);
             emailVbox.setVisible(true);
         }
-
     }
+
     @FXML
     private void onMainBorderPaneClick(Event event){
        /* System.out.println("onMainBorderPaneClick: 1 " + loginVbox.isVisible());

@@ -25,8 +25,8 @@ import java.util.Date;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class DatabaseTest {
     // Variables
-    String userName = "otpdb";
-    String password = "Asdfghjkl1234567890";
+    String dbUserName = "otpdb";
+    String dbPassWord = "Asdfghjkl1234567890";
     String url = "jdbc:mysql://10.114.32.13:3306/Fotos";
 
     @Test
@@ -37,7 +37,7 @@ public class DatabaseTest {
 
         try {
             // Connection statement
-            conn = DriverManager.getConnection(url, userName, password);
+            conn = DriverManager.getConnection(url, dbUserName, dbPassWord);
             System.out.println("\nDatabase Connection Established...");
 
             // Deleting entry from Image table
@@ -79,7 +79,7 @@ public class DatabaseTest {
 
         try {
             // Connection statement
-            conn = DriverManager.getConnection(url, userName, password);
+            conn = DriverManager.getConnection(url, dbUserName, dbPassWord);
             System.out.println("\nDatabase Connection Established...");
 
         } catch (Exception ex) {
@@ -106,11 +106,11 @@ public class DatabaseTest {
 
         try {
             // Connection statement
-            conn = DriverManager.getConnection(url, userName, password);
+            conn = DriverManager.getConnection(url, dbUserName, dbPassWord);
             System.out.println("\nDatabase Connection Established...");
 
             // USER statement VALUES(userID (int11), frontName (varchar32), surName(varchar32), userLevel(int11)
-            // email(varchar32), passWord(varchar64), userName(varchar32)
+            // email(varchar32), passWord(varchar64), dbUserName(varchar32)
             PreparedStatement pstmt = conn.prepareStatement("INSERT INTO User VALUES(?,?,?,?,?,?,?)");
             // userID
             pstmt.setInt(1, 99999);
@@ -124,7 +124,7 @@ public class DatabaseTest {
             pstmt.setString(5, "test@test.com");
             // passWord
             pstmt.setString(6, "1234");
-            // userName
+            // dbUserName
             pstmt.setString(7, "test");
             //Executing the statement
             pstmt.execute();
@@ -154,7 +154,7 @@ public class DatabaseTest {
 
         try {
             // Connection statement
-            conn = DriverManager.getConnection(url, userName, password);
+            conn = DriverManager.getConnection(url, dbUserName, dbPassWord);
             System.out.println("\nDatabase Connection Established...");
 
             // Image statement VALUES(imageID (int11), viewingRights (int11), fileName(varchar64), image(blob), date(date)
@@ -205,7 +205,7 @@ public class DatabaseTest {
 
         try {
             // Connection statement
-            conn = DriverManager.getConnection(url, userName, password);
+            conn = DriverManager.getConnection(url, dbUserName, dbPassWord);
             System.out.println("\nDatabase Connection Established...");
 
             // Folder statement VALUES(name(varchar32), folderID(int11), editDate(Date), userID(int11)
@@ -244,7 +244,7 @@ public class DatabaseTest {
 
     @DisplayName("Testataan userExists metodi useammalla käyttäjätunnuksella.")
     @ParameterizedTest (name="Testataan loytyyko username {0}")
-    @CsvSource({"ppouta, true", "noexist, false", "8u34958u342985u89t3hf89ht298t48h, false","-1,false", "NULL, false" })
+    @CsvSource({"ppouta, false", "noexist, false", "8u34958u342985u89t3hf89ht298t48h, false","-1,false", "NULL, false" })
     public void userExistsTest(String userName, boolean result){
         Database base = new Database();
         assertEquals(result, base.userExists(userName), "UserExiststest failed with username " + userName);
