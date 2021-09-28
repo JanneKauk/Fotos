@@ -1,33 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.Double?>
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.CheckBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.PasswordField?>
-<?import javafx.scene.control.RadioButton?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.Slider?>
-<?import javafx.scene.control.SplitMenuButton?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Pane?>
-<?import javafx.scene.layout.Region?>
-<?import javafx.scene.layout.RowConstraints?>
-<?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.shape.Circle?>
-<?import javafx.scene.shape.Polygon?>
-<?import javafx.scene.shape.Rectangle?>
-<?import javafx.scene.text.Font?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
 
-<StackPane xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="otp1.otpr21fotosdemo.FotosController">
+<StackPane xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="otp1.otpr21fotosdemo.FotosController">
    <children>
       <StackPane fx:id="blurringStackPane">
          <children>
@@ -376,7 +356,7 @@
       </StackPane>
       <StackPane fx:id="imageViewStackPane" visible="false">
          <children>
-            <Region fx:id="imageviewBackgroundRegion" opacity="0.5" style="-fx-background-color: #ff8c8c;" />
+            <Region fx:id="imageviewBackgroundRegion" opacity="0" style="-fx-background-color: #cccccc;" />
             <BorderPane prefHeight="200.0" prefWidth="200.0">
                <top>
                   <StackPane alignment="CENTER_RIGHT" prefHeight="40.0" style="-fx-background-color: #ebebeb;">
@@ -390,14 +370,14 @@
                               <Region HBox.hgrow="ALWAYS" />
                               <Button mnemonicParsing="false" style="-fx-background-radius: 10;" text="Lataa" />
                               <Button mnemonicParsing="false" style="-fx-background-radius: 10; -fx-background-color: #59c3f4;" text="Jaa" />
-                              <Button mnemonicParsing="false" style="-fx-background-radius: 10;" text="X" />
+                              <Button mnemonicParsing="false" onMouseClicked="#closeImageview" style="-fx-background-radius: 10;" text="X" />
                            </children>
                         </HBox>
                      </children>
                   </StackPane>
                </top>
                <center>
-                  <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER" />
+                  <ImageView fx:id="bigPicture" fitHeight="573.0" fitWidth="1154.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER" />
                </center>
             </BorderPane>
          </children>
