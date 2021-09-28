@@ -21,11 +21,13 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Circle;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 public class FotosController {
     @FXML
@@ -57,9 +59,9 @@ public class FotosController {
     @FXML
     private Region imageviewBackgroundRegion;
     @FXML
-    private StackPane imageViewStackPane, blurringStackPane;
+    private StackPane imageViewStackPane, blurringStackPane, addImageButton;
 
-
+    private Stage mainStage = null;
     private boolean loggedIn;
 
     //Image Grid settings
@@ -89,6 +91,10 @@ public class FotosController {
 
         imageViewStackPane.setVisible(false);
         //openImageview();
+
+    }
+    public void setMainStage(Stage stage){
+        mainStage = stage;
     }
 
     private void openImageview(){
@@ -208,6 +214,15 @@ public class FotosController {
     protected void onAddImgButtonClick() {
         //Tähän tullaa ku painetaan sinistä pluspallo-kuvaketta kuvan lisäämiseks.
         System.out.println ("Add image");
+        if (mainStage != null) {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Valitse kuvatiedosto(t)");
+            fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.gif"),
+                new FileChooser.ExtensionFilter("All Files", "*.*"));
+            List<File> files = fileChooser.showOpenMultipleDialog(mainStage);
+
+        }
     }
     @FXML
     protected void onProfileClick(){
