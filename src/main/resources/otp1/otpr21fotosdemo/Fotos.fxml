@@ -1,234 +1,367 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.shape.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.SplitMenuButton?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.shape.Polygon?>
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.text.Font?>
 
-<StackPane xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="otp1.otpr21fotosdemo.FotosController">
+<StackPane xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="otp1.otpr21fotosdemo.FotosController">
    <children>
-      <BorderPane fx:id="rootborderpane" onMouseClicked="#onMainBorderPaneClick" prefHeight="800.0" prefWidth="1280.0">
-         <top>
-            <VBox BorderPane.alignment="CENTER">
-               <children>
-                  <GridPane style="-fx-background-color: #ebebeb;">
-                     <columnConstraints>
-                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="40.0" />
-                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="20.0" />
-                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="40.0" />
-                     </columnConstraints>
-                     <rowConstraints>
-                        <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-                     </rowConstraints>
+      <StackPane fx:id="blurringStackPane">
+         <children>
+            <BorderPane fx:id="rootborderpane" onMouseClicked="#onMainBorderPaneClick" prefHeight="800.0" prefWidth="1280.0">
+               <top>
+                  <VBox BorderPane.alignment="CENTER">
                      <children>
-                        <HBox alignment="CENTER" GridPane.hgrow="ALWAYS">
+                        <GridPane style="-fx-background-color: #ebebeb;">
+                           <columnConstraints>
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="40.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="20.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="40.0" />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                           </rowConstraints>
                            <children>
-                              <Circle fill="DODGERBLUE" onMouseClicked="#switchToDefaultScene" radius="17.0" stroke="BLACK" strokeType="INSIDE">
-                                 <HBox.margin>
-                                    <Insets />
-                                 </HBox.margin>
-                              </Circle>
-                              <Region HBox.hgrow="ALWAYS" />
-                              <Button fx:id="omatKuvatButton" mnemonicParsing="false" onMouseClicked="#switchToDefaultScene" prefWidth="150.0" text="Omat kuvat" />
-                              <Region HBox.hgrow="ALWAYS" />
-                              <Button fx:id="julkisetKuvatButton" mnemonicParsing="false" prefWidth="150.0" text="Julkiset kuvat" />
-                              <Region HBox.hgrow="ALWAYS" />
-                           </children>
-                        </HBox>
-                        <GridPane alignment="CENTER" GridPane.columnIndex="1">
-                          <columnConstraints>
-                            <ColumnConstraints hgrow="SOMETIMES" minWidth="100.0" />
-                          </columnConstraints>
-                          <rowConstraints>
-                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                          </rowConstraints>
-                           <children>
-                              <TextField alignment="CENTER" promptText="Hae" />
-                              <Label text="Tarkennettu haku" GridPane.halignment="CENTER" GridPane.rowIndex="1">
-                                 <font>
-                                    <Font name="System Bold" size="12.0" />
-                                 </font>
-                              </Label>
+                              <HBox alignment="CENTER" GridPane.hgrow="ALWAYS">
+                                 <children>
+                                    <Circle fill="DODGERBLUE" onMouseClicked="#switchToDefaultScene" radius="17.0" stroke="BLACK" strokeType="INSIDE">
+                                       <HBox.margin>
+                                          <Insets />
+                                       </HBox.margin>
+                                    </Circle>
+                                    <Region HBox.hgrow="ALWAYS" />
+                                    <Button fx:id="omatKuvatButton" mnemonicParsing="false" onMouseClicked="#switchToDefaultScene" prefWidth="150.0" text="Omat kuvat" />
+                                    <Region HBox.hgrow="ALWAYS" />
+                                    <Button fx:id="julkisetKuvatButton" mnemonicParsing="false" prefWidth="150.0" text="Julkiset kuvat" />
+                                    <Region HBox.hgrow="ALWAYS" />
+                                 </children>
+                              </HBox>
+                              <GridPane alignment="CENTER" GridPane.columnIndex="1">
+                                <columnConstraints>
+                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="100.0" />
+                                </columnConstraints>
+                                <rowConstraints>
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                </rowConstraints>
+                                 <children>
+                                    <TextField alignment="CENTER" promptText="Hae" />
+                                    <Label text="Tarkennettu haku" GridPane.halignment="CENTER" GridPane.rowIndex="1">
+                                       <font>
+                                          <Font name="System Bold" size="12.0" />
+                                       </font>
+                                    </Label>
+                                 </children>
+                              </GridPane>
+                              <HBox alignment="CENTER" GridPane.columnIndex="2">
+                                 <children>
+                                    <Region HBox.hgrow="ALWAYS" />
+                                    <Button fx:id="jaetutKuvatButton" mnemonicParsing="false" prefWidth="150.0" text="Jaetut kuvat" />
+                                    <Region HBox.hgrow="ALWAYS" />
+                                    <Label fx:id="usernameLabel" text="Username">
+                                       <font>
+                                          <Font name="System Bold" size="12.0" />
+                                       </font>
+                                       <HBox.margin>
+                                          <Insets right="5.0" />
+                                       </HBox.margin>
+                                    </Label>
+                                    <Circle fx:id="profile" fill="DODGERBLUE" onMouseClicked="#onProfileClick" radius="17.0" stroke="BLACK" strokeType="INSIDE" />
+                                 </children>
+                              </HBox>
                            </children>
                         </GridPane>
-                        <HBox alignment="CENTER" GridPane.columnIndex="2">
+                        <ScrollPane fx:id="folderMenu" fitToHeight="true" hbarPolicy="NEVER" pannable="true" vbarPolicy="NEVER">
+                          <content>
+                              <GridPane prefHeight="45.0">
+                                <columnConstraints>
+                                  <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="100.0" prefWidth="100.0" />
+                                  <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="100.0" prefWidth="100.0" />
+                                    <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="100.0" prefWidth="100.0" />
+                                    <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="100.0" prefWidth="100.0" />
+                                    <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="100.0" prefWidth="100.0" />
+                                    <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="100.0" prefWidth="100.0" />
+                                    <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="100.0" prefWidth="100.0" />
+                                    <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="100.0" prefWidth="100.0" />
+                                    <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="100.0" prefWidth="100.0" />
+                                    <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="100.0" prefWidth="100.0" />
+                                    <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="100.0" prefWidth="100.0" />
+                                    <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="100.0" prefWidth="100.0" />
+                                    <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="100.0" prefWidth="100.0" />
+                                    <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="100.0" prefWidth="100.0" />
+                                    <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="100.0" prefWidth="100.0" />
+                                    <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="100.0" prefWidth="100.0" />
+                                    <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="100.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="100.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="100.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="100.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="100.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="100.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="100.0" prefWidth="100.0" />
+                                </columnConstraints>
+                                <rowConstraints>
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                </rowConstraints>
+                                 <children>
+                                    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="DODGERBLUE" height="45.0" stroke="BLACK" strokeType="INSIDE" width="70.0" />
+                                    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="DODGERBLUE" height="45.0" layoutX="125.0" layoutY="10.0" stroke="BLACK" strokeType="INSIDE" width="70.0" GridPane.columnIndex="1" />
+                                    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="DODGERBLUE" height="45.0" layoutX="125.0" layoutY="10.0" stroke="BLACK" strokeType="INSIDE" width="70.0" GridPane.columnIndex="2" />
+                                    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="DODGERBLUE" height="45.0" layoutX="225.0" layoutY="10.0" stroke="BLACK" strokeType="INSIDE" width="70.0" GridPane.columnIndex="3" />
+                                 </children>
+                              </GridPane>
+                          </content>
+                           <padding>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </padding>
+                        </ScrollPane>
+                        <StackPane fx:id="folderMenuHideButton" style="-fx-border-color: grey; -fx-border-width: 1 0 0 0;">
                            <children>
-                              <Region HBox.hgrow="ALWAYS" />
-                              <Button fx:id="jaetutKuvatButton" mnemonicParsing="false" prefWidth="150.0" text="Jaetut kuvat" />
-                              <Region HBox.hgrow="ALWAYS" />
-                              <Label fx:id="usernameLabel" text="Username">
-                                 <font>
-                                    <Font name="System Bold" size="12.0" />
-                                 </font>
-                                 <HBox.margin>
-                                    <Insets right="5.0" />
-                                 </HBox.margin>
-                              </Label>
-                              <Circle fx:id="profile" fill="DODGERBLUE" onMouseClicked="#onProfileClick" onMouseEntered="#onProfileHover" radius="17.0" stroke="BLACK" strokeType="INSIDE" />
-                           </children>
-                        </HBox>
-                     </children>
-                  </GridPane>
-                  <ScrollPane fx:id="folderMenu" fitToHeight="true" hbarPolicy="NEVER" pannable="true" vbarPolicy="NEVER">
-                    <content>
-                        <GridPane prefHeight="45.0">
-                          <columnConstraints>
-                            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="100.0" prefWidth="100.0" />
-                            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="100.0" prefWidth="100.0" />
-                              <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="100.0" prefWidth="100.0" />
-                              <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="100.0" prefWidth="100.0" />
-                              <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="100.0" prefWidth="100.0" />
-                              <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="100.0" prefWidth="100.0" />
-                              <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="100.0" prefWidth="100.0" />
-                              <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="100.0" prefWidth="100.0" />
-                              <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="100.0" prefWidth="100.0" />
-                              <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="100.0" prefWidth="100.0" />
-                              <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="100.0" prefWidth="100.0" />
-                              <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="100.0" prefWidth="100.0" />
-                              <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="100.0" prefWidth="100.0" />
-                              <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="100.0" prefWidth="100.0" />
-                              <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="100.0" prefWidth="100.0" />
-                              <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="100.0" prefWidth="100.0" />
-                              <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="100.0" prefWidth="100.0" />
-                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="100.0" prefWidth="100.0" />
-                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="100.0" prefWidth="100.0" />
-                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="100.0" prefWidth="100.0" />
-                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="100.0" prefWidth="100.0" />
-                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="100.0" prefWidth="100.0" />
-                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="100.0" prefWidth="100.0" />
-                          </columnConstraints>
-                          <rowConstraints>
-                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                          </rowConstraints>
-                           <children>
-                              <Rectangle arcHeight="5.0" arcWidth="5.0" fill="DODGERBLUE" height="45.0" stroke="BLACK" strokeType="INSIDE" width="70.0" />
-                              <Rectangle arcHeight="5.0" arcWidth="5.0" fill="DODGERBLUE" height="45.0" layoutX="125.0" layoutY="10.0" stroke="BLACK" strokeType="INSIDE" width="70.0" GridPane.columnIndex="1" />
-                              <Rectangle arcHeight="5.0" arcWidth="5.0" fill="DODGERBLUE" height="45.0" layoutX="125.0" layoutY="10.0" stroke="BLACK" strokeType="INSIDE" width="70.0" GridPane.columnIndex="2" />
-                              <Rectangle arcHeight="5.0" arcWidth="5.0" fill="DODGERBLUE" height="45.0" layoutX="225.0" layoutY="10.0" stroke="BLACK" strokeType="INSIDE" width="70.0" GridPane.columnIndex="3" />
-                           </children>
-                        </GridPane>
-                    </content>
-                     <padding>
-                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                     </padding>
-                  </ScrollPane>
-                  <StackPane fx:id="folderMenuHideButton" style="-fx-border-color: grey; -fx-border-width: 1 0 0 0;">
-                     <children>
-                        <StackPane fx:id="folderButtonStackPane" prefWidth="40.0">
-                           <children>
-                              <Circle fill="#5aaaf6" onMouseClicked="#onFolderShowHidebuttonClick" radius="20.0" stroke="WHITE" strokeType="INSIDE" />
-                              <Polygon fill="WHITE" onMouseClicked="#onFolderShowHidebuttonClick" points="                            -20, 0,                             0, 10,                             0, -10" rotate="90.0" stroke="WHITE" strokeType="INSIDE">
-                                 <StackPane.margin>
-                                    <Insets bottom="4.0" />
-                                 </StackPane.margin>
-                              </Polygon>
+                              <StackPane fx:id="folderButtonStackPane" prefWidth="40.0">
+                                 <children>
+                                    <Circle fill="#5aaaf6" onMouseClicked="#onFolderShowHidebuttonClick" radius="20.0" stroke="WHITE" strokeType="INSIDE" />
+                                    <Polygon fill="WHITE" onMouseClicked="#onFolderShowHidebuttonClick" points="                            -20, 0,                             0, 10,                             0, -10" rotate="90.0" stroke="WHITE" strokeType="INSIDE">
+                                       <StackPane.margin>
+                                          <Insets bottom="4.0" />
+                                       </StackPane.margin>
+                                    </Polygon>
+                                 </children>
+                              </StackPane>
                            </children>
                         </StackPane>
                      </children>
-                  </StackPane>
-               </children>
-            </VBox>
-         </top>
-         <left>
-            <HBox fx:id="filterMenuHbox" maxHeight="600.0" BorderPane.alignment="TOP_CENTER">
-               <children>
-                  <Pane fx:id="filterMenu" prefWidth="200.0" style="-fx-border-color: grey;">
+                  </VBox>
+               </top>
+               <left>
+                  <HBox fx:id="filterMenuHbox" maxHeight="600.0" BorderPane.alignment="TOP_CENTER">
                      <children>
-                        <CheckBox layoutX="39.0" layoutY="131.0" mnemonicParsing="false" text="CheckBox" />
-                        <Slider layoutX="33.0" layoutY="240.0" value="50.0" />
-                        <RadioButton layoutX="39.0" layoutY="161.0" mnemonicParsing="false" text="RadioButton" />
-                        <RadioButton layoutX="39.0" layoutY="188.0" mnemonicParsing="false" text="RadioButton" />
-                        <SplitMenuButton layoutX="40.0" layoutY="92.0" mnemonicParsing="false" text="OrderBy">
-                          <items>
-                            <MenuItem mnemonicParsing="false" text="Date Ascending" />
-                            <MenuItem mnemonicParsing="false" text="Date Decending" />
-                          </items>
-                        </SplitMenuButton>
-                        <Label layoutX="58.0" layoutY="14.0" text="Filter Menu" textAlignment="CENTER">
-                           <font>
-                              <Font size="18.0" />
-                           </font>
-                        </Label>
-                        <Label layoutX="69.0" layoutY="220.0" text="Image Size" textAlignment="CENTER">
-                           <font>
-                              <Font size="14.0" />
-                           </font>
-                        </Label>
+                        <Pane fx:id="filterMenu" prefWidth="200.0" style="-fx-border-color: grey;">
+                           <children>
+                              <CheckBox layoutX="39.0" layoutY="131.0" mnemonicParsing="false" text="CheckBox" />
+                              <Slider layoutX="33.0" layoutY="240.0" value="50.0" />
+                              <RadioButton layoutX="39.0" layoutY="161.0" mnemonicParsing="false" text="RadioButton" />
+                              <RadioButton layoutX="39.0" layoutY="188.0" mnemonicParsing="false" text="RadioButton" />
+                              <SplitMenuButton layoutX="40.0" layoutY="92.0" mnemonicParsing="false" text="OrderBy">
+                                <items>
+                                  <MenuItem mnemonicParsing="false" text="Date Ascending" />
+                                  <MenuItem mnemonicParsing="false" text="Date Decending" />
+                                </items>
+                              </SplitMenuButton>
+                              <Label layoutX="58.0" layoutY="14.0" text="Filter Menu" textAlignment="CENTER">
+                                 <font>
+                                    <Font size="18.0" />
+                                 </font>
+                              </Label>
+                              <Label layoutX="69.0" layoutY="220.0" text="Image Size" textAlignment="CENTER">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </Pane>
+                        <StackPane>
+                           <children>
+                              <StackPane fx:id="filterButtonStackPane" prefWidth="40.0">
+                                 <children>
+                                    <Circle fill="#5aaaf6" onMouseClicked="#onFilterShowHidebuttonClick" radius="20.0" stroke="WHITE" strokeType="INSIDE" />
+                                    <Polygon fill="WHITE" onMouseClicked="#onFilterShowHidebuttonClick" points="                            -20, 0,                             0, 10,                             0, -10" stroke="WHITE" strokeType="INSIDE">
+                                       <StackPane.margin>
+                                          <Insets right="4.0" />
+                                       </StackPane.margin>
+                                    </Polygon>
+                                 </children>
+                              </StackPane>
+                           </children>
+                        </StackPane>
                      </children>
-                  </Pane>
+                  </HBox>
+               </left>
+               <center>
                   <StackPane>
                      <children>
-                        <StackPane fx:id="filterButtonStackPane" prefWidth="40.0">
-                           <children>
-                              <Circle fill="#5aaaf6" onMouseClicked="#onFilterShowHidebuttonClick" radius="20.0" stroke="WHITE" strokeType="INSIDE" />
-                              <Polygon fill="WHITE" onMouseClicked="#onFilterShowHidebuttonClick" points="                            -20, 0,                             0, 10,                             0, -10" stroke="WHITE" strokeType="INSIDE">
-                                 <StackPane.margin>
-                                    <Insets right="4.0" />
-                                 </StackPane.margin>
-                              </Polygon>
-                           </children>
-                        </StackPane>
-                     </children>
-                  </StackPane>
-               </children>
-            </HBox>
-         </left>
-         <center>
-             <ScrollPane fx:id="scrollp" fitToWidth="true">
-                 <content>
-                     <GridPane fx:id="fotosGridPane" alignment="CENTER" hgap="10.0" vgap="10.0">
+                        <BorderPane fx:id="settingsBorderPane" prefHeight="200.0" prefWidth="200.0">
+                           <center>
+                                  <GridPane alignment="CENTER" prefHeight="489.0" prefWidth="1042.0" BorderPane.alignment="CENTER">
+                                      <columnConstraints>
+                                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="322.0" minWidth="200.0" prefWidth="0.0" />
+                                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="280.33333333333337" minWidth="225.0" prefWidth="224.66666666666669" />
+                                      </columnConstraints>
+                                      <rowConstraints>
+                                          <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                      </rowConstraints>
+                                      <children>
+                                            <Label text="Sukunimi" GridPane.rowIndex="3" />
+                                            <TextField fx:id="surName" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="223.0" GridPane.rowIndex="4" />
+                                            <Label text="Etunimi" GridPane.rowIndex="5" />
+                                            <TextField fx:id="firstName" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="223.0" GridPane.rowIndex="6" />
+                                            <Label text="Sähköposti" GridPane.rowIndex="7" />
+                                            <TextField fx:id="email" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="223.0" GridPane.rowIndex="8" />
+                                            <Label fx:id="userID" prefHeight="25.0" prefWidth="215.0" text="mdmaflmvmvz" textFill="#7c7c7c" GridPane.rowIndex="2">
+                                                <font>
+                                                    <Font size="13.0" />
+                                                </font>
+                                            </Label>
+                                            <Label text="Käyttäjätunnus:" textFill="#7c7c7c" GridPane.rowIndex="1">
+                                                <font>
+                                                    <Font size="13.0" />
+                                                </font>
+                                    </Label>
+                                            <Label text="Omat tiedot" textFill="#7c7c7c">
+                                                <font>
+                                                    <Font name="System Bold" size="30.0" />
+                                                </font>
+                                    </Label>
+                                            <PasswordField fx:id="newPassWordAgain" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="223.0" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+                                            <Label text="Uusi salasana uudelleen" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                                            <PasswordField fx:id="newPassWord" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="223.0" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                                            <Label text="Uusi" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                                            <PasswordField fx:id="oldPassWord" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="223.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                            <Label text="Vanha" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="3" />
+                                            <Label alignment="TOP_LEFT" text="Vaihda Salasana" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="2">
+                                                <font>
+                                                    <Font size="25.0" />
+                                                </font>
+                                            </Label>
+                                      </children>
+                                  </GridPane>
+                           </center>
+                           <top>
+                                  <Label alignment="CENTER" text="Asetukset" textAlignment="CENTER" BorderPane.alignment="CENTER">
+                                      <font>
+                                          <Font name="System Bold" size="43.0" />
+                                      </font>
+                                  </Label>
+                           </top>
+                           <bottom>
+                                  <GridPane alignment="CENTER" prefHeight="81.0" prefWidth="381.0" BorderPane.alignment="CENTER">
+                                      <columnConstraints>
+                                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="416.33336385091144" minWidth="10.0" prefWidth="249.33333333333331" />
+                                      </columnConstraints>
+                                      <rowConstraints>
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                      </rowConstraints>
+                                      <children>
+                                          <Button fx:id="deleteAllPhotosButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="31.0" prefWidth="160.0" text="Poista kaikki kuvat" GridPane.halignment="CENTER" />
+                                          <Button fx:id="deleteAccountButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="31.0" prefWidth="160.0" text="Poista tili" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
+                                      </children>
+                                  </GridPane>
+                           </bottom>
+                        </BorderPane>
+                         <ScrollPane fx:id="scrollp" fitToWidth="true">
+                             <content>
+                                 <GridPane fx:id="fotosGridPane" alignment="CENTER" hgap="10.0" vgap="10.0">
 
                      </GridPane>
-                 </content>
-             </ScrollPane>
-         </center>
-      </BorderPane>
-      <VBox fx:id="loginVbox" blendMode="SRC_ATOP" maxHeight="200.0" maxWidth="160.0" prefHeight="200.0" prefWidth="100.0" style="-fx-background-color: white; -fx-border-width: 1; -fx-border-color: black; -fx-border-radius: 15; -fx-background-radius: 15;" StackPane.alignment="TOP_RIGHT">
-         <StackPane.margin>
-            <Insets right="10.0" top="50.0" />
-         </StackPane.margin>
-         <children>
-            <Label text="Käyttäjätunnus" />
-            <TextField fx:id="usernameField" />
-            <Label text="Salasana">
-               <VBox.margin>
-                  <Insets top="10.0" />
-               </VBox.margin>
-            </Label>
-            <PasswordField fx:id="passwordField" />
-            <VBox fx:id="emailVbox">
+                             </content>
+                         </ScrollPane>
+                     </children>
+                  </StackPane>
+               </center>
+            </BorderPane>
+            <VBox fx:id="loginVbox" blendMode="SRC_ATOP" maxHeight="200.0" maxWidth="160.0" prefHeight="200.0" prefWidth="100.0" style="-fx-background-color: white; -fx-border-width: 1; -fx-border-color: black; -fx-border-radius: 15; -fx-background-radius: 15;" StackPane.alignment="TOP_RIGHT">
                <children>
-                  <Label text="Sähköposti">
+                  <Label text="Käyttäjätunnus" />
+                  <TextField fx:id="usernameField" />
+                  <Label text="Salasana">
                      <VBox.margin>
                         <Insets top="10.0" />
                      </VBox.margin>
                   </Label>
-                  <TextField fx:id="emailField1" />
-                  <Label text="Sähköposti uudelleen">
+                  <PasswordField fx:id="passwordField" />
+                  <VBox fx:id="emailVbox">
+                     <children>
+                        <Label text="Sähköposti">
+                           <VBox.margin>
+                              <Insets top="10.0" />
+                           </VBox.margin>
+                        </Label>
+                        <TextField fx:id="emailField1" />
+                        <Label text="Sähköposti uudelleen">
+                           <VBox.margin>
+                              <Insets top="10.0" />
+                           </VBox.margin>
+                        </Label>
+                        <TextField fx:id="emailField2" />
+                     </children>
+                  </VBox>
+                  <Label fx:id="loginErrorLabel" />
+                  <Button fx:id="loginButton" mnemonicParsing="false" onAction="#login" style="-fx-background-color: #59c3f4;" text="Kirjaudu">
                      <VBox.margin>
-                        <Insets top="10.0" />
+                        <Insets />
                      </VBox.margin>
-                  </Label>
-                  <TextField fx:id="emailField2" />
+                  </Button>
+                  <Button mnemonicParsing="false" onAction="#registerMenu" text="Rekisteröidy">
+                     <VBox.margin>
+                        <Insets top="20.0" />
+                     </VBox.margin>
+                  </Button>
                </children>
+               <padding>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+               </padding>
+               <StackPane.margin>
+                  <Insets right="10.0" top="50.0" />
+               </StackPane.margin>
             </VBox>
-            <Label fx:id="loginErrorLabel" />
-            <Button fx:id="loginButton" mnemonicParsing="false" onAction="#login" style="-fx-background-color: #59c3f4;" text="Kirjaudu">
-               <VBox.margin>
-                  <Insets />
-               </VBox.margin>
-            </Button>
-            <Button fx:id="registerButton" mnemonicParsing="false" onAction="#registerMenu" text="Rekisteröidy">
-               <VBox.margin>
-                  <Insets top="20.0" />
-               </VBox.margin>
-            </Button>
          </children>
-         <padding>
-            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-         </padding>
-      </VBox>
+      </StackPane>
+      <StackPane fx:id="imageViewStackPane" visible="false">
+         <children>
+            <Region fx:id="imageviewBackgroundRegion" opacity="0.5" style="-fx-background-color: #ff8c8c;" />
+            <BorderPane prefHeight="200.0" prefWidth="200.0">
+               <top>
+                  <StackPane alignment="CENTER_RIGHT" prefHeight="40.0" style="-fx-background-color: #ebebeb;">
+                     <children>
+                        <HBox alignment="CENTER_RIGHT" maxWidth="400.0" nodeOrientation="LEFT_TO_RIGHT">
+                           <children>
+                              <Button mnemonicParsing="false" style="-fx-background-radius: 10;" text="Kuvan tiedot" />
+                              <Region HBox.hgrow="ALWAYS" />
+                              <Button mnemonicParsing="false" style="-fx-background-radius: 10;" text="&lt;" />
+                              <Button mnemonicParsing="false" style="-fx-background-radius: 10;" text="&gt;" />
+                              <Region HBox.hgrow="ALWAYS" />
+                              <Button mnemonicParsing="false" style="-fx-background-radius: 10;" text="Lataa" />
+                              <Button mnemonicParsing="false" style="-fx-background-radius: 10; -fx-background-color: #59c3f4;" text="Jaa" />
+                              <Button mnemonicParsing="false" style="-fx-background-radius: 10;" text="X" />
+                           </children>
+                        </HBox>
+                     </children>
+                  </StackPane>
+               </top>
+               <center>
+                  <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER" />
+               </center>
+            </BorderPane>
+         </children>
+      </StackPane>
    </children>
 </StackPane>

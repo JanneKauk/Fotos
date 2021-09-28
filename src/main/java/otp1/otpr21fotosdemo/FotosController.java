@@ -6,24 +6,30 @@ import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.VPos;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Circle;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.io.File;
+import java.io.IOException;
 
 public class FotosController {
     @FXML
-    private BorderPane rootborderpane;
+    private BorderPane rootborderpane, settingsBorderPane;
     @FXML
     private Circle profile;
     @FXML
@@ -45,12 +51,15 @@ public class FotosController {
     @FXML
     VBox loginVbox, emailVbox;
     @FXML
-    private TextField usernameField, emailField1, emailField2;
+    TextField usernameField, emailField1, emailField2;
     @FXML
-    private PasswordField passwordField;
+    PasswordField passwordField;
+    @FXML
+    private Region imageviewBackgroundRegion;
+    @FXML
+    private StackPane imageViewStackPane, blurringStackPane;
     @FXML
     public Label loginErrorLabel;
-
     private boolean loggedIn;
 
     //Image Grid settings
@@ -69,13 +78,23 @@ public class FotosController {
         filterMenu.setTranslateX(-200);
         filterButtonStackPane.setRotate(180);
         filterMenu.setManaged(false);
+
         //Login menu piiloo ja sen sisällä rekisteröitymiseen tarvittavat tekstikentät myös.
         loginVbox.setVisible(false);
         emailVbox.setVisible(false);
         emailVbox.setManaged(false);
+        settingsBorderPane.setManaged(false);
+        settingsBorderPane.setVisible(false);
         createPictureGrid();
+
+        imageViewStackPane.setVisible(false);
+        //openImageview();
     }
 
+    private void openImageview(){
+        blurringStackPane.setEffect(new GaussianBlur());
+        imageViewStackPane.setVisible(true);
+    }
     @FXML
     private void createPictureGrid(){
         //TODO: getPictureTable, tableCount = getPictureTable.count
@@ -202,11 +221,6 @@ public class FotosController {
     }
     @FXML
     protected void onProfileClick(){
-        //loginmenu auki
-        loginVbox.setVisible(true);
-    }
-    @FXML
-    protected void onProfileHover() {
         if (loggedIn) {
             //Kun hiiri viedään proffilikuvan päälle
             System.out.println("Cursor on profile picture.");
@@ -218,7 +232,11 @@ public class FotosController {
                 @Override
                 public void handle(ActionEvent event) {
                     System.out.println("Menty asetuksiin.");
-                    switchToSettingsScene();
+                    try {
+                        switchToSettingsScene();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             });
             MenuItem logout = new MenuItem("Kirjaudu ulos");
@@ -235,6 +253,9 @@ public class FotosController {
             double boundsInScenex = profile.localToScene(profile.getBoundsInLocal()).getMaxX();
             double boundsInSceney = profile.localToScene(profile.getBoundsInLocal()).getMaxY();
             menu.show(profile, boundsInScenex, boundsInSceney);
+        } else {
+            //loginmenu auki
+            loginVbox.setVisible(true);
         }
     }
 
@@ -303,30 +324,44 @@ public class FotosController {
         }
     }
     @FXML
-    public void switchToSettingsScene() {
-        //Laitetaan etusivun elementit pois näkyvistä.
-            folderMenu.setVisible(false);
-            folderMenuHideButton.setVisible(false);
-            fotosGridPane.setVisible(false);
-            filterMenuHbox.setVisible(false);
-            folderMenu.setManaged(false);
-            folderMenuHideButton.setManaged(false);
-            fotosGridPane.setManaged(false);
-            filterMenuHbox.setManaged(false);
+    public void switchToSettingsScene() throws IOException {
+        //Laitetaan asetusten elementit näkyviin ja poistetaan etusivun elementit pois näkyvistä.
+        settingsBorderPane.setManaged(true);
+        settingsBorderPane.setVisible(true);
+        scrollp.setManaged(false);
+        scrollp.setVisible(false);
+        filterMenuHbox.setManaged(false);
+        filterMenuHbox.setVisible(false);
+        folderMenu.setVisible(false);
+        folderMenuHideButton.setManaged(false);
+        folderMenuHideButton.setVisible(false);
 
-        /*Stage stage;
+        /*
+        Stage stage;
         Scene scene;
-        Parent root;
         //Vaihdetaan asetukset-näkymään.
         FXMLLoader fxmlLoader = new FXMLLoader(Fotos.class.getResource("Settings.fxml"));
         scene = new Scene(fxmlLoader.load(), 1280, 800);
         stage = (Stage) rootborderpane.getScene().getWindow();
         stage.setScene(scene);
-        stage.show();*/
+        stage.show();
+        */
     }
 
     @FXML
     public void switchToDefaultScene() {
+        //Laitetaan etusivun elementit näkyviin ja poistetaan asetusten elementit pois näkyvistä.
+        settingsBorderPane.setManaged(false);
+        settingsBorderPane.setVisible(false);
+        scrollp.setManaged(true);
+        scrollp.setVisible(true);
+        filterMenuHbox.setManaged(true);
+        filterMenuHbox.setVisible(true);
+        folderMenu.setVisible(true);
+        folderMenuHideButton.setManaged(true);
+        folderMenuHideButton.setVisible(true);
+
+        /*
         //Laitetaan etusivun elementit takaisin näkyviin.
         folderMenu.setVisible(true);
         folderMenuHideButton.setVisible(true);
@@ -336,5 +371,6 @@ public class FotosController {
         folderMenuHideButton.setManaged(true);
         fotosGridPane.setManaged(true);
         filterMenuHbox.setManaged(true);
+         */
     }
 }
