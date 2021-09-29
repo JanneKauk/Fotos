@@ -10,6 +10,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.VPos;
+import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -22,14 +23,18 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Circle;
+import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.w3c.dom.events.MouseEvent;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 public class FotosController {
     @FXML
@@ -63,12 +68,15 @@ public class FotosController {
     @FXML
     private Region imageviewBackgroundRegion;
     @FXML
-    private StackPane imageViewStackPane, blurringStackPane, addImageButton;
+    private StackPane imageViewStackPane, blurringStackPane, addImageButton, testStackPane;
+    @FXML
+    private ImageView testImageView;
     @FXML
     public Label loginErrorLabel;
 
     private Stage mainStage = null;
-    private boolean loggedIn;
+    private boolean loggedIn = false;
+    private Database database = null;
 
     //Image Grid settings
     private int columns = 5, rows = 5;
@@ -99,6 +107,9 @@ public class FotosController {
 
         imageViewStackPane.setVisible(false);
         //openImageview();
+
+        database = new Database();
+        testStackPane.setVisible(false);
 
     }
     public void setMainStage(Stage stage){
@@ -243,16 +254,69 @@ public class FotosController {
     protected void onAddImgButtonClick() {
         //Tähän tullaa ku painetaan sinistä pluspallo-kuvaketta kuvan lisäämiseks.
         System.out.println ("Add image");
+        //Varmistetaan että controller on saanut start-metodilta mainStagen
         if (mainStage != null) {
+            //Tiedostonvalintaikkuna
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Valitse kuvatiedosto(t)");
             fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.gif"),
-                new FileChooser.ExtensionFilter("All Files", "*.*"));
+                new FileChooser.ExtensionFilter("All Files", "*.*"
+            ));
             List<File> files = fileChooser.showOpenMultipleDialog(mainStage);
+            //Valittiinko tiedostoja?
+            if (files != null){
+                //Rakennetaan varmistuskysymys
+                Stage dialog = new Stage();
+                StringBuilder kysymys = new StringBuilder();
+                if (files.size() == 1){
+                    kysymys.append("Haluatko varmasti ladata palveluun seuraavan kuvan?\n");
+                } else {
+                    kysymys.append("Haluatko varmasti ladata palveluun seuraavat " + files.size() + " kuvaa?\n");
+                }
+                final int rows_in_confirmation = 10;
+                System.out.println("File: " + ((File)files.toArray()[0]).getAbsolutePath());
 
+                System.out.println("File: " + ((File)files.toArray()[0]).getPath());
+
+                System.out.println("File: " + ((File)files.toArray()[0]).toPath());
+                System.out.println("File: " + ((File)files.toArray()[0]).toURI());
+
+                if (files.size() <= rows_in_confirmation) {
+                    files.forEach(file -> kysymys.append(file.getName() + '\n'));
+
+                } else {
+                    Iterator<File> it = files.iterator();
+                    for(int i = 0; i < rows_in_confirmation; i++){
+                        kysymys.append(it.next().getName() + '\n');
+                    }
+                    kysymys.append("...\n");
+                }
+
+                //Esitetään varmistuskysymys
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION, kysymys.toString());
+                alert.setTitle("Vahvista");
+                alert.setHeaderText(null);
+
+                Optional<ButtonType> vastaus = alert.showAndWait();
+                if(vastaus.isPresent() && vastaus.get() == ButtonType.OK){
+                    //Upload
+                    System.out.println ("Upload");
+                    database.uploadImages(1,1, files);
+                } else {
+                    //No upload
+                    System.out.println ("No upload");
+                }
+
+
+
+            }
         }
     }
+
+
+
+
     @FXML
     protected void onProfileClick(){
         if (loggedIn) {
