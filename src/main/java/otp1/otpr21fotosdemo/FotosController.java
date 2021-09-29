@@ -6,7 +6,6 @@ import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.VPos;
@@ -20,7 +19,6 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
@@ -28,10 +26,10 @@ import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import org.w3c.dom.events.MouseEvent;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -207,12 +205,12 @@ public class FotosController {
     }
 
     @FXML
-    private void registerMenu(){
+    private void registerMenu() throws UnsupportedEncodingException {
         System.out.println("emailvbox: " + emailVbox.isVisible());
         if (emailVbox.isVisible()) {
             // Lähetetään pyyntö back-end koodin puolelle, jossa toteutetaan tarkistukset ja datan pusku palvelimelle
             if (!Database.userExists(usernameField.getText())) {
-                new Database(usernameField.getText(), passwordField.getText(), emailField1.getText(), emailField2.getText(), loginErrorLabel);
+                Database.saltRegister(usernameField.getText(), passwordField.getText(), emailField1.getText(), emailField2.getText(), loginErrorLabel);
             } else {
                 loginErrorLabel.setText("Tämä käyttäjä on jo olemassa");
             }

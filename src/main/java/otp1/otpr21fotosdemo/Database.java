@@ -6,6 +6,13 @@ import javax.imageio.ImageIO;
 import javax.xml.transform.Result;
 import java.awt.*;
 import java.io.*;
+import org.apache.commons.codec.binary.Hex;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
+
 import java.sql.*;
 import java.util.Iterator;
 import java.util.List;
@@ -23,11 +30,49 @@ public class Database {
 
     }
 
+    public static void saltRegister(String userName, String passWord, String email1, String email2, Label loginErrorLabel) {
+        String salt = "1234";
+        int iterations = 10000;
+        int keyLength = 512;
+        char[] passwordChars = passWord.toCharArray();
+        byte[] saltBytes = salt.getBytes();
+
+        byte[] hashedBytes = hashPassword(passwordChars, saltBytes, iterations, keyLength);
+        String hashedString = Hex.encodeHexString(hashedBytes);
+
+        System.out.println(hashedString);
+        new Database(userName, hashedString, email1, email2, loginErrorLabel);
+    }
+
+    public static String saltLogin(String passWord) {
+        String salt = "1234";
+        int iterations = 10000;
+        int keyLength = 512;
+        char[] passwordChars = passWord.toCharArray();
+        byte[] saltBytes = salt.getBytes();
+
+        byte[] hashedBytes = hashPassword(passwordChars, saltBytes, iterations, keyLength);
+        String hashedString = Hex.encodeHexString(hashedBytes);
+
+        System.out.println(hashedString);
+        return hashedString;
+    }
+
+    public static byte[] hashPassword( final char[] password, final byte[] salt, final int iterations, final int keyLength ) {
+        try {
+            SecretKeyFactory skf = SecretKeyFactory.getInstance( "PBKDF2WithHmacSHA512" );
+            PBEKeySpec spec = new PBEKeySpec( password, salt, iterations, keyLength );
+            SecretKey key = skf.generateSecret( spec );
+            byte[] res = key.getEncoded( );
+            return res;
+        } catch ( NoSuchAlgorithmException | InvalidKeySpecException e ) {
+            throw new RuntimeException( e );
+        }
+    }
 
     // For registering
     public Database(String userName, String passWord, String email1, String email2, Label loginErrorLabel) {
         if (!userAndPwExists(userName, passWord)) {
-            System.out.println("AAAAAAAAAAAAAAAAAA");
             // Variables
             Connection conn = null;
             String dbUserName = "otpdb";
@@ -83,10 +128,12 @@ public class Database {
         System.out.println("\n\n***** MySQL JDBC Connection Testing *****");
     }
 
-    public static boolean userAndPwExists(String user, String passWord){
+    public static boolean userAndPwExists(String user, String passWord) {
         String dbUserName = "otpdb";
         String dbPassword = "Asdfghjkl1234567890";
         String url = "jdbc:mysql://10.114.32.13:3306/";
+
+        passWord = saltLogin(passWord);
 
         boolean found = false;
         Connection conn = null;
@@ -109,7 +156,7 @@ public class Database {
                 result2.next();
 
                 //Tarkistetaan löytyikö yhtään kyseistä usernamea. (Ei pitäisi olla koskaan enempää kuin yksi)
-                if (result.getInt(1) > 0 && result2.getInt(1) > 0){
+                if (result.getInt(1) > 0 && result2.getInt(1) > 0) {
                     found = true;
                 }
                 System.out.println("Found " + result.getInt(1) + " " + user);
@@ -118,7 +165,7 @@ public class Database {
                 System.err.println("Error in query");
                 e.printStackTrace();
 
-            }  finally {
+            } finally {
                 if (pstmt != null) {
                     try {
                         System.out.println("\n***** Close the statement *****");
@@ -155,7 +202,7 @@ public class Database {
 
     }
 
-    public static boolean userExists(String user){
+    public static boolean userExists(String user) {
         String dbUserName = "otpdb";
         String dbPassword = "Asdfghjkl1234567890";
         String url = "jdbc:mysql://10.114.32.13:3306/";
@@ -175,7 +222,7 @@ public class Database {
                 result.next();
 
                 //Tarkistetaan löytyikö yhtään kyseistä usernamea. (Ei pitäisi olla koskaan enempää kuin yksi)
-                if (result.getInt(1) > 0){
+                if (result.getInt(1) > 0) {
                     found = true;
                 }
                 System.out.println("Found " + result.getInt(1) + " " + user);
@@ -184,7 +231,7 @@ public class Database {
                 System.err.println("Error in query");
                 e.printStackTrace();
 
-            }  finally {
+            } finally {
                 if (pstmt != null) {
                     try {
                         System.out.println("\n***** Close the statement *****");
