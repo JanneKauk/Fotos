@@ -280,7 +280,6 @@ public class Database {
             while(it.hasNext()) {
                 File originalFile = it.next();
 
-                //TODO säästä tiedostopääte liian pitkistä tiedostonimistä.
                 //Rajataan tiedostonimeä jos se on pidempi kuin tietokannan raja
                 String filename = originalFile.getName();
                 if (filename.length() > 64){
