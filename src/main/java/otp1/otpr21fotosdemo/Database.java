@@ -22,8 +22,8 @@ public class Database {
     private String dbUserName = "otpdb";
     private String dbPassword = "Asdfghjkl1234567890";
     private String url = "jdbc:mysql://10.114.32.13:3306/";
-    private final int thumbHeight = 200;
-    private final int thumbWidth = Math.round(1920f/1080f * thumbHeight);
+    private final int MAX_THUMB_HEIGHT = 200;
+    private final int MAX_THUMB_WIDTH = 200;
 
 
     public Database (){
@@ -267,6 +267,8 @@ public class Database {
         return found;
 
     }
+    //TODO Koko metodin suoritus omaan threadiin ettei freesaa muuta äppiä.
+    //TODO Joku "progress bar" -tyyppinen näkymä mistä näkee miten kuvien uploadaus edistyy
     public void uploadImages(int userId, int folderId, List<File> files){
 
         Connection conn = null;
@@ -298,8 +300,22 @@ public class Database {
 
                 //Muodostetaan thumbnail InputStream kuvalle
                 System.out.println("Thumbthumb... Thumbnailing");
+                BufferedImage originalBufferedImage = ImageIO.read(originalFile);
+                int origWidth = originalBufferedImage.getWidth();
+                int origHeight = originalBufferedImage.getHeight();
+                int thumbWidth, thumbHeight;
+                if (origHeight > origWidth){
+                    thumbHeight = MAX_THUMB_HEIGHT;
+                    thumbWidth = Math.round((float)thumbHeight/origHeight * origWidth);
+                } else {
+                    thumbWidth = MAX_THUMB_WIDTH;
+                    thumbHeight = Math.round((float)thumbWidth/origWidth * origHeight);
+                }
+
                 BufferedImage thumb = new BufferedImage(thumbWidth, thumbHeight, BufferedImage.TYPE_INT_RGB);
-                thumb.createGraphics().drawImage(ImageIO.read(originalFile).getScaledInstance(thumbWidth, thumbHeight, Image.SCALE_SMOOTH),0,0,null);
+                Graphics2D g = thumb.createGraphics();
+                g.drawImage(originalBufferedImage.getScaledInstance(thumbWidth, thumbHeight, Image.SCALE_SMOOTH),0,0,null);
+                g.dispose();
                 ByteArrayOutputStream os = new ByteArrayOutputStream();
                 ImageIO.write(thumb, "jpg", os);
                 InputStream is = new ByteArrayInputStream(os.toByteArray());
