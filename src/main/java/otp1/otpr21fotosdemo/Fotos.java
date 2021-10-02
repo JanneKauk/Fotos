@@ -15,6 +15,8 @@ public class Fotos extends Application {
         stage.setTitle("Fotos!");
         stage.setMaximized(true);
         stage.setScene(scene);
+        FotosController controller = fxmlLoader.getController();
+        controller.setMainStage(stage);
         stage.show();
     }
 

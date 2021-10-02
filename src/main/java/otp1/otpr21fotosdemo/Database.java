@@ -2,6 +2,10 @@ package otp1.otpr21fotosdemo;
 
 import javafx.scene.control.Label;
 
+import javax.imageio.ImageIO;
+import javax.xml.transform.Result;
+import java.awt.*;
+import java.io.*;
 import org.apache.commons.codec.binary.Hex;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
@@ -10,9 +14,19 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 
 import java.sql.*;
+import java.util.Iterator;
+import java.util.List;
+import java.awt.image.*;
 
 public class Database {
-    public Database() {
+    private String dbUserName = "otpdb";
+    private String dbPassword = "Asdfghjkl1234567890";
+    private String url = "jdbc:mysql://10.114.32.13:3306/";
+    private final int MAX_THUMB_HEIGHT = 200;
+    private final int MAX_THUMB_WIDTH = 200;
+
+
+    public Database (){
 
     }
 
@@ -253,4 +267,209 @@ public class Database {
         return found;
 
     }
+    //TODO Koko metodin suoritus omaan threadiin ettei freesaa muuta äppiä.
+    //TODO Joku "progress bar" -tyyppinen näkymä mistä näkee miten kuvien uploadaus edistyy
+    public void uploadImages(int userId, int folderId, List<File> files){
+
+        Connection conn = null;
+        try {
+            // Connection statement
+            conn = DriverManager.getConnection(url, dbUserName, dbPassword);
+            System.out.println("\nDatabase Connection Established...");
+
+            Iterator<File> it = files.iterator();
+            //Jokainen tiedosto lähetetään erikseen
+            while(it.hasNext()) {
+                File originalFile = it.next();
+
+                //Rajataan tiedostonimeä jos se on pidempi kuin tietokannan raja
+                String filename = originalFile.getName();
+                if (filename.length() > 64){
+                    System.out.println("Filename length1: " + filename.length());
+                    System.out.println("Filename: " + filename);
+
+                    StringBuilder builder = new StringBuilder();
+                    String end = filename.substring(filename.lastIndexOf("."));
+                    builder.append(filename.substring(0,(63 - end.length() - 3)));
+                    builder.append("---" + end);
+                    filename = builder.toString();
+
+                    System.out.println("Filename length2: " + filename.length());
+                    System.out.println("Filename: " + filename);
+                }
+
+                //Muodostetaan thumbnail InputStream kuvalle
+                System.out.println("Thumbthumb... Thumbnailing");
+                BufferedImage originalBufferedImage = ImageIO.read(originalFile);
+                int origWidth = originalBufferedImage.getWidth();
+                int origHeight = originalBufferedImage.getHeight();
+                int thumbWidth, thumbHeight;
+                if (origHeight > origWidth){
+                    thumbHeight = MAX_THUMB_HEIGHT;
+                    thumbWidth = Math.round((float)thumbHeight/origHeight * origWidth);
+                } else {
+                    thumbWidth = MAX_THUMB_WIDTH;
+                    thumbHeight = Math.round((float)thumbWidth/origWidth * origHeight);
+                }
+
+                BufferedImage thumb = new BufferedImage(thumbWidth, thumbHeight, BufferedImage.TYPE_INT_RGB);
+                Graphics2D g = thumb.createGraphics();
+                g.drawImage(originalBufferedImage.getScaledInstance(thumbWidth, thumbHeight, Image.SCALE_SMOOTH),0,0,null);
+                g.dispose();
+                ByteArrayOutputStream os = new ByteArrayOutputStream();
+                ImageIO.write(thumb, "jpg", os);
+                InputStream is = new ByteArrayInputStream(os.toByteArray());
+                int thumbSize = is.available();
+                System.out.println("Thumbthumbthumbthumb... Thumbnailed!");
+                PreparedStatement pstmt = null;
+                PreparedStatement pstmt2 = null;
+
+                try {
+                    //Uploadataan thumbnail
+                    pstmt = conn.prepareStatement(
+                            "INSERT INTO Fotos.Image(viewingRights, fileName, image, date, userID, folderID) values (?, ?, ?, ?, ?, ?)",
+                            Statement.RETURN_GENERATED_KEYS
+                    );
+
+                    pstmt.setInt(1, 0 );
+                    pstmt.setString(2, filename);
+                    pstmt.setBinaryStream(3, is);
+
+                    long dateLong = new java.util.Date().getTime();
+                    pstmt.setDate(4, new java.sql.Date(dateLong));
+
+                    pstmt.setInt(5, userId);
+                    pstmt.setInt(6, folderId);
+                    System.out.println("Executing statement...");
+                    pstmt.execute();
+
+                    ResultSet key = pstmt.getGeneratedKeys();
+                    key.next();
+                    System.out.println("Sent " + thumbSize + " bytes. New imageID: " + key.getInt(1)+ " Filename: " + filename);
+
+                    //Uploadataan täyden reson kuva
+                    FileInputStream fis2 = new FileInputStream(originalFile);
+                    pstmt2 = conn.prepareStatement(
+                            "INSERT INTO Fotos.Full_Image(imageID, image) values (?, ?)"
+                    );
+                    //Tähä laitetaa edellisessä insertissä saatu autogeneroitu key
+                    pstmt2.setInt(1, key.getInt(1) );
+                    pstmt2.setBinaryStream(2, fis2, (int) originalFile.length());
+                    System.out.println("Executing statement 2...");
+                    pstmt2.execute();
+                    System.out.println("Sent " + originalFile.length() + " bytes.");
+
+
+
+                } catch (Exception e) {
+                    System.err.println("Error in query");
+                    e.printStackTrace();
+
+                }  finally {
+                    if (pstmt != null) {
+                        try {
+                            pstmt.close();
+
+                        } catch (Exception ex) {
+                            System.out.println("Error in statement 1 termination!");
+
+                        }
+                    }
+                    if (pstmt2 != null) {
+                        try {
+                            pstmt2.close();
+
+                        } catch (Exception ex) {
+                            System.out.println("Error in statement 2 termination!");
+
+                        }
+                    }
+
+                }
+            }
+
+
+
+        } catch (Exception ex) {
+            System.err.println("Cannot connect to database server");
+            ex.printStackTrace();
+        } finally {
+            if (conn != null) {
+                try {
+                    System.out.println("\n***** Let terminate the Connection *****");
+                    conn.close();
+                    System.out.println("\nDatabase connection terminated...");
+
+                } catch (Exception ex) {
+                    System.out.println("Error in connection termination!");
+
+                }
+            }
+
+        }
+    }
+
+    //Work in progress....
+    public List<File> downloadImages(){
+        Connection conn = null;
+        List<File> files = null;
+        int userId = 1;
+        try {
+            // Connection statement
+            conn = DriverManager.getConnection(url, dbUserName, dbPassword);
+            System.out.println("\nDatabase Connection Established...");
+
+            PreparedStatement pstmt = null;
+            try {
+
+
+                pstmt = conn.prepareStatement(
+                        "SELECT imageID, fileName, image FROM Image WHERE userID=?;"
+                );
+
+                pstmt.setInt(1, userId );
+                ResultSet result = pstmt.executeQuery();
+              //  (Array)result.getArray(3)
+
+            } catch (Exception e) {
+                System.err.println("Error in query");
+                e.printStackTrace();
+
+            }  finally {
+                if (pstmt != null) {
+                    try {
+                        pstmt.close();
+
+                    } catch (Exception ex) {
+                        System.out.println("Error in statement termination!");
+
+                    }
+                }
+
+            }
+
+
+
+
+        } catch (Exception ex) {
+            System.err.println("Cannot connect to database server");
+            ex.printStackTrace();
+        } finally {
+            if (conn != null) {
+                try {
+                    System.out.println("\n***** Let terminate the Connection *****");
+                    conn.close();
+                    System.out.println("\nDatabase connection terminated...");
+
+                } catch (Exception ex) {
+                    System.out.println("Error in connection termination!");
+
+                }
+            }
+
+        }
+        return files;
+    }
+
+
 }
