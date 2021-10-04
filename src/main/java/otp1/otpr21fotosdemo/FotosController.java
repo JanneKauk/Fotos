@@ -119,11 +119,6 @@ public class FotosController {
             //System.out.println("Width: " + newSceneWidth);
             adjustGrid(newSceneWidth);
         });
-//        centerStackp.heightProperty().addListener(new ChangeListener<Number>() {
-//            @Override public void changed(ObservableValue<? extends Number> observableValue, Number oldSceneHeight, Number newSceneHeight) {
-//                System.out.println("Height: " + newSceneHeight);
-//            }
-//        });
     }
 
     private void openImageview(){
@@ -144,10 +139,10 @@ public class FotosController {
 
         //Column constraints
         cc.setMinWidth(150);
-        cc.setHgrow(Priority.ALWAYS);
+        //cc.setHgrow(Priority.ALWAYS);
         //Row constraints
         rc.setMinHeight(150);
-        rc.setVgrow(Priority.ALWAYS);
+        //rc.setVgrow(Priority.ALWAYS);
     }
 
     private void adjustGrid(Number parentWidth){
