@@ -72,7 +72,7 @@ public class FotosController {
     private Stage mainStage = null;
     private boolean loggedIn = false;
     private Database database = null;
-    private Integer privateUsernameID;
+    private Integer privateUserID;
 
     //Image Grid settings
     private int columns, rows, maxCols = 8;
@@ -198,8 +198,8 @@ public class FotosController {
         switchToDefaultScene();
     }
 
-    public void fetchUserID(int methodUsernameID) {
-        privateUsernameID = methodUsernameID;
+    public void fetchUserID(int methodUserID) {
+        privateUserID = methodUserID;
     }
 
     @FXML
