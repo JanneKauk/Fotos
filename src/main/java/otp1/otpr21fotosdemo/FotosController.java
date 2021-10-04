@@ -3,18 +3,11 @@ package otp1.otpr21fotosdemo;
 import javafx.animation.RotateTransition;
 import javafx.animation.TranslateTransition;
 import javafx.beans.binding.Bindings;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.geometry.HPos;
 import javafx.geometry.Insets;
-import javafx.geometry.VPos;
-import javafx.scene.Group;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -26,7 +19,6 @@ import javafx.scene.layout.*;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.Pair;
@@ -82,6 +74,7 @@ public class FotosController {
     private Stage mainStage = null;
     private boolean loggedIn = false;
     private Database database = null;
+    private Integer privateUserID;
 
     //Image Grid settings
     private int columns, rows, maxCols = 8;
@@ -228,9 +221,13 @@ public class FotosController {
         switchToDefaultScene();
     }
 
+    public void fetchUserID(int methodUserID) {
+        privateUserID = methodUserID;
+    }
+
     @FXML
-    private void login(){
-        if (Database.userAndPwExists(usernameField.getText(), passwordField.getText())) {
+    private void login() {
+        if (database.userAndPwExists(usernameField.getText(), passwordField.getText()) != 0) {
             loggedIn = true;
             omatKuvatButton.setVisible(true);
             jaetutKuvatButton.setVisible(true);
@@ -248,8 +245,8 @@ public class FotosController {
         System.out.println("emailvbox: " + emailVbox.isVisible());
         if (emailVbox.isVisible()) {
             // Lähetetään pyyntö back-end koodin puolelle, jossa toteutetaan tarkistukset ja datan pusku palvelimelle
-            if (!Database.userExists(usernameField.getText())) {
-                Database.saltRegister(usernameField.getText(), passwordField.getText(), emailField1.getText(), emailField2.getText(), loginErrorText);
+            if (!database.userExists(usernameField.getText())) {
+                database.saltRegister(usernameField.getText(), passwordField.getText(), emailField1.getText(), emailField2.getText(), loginErrorText);
             } else {
                 loginErrorText.setText("Tämä käyttäjä on jo olemassa");
             }
