@@ -6,6 +6,8 @@ import javax.imageio.ImageIO;
 import javax.xml.transform.Result;
 import java.awt.*;
 import java.io.*;
+
+import javafx.scene.text.Text;
 import org.apache.commons.codec.binary.Hex;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
@@ -30,7 +32,7 @@ public class Database {
 
     }
 
-    public static void saltRegister(String userName, String passWord, String email1, String email2, Label loginErrorLabel) {
+    public static void saltRegister(String userName, String passWord, String email1, String email2, Text loginErrorText) {
         String salt = "1234";
         int iterations = 10000;
         int keyLength = 512;
@@ -41,7 +43,7 @@ public class Database {
         String hashedString = Hex.encodeHexString(hashedBytes);
 
         System.out.println(hashedString);
-        new Database(userName, hashedString, email1, email2, loginErrorLabel);
+        new Database(userName, hashedString, email1, email2, loginErrorText);
     }
 
     public static String saltLogin(String passWord) {
@@ -71,7 +73,7 @@ public class Database {
     }
 
     // For registering
-    public Database(String userName, String passWord, String email1, String email2, Label loginErrorLabel) {
+    public Database(String userName, String passWord, String email1, String email2, Text loginErrorText) {
         if (!userAndPwExists(userName, passWord)) {
             // Variables
             Connection conn = null;
@@ -120,7 +122,7 @@ public class Database {
             }
         } else {
             System.out.println("BBBBBBBBBBBBB");
-            loginErrorLabel.setText("AAAAA");
+            loginErrorText.setText("AAAAA");
         }
     }
 

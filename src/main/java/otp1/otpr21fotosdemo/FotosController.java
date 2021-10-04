@@ -75,7 +75,7 @@ public class FotosController {
     @FXML
     private ImageView testImageView;
     @FXML
-    public Label loginErrorLabel;
+    public Text loginErrorText;
 
     private Stage mainStage = null;
     private boolean loggedIn = false;
@@ -214,8 +214,9 @@ public class FotosController {
             usernameLabel.setText("Käyttäjänimi");
             loginVbox.setVisible(false);
             clearLoginFields();
+            loginErrorText.setText("");
         } else {
-            loginErrorLabel.setText("Käyttäjänimi tai salasana väärin");
+            loginErrorText.setText("Käyttäjänimi tai salasana väärin");
         }
     }
 
@@ -225,12 +226,11 @@ public class FotosController {
         if (emailVbox.isVisible()) {
             // Lähetetään pyyntö back-end koodin puolelle, jossa toteutetaan tarkistukset ja datan pusku palvelimelle
             if (!Database.userExists(usernameField.getText())) {
-                Database.saltRegister(usernameField.getText(), passwordField.getText(), emailField1.getText(), emailField2.getText(), loginErrorLabel);
+                Database.saltRegister(usernameField.getText(), passwordField.getText(), emailField1.getText(), emailField2.getText(), loginErrorText);
             } else {
-                loginErrorLabel.setText("Tämä käyttäjä on jo olemassa");
+                loginErrorText.setText("Tämä käyttäjä on jo olemassa");
             }
 
-            login();
             loginButton.setVisible(true);
             loginButton.setManaged(true);
             emailVbox.setManaged(false);
