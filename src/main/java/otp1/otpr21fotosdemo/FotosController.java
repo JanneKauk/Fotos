@@ -37,9 +37,7 @@ public class FotosController {
     @FXML
     private Circle profile;
     @FXML
-    private StackPane folderMenuHideButton;
-    @FXML
-    private ScrollPane folderMenu;
+    private StackPane folderMenuHideButton, folderMenu;
     @FXML
     private StackPane folderButtonStackPane;
     @FXML
