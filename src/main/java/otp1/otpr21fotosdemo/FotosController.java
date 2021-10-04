@@ -204,7 +204,13 @@ public class FotosController {
                 iv.fitWidthProperty().bind(p.widthProperty());
                 iv.fitHeightProperty().bind(p.heightProperty());
                 iv.setOnMouseClicked(event -> {
-                    bigPicture.setImage(iv.getImage());//TODO: Original
+                    Image fullImage = database.downloadFullImage(imageID);
+                    if (fullImage != null){
+                        bigPicture.setImage(fullImage);
+                    } else {
+                        bigPicture.setImage(iv.getImage());
+                    }
+
                     openImageview();
                 });
                 //Add the created element p to the grid in pos (j,i)

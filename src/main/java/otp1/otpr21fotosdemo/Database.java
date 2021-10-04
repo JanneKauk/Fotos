@@ -477,5 +477,65 @@ public class Database {
         return images;
     }
 
+    public javafx.scene.image.Image downloadFullImage(int imageID){
+        Connection conn = null;
+        ResultSet result = null;
+        javafx.scene.image.Image image = null;
+
+        int userId = 1;
+        try {
+            // Connection statement
+            conn = DriverManager.getConnection(url, dbUserName, dbPassword);
+            System.out.println("\nDatabase Connection Established...");
+
+            PreparedStatement pstmt = null;
+            try {
+
+
+                pstmt = conn.prepareStatement(
+                        "SELECT image FROM Fotos.Full_Image WHERE imageID=?;"
+                );
+                pstmt.setInt(1, imageID );
+                result = pstmt.executeQuery();
+
+                if (result.next()) {
+                    image = new javafx.scene.image.Image(result.getBinaryStream("image"));
+                }
+
+            } catch (Exception e) {
+                System.err.println("Error in query");
+                e.printStackTrace();
+
+            }  finally {
+                if (pstmt != null) {
+                    try {
+                        pstmt.close();
+
+                    } catch (Exception ex) {
+                        System.out.println("Error in statement termination!");
+
+                    }
+                }
+            }
+
+        } catch (Exception ex) {
+            System.err.println("Cannot connect to database server");
+            ex.printStackTrace();
+        } finally {
+            if (conn != null) {
+                try {
+                    System.out.println("\n***** Let terminate the Connection *****");
+                    conn.close();
+                    System.out.println("\nDatabase connection terminated...");
+
+                } catch (Exception ex) {
+                    System.out.println("Error in connection termination!");
+
+                }
+            }
+
+        }
+        return image;
+    }
 
 }
