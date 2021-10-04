@@ -3,18 +3,11 @@ package otp1.otpr21fotosdemo;
 import javafx.animation.RotateTransition;
 import javafx.animation.TranslateTransition;
 import javafx.beans.binding.Bindings;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.geometry.HPos;
 import javafx.geometry.Insets;
-import javafx.geometry.VPos;
-import javafx.scene.Group;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -26,16 +19,17 @@ import javafx.scene.layout.*;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import javafx.util.Pair;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.*;
 
 public class FotosController {
     @FXML
@@ -80,6 +74,7 @@ public class FotosController {
     private Stage mainStage = null;
     private boolean loggedIn = false;
     private Database database = null;
+    private Integer privateUserID;
 
     //Image Grid settings
     private int columns, rows, maxCols = 8;
@@ -109,7 +104,6 @@ public class FotosController {
         imageViewStackPane.setVisible(false);
 
         database = new Database();
-        testStackPane.setVisible(false);
 
     }
     public void setMainStage(Stage stage){
@@ -159,6 +153,27 @@ public class FotosController {
         setGridConstraints();
         if(imageTableCount < 1) return; //Return if there are no pictures in this location
         int t = imageTableCount;
+
+        //Palauttaa Hashmapin jossa key on imageID ja Value on PAIR-rakenne. Pair-rakenteessa taas key on tiedostonimi ja value on imagedata
+        Map<Integer, Pair<String, Image>> images = database.downloadImages(1);
+
+        //Esimerkiksi:  luetellaan tiedostonimet konsolii.
+        {
+            //iteraattori imageID:iden läpikäymiseen
+            Iterator<Integer> it = images.keySet().iterator();
+            int count = 1;
+            while (it.hasNext()) {
+                int imageID = it.next();
+                Pair<String, Image> filenameAndImage = images.get(imageID);
+                //Tällä saa tiedostonimen
+                String filename = filenameAndImage.getKey();
+                //Tällä saa imagedatan Image-muodossa (javafx.scene...)
+                Image image = filenameAndImage.getValue();
+                System.out.println("File " + count + " " + filename);
+                count++;
+            }
+        }
+
         //For each row
         for (int i = 0; i < rows; i++) {
             //For each column
@@ -172,6 +187,7 @@ public class FotosController {
                 //ImageView settings
                 if(j%2==0)iv.setImage(missingImage);//For testing,TODO: set to next picture in iteration (thumbnail)
                 if(j%2==1)iv.setImage(additionImage);
+
                 iv.setSmooth(true);
                 iv.setPreserveRatio(true);
                 iv.fitWidthProperty().bind(p.widthProperty());
@@ -205,9 +221,13 @@ public class FotosController {
         switchToDefaultScene();
     }
 
+    public void fetchUserID(int methodUserID) {
+        privateUserID = methodUserID;
+    }
+
     @FXML
-    private void login(){
-        if (Database.userAndPwExists(usernameField.getText(), passwordField.getText())) {
+    private void login() {
+        if (database.userAndPwExists(usernameField.getText(), passwordField.getText()) != 0) {
             loggedIn = true;
             omatKuvatButton.setVisible(true);
             jaetutKuvatButton.setVisible(true);
@@ -225,8 +245,8 @@ public class FotosController {
         System.out.println("emailvbox: " + emailVbox.isVisible());
         if (emailVbox.isVisible()) {
             // Lähetetään pyyntö back-end koodin puolelle, jossa toteutetaan tarkistukset ja datan pusku palvelimelle
-            if (!Database.userExists(usernameField.getText())) {
-                Database.saltRegister(usernameField.getText(), passwordField.getText(), emailField1.getText(), emailField2.getText(), loginErrorText);
+            if (!database.userExists(usernameField.getText())) {
+                database.saltRegister(usernameField.getText(), passwordField.getText(), emailField1.getText(), emailField2.getText(), loginErrorText);
             } else {
                 loginErrorText.setText("Tämä käyttäjä on jo olemassa");
             }
@@ -483,5 +503,18 @@ public class FotosController {
         fotosGridPane.setManaged(true);
         filterMenuHbox.setManaged(true);
          */
+    }
+
+    @FXML
+    public void testDownload(){
+        /*System.out.println("TestDownload");
+        List<javafx.scene.image.Image> images = database.downloadImages(1);
+        System.out.println("Number of images: " + images.size());
+        if (images.size() > 0){
+            System.out.println("Height: " + images.get(0).getHeight());
+            System.out.println("Width: " + images.get(0).getWidth());
+            testImageView.setImage(missingImage);
+        }
+*/
     }
 }

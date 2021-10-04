@@ -8,6 +8,7 @@ import java.awt.*;
 import java.io.*;
 
 import javafx.scene.text.Text;
+import javafx.util.Pair;
 import org.apache.commons.codec.binary.Hex;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
@@ -16,9 +17,11 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 
 import java.sql.*;
-import java.util.Iterator;
-import java.util.List;
+import java.sql.Date;
+import java.util.*;
 import java.awt.image.*;
+import java.util.List;
+import java.util.Objects;
 
 public class Database {
     private String dbUserName = "otpdb";
@@ -32,7 +35,7 @@ public class Database {
 
     }
 
-    public static void saltRegister(String userName, String passWord, String email1, String email2, Text loginErrorText) {
+    public void saltRegister(String userName, String passWord, String email1, String email2, Text loginErrorText) {
         String salt = "1234";
         int iterations = 10000;
         int keyLength = 512;
@@ -46,7 +49,7 @@ public class Database {
         new Database(userName, hashedString, email1, email2, loginErrorText);
     }
 
-    public static String saltLogin(String passWord) {
+    public String saltLogin(String passWord) {
         String salt = "1234";
         int iterations = 10000;
         int keyLength = 512;
@@ -60,7 +63,7 @@ public class Database {
         return hashedString;
     }
 
-    public static byte[] hashPassword( final char[] password, final byte[] salt, final int iterations, final int keyLength ) {
+    public byte[] hashPassword( final char[] password, final byte[] salt, final int iterations, final int keyLength ) {
         try {
             SecretKeyFactory skf = SecretKeyFactory.getInstance( "PBKDF2WithHmacSHA512" );
             PBEKeySpec spec = new PBEKeySpec( password, salt, iterations, keyLength );
@@ -74,7 +77,7 @@ public class Database {
 
     // For registering
     public Database(String userName, String passWord, String email1, String email2, Text loginErrorText) {
-        if (!userAndPwExists(userName, passWord)) {
+        if (userAndPwExists(userName, passWord) != 0) {
             // Variables
             Connection conn = null;
             String dbUserName = "otpdb";
@@ -130,14 +133,10 @@ public class Database {
         System.out.println("\n\n***** MySQL JDBC Connection Testing *****");
     }
 
-    public static boolean userAndPwExists(String user, String passWord) {
-        String dbUserName = "otpdb";
-        String dbPassword = "Asdfghjkl1234567890";
-        String url = "jdbc:mysql://10.114.32.13:3306/";
-
+    public Integer userAndPwExists(String user, String passWord) {
         passWord = saltLogin(passWord);
 
-        boolean found = false;
+        int found = 0;
         Connection conn = null;
         try {
             // Connection statement
@@ -147,10 +146,13 @@ public class Database {
             PreparedStatement pstmt2 = null;
 
             try {
-                pstmt = conn.prepareStatement("SELECT COUNT(*) FROM Fotos.User WHERE userName=?;");
+                pstmt = conn.prepareStatement("SELECT userName,userID FROM Fotos.User WHERE userName=?;");
                 pstmt.setString(1, user);
                 ResultSet result = pstmt.executeQuery();
-                result.next();
+                if (result.next()) {
+                    System.out.println("AAAA" + result.getString("userName"));
+                    System.out.println("BBBB" + result.getInt("userID"));
+                }
 
                 pstmt2 = conn.prepareStatement("SELECT COUNT(*) FROM Fotos.User WHERE passWord=?;");
                 pstmt2.setString(1, passWord);
@@ -158,10 +160,10 @@ public class Database {
                 result2.next();
 
                 //Tarkistetaan löytyikö yhtään kyseistä usernamea. (Ei pitäisi olla koskaan enempää kuin yksi)
-                if (result.getInt(1) > 0 && result2.getInt(1) > 0) {
-                    found = true;
+                if (Objects.equals(result.getString("userName"), user) && result2.getInt(1) > 0) {
+                    found = result.getInt("userID");
                 }
-                System.out.println("Found " + result.getInt(1) + " " + user);
+                System.out.println("Found " + Objects.equals(result.getString("userName"), user) + " " + user);
 
             } catch (Exception e) {
                 System.err.println("Error in query");
@@ -195,20 +197,16 @@ public class Database {
 
                 } catch (Exception ex) {
                     System.out.println("Error in connection termination!");
-
                 }
             }
-
         }
+        // Palauttaa userID ja lähettää sen FotosController variableks
+        FotosController fotosController = new FotosController();
+        fotosController.fetchUserID(found);
         return found;
-
     }
 
-    public static boolean userExists(String user) {
-        String dbUserName = "otpdb";
-        String dbPassword = "Asdfghjkl1234567890";
-        String url = "jdbc:mysql://10.114.32.13:3306/";
-
+    public boolean userExists(String user) {
         boolean found = false;
         Connection conn = null;
         try {
@@ -411,10 +409,12 @@ public class Database {
         }
     }
 
-    //Work in progress....
-    public List<File> downloadImages(){
+    //Palauttaa Hashmapin jossa key on imageID ja Value on PAIR-rakenne. Pair-rakenteessa taas key on tiedostonimi ja value on imagedata
+    public Map<Integer, Pair<String, javafx.scene.image.Image>> downloadImages(int folderId){
         Connection conn = null;
-        List<File> files = null;
+        ResultSet result = null;
+        Map<Integer, Pair<String, javafx.scene.image.Image>> images = new HashMap<>();
+
         int userId = 1;
         try {
             // Connection statement
@@ -426,12 +426,20 @@ public class Database {
 
 
                 pstmt = conn.prepareStatement(
-                        "SELECT imageID, fileName, image FROM Image WHERE userID=?;"
+                        "SELECT imageID, fileName, image FROM Fotos.Image WHERE userID=? AND folderID=?;"
                 );
 
                 pstmt.setInt(1, userId );
-                ResultSet result = pstmt.executeQuery();
-              //  (Array)result.getArray(3)
+                pstmt.setInt(2, folderId );
+                result = pstmt.executeQuery();
+
+                while (result.next()) {
+                    int id = result.getInt("imageID");
+                    String filename = result.getString("filename");
+                    javafx.scene.image.Image image = new javafx.scene.image.Image(result.getBinaryStream("image"));
+                    images.put(id, new Pair<>(filename,image));
+
+                }
 
             } catch (Exception e) {
                 System.err.println("Error in query");
@@ -447,11 +455,7 @@ public class Database {
 
                     }
                 }
-
             }
-
-
-
 
         } catch (Exception ex) {
             System.err.println("Cannot connect to database server");
@@ -470,7 +474,7 @@ public class Database {
             }
 
         }
-        return files;
+        return images;
     }
 
 
