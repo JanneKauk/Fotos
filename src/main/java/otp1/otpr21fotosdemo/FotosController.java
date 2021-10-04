@@ -2,6 +2,9 @@ package otp1.otpr21fotosdemo;
 
 import javafx.animation.RotateTransition;
 import javafx.animation.TranslateTransition;
+import javafx.beans.binding.Bindings;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -64,6 +67,8 @@ public class FotosController {
     @FXML
     ImageView bigPicture;
     @FXML
+    StackPane centerStackp;
+    @FXML
     private Region imageviewBackgroundRegion;
     @FXML
     private StackPane imageViewStackPane, blurringStackPane, addImageButton, testStackPane;
@@ -77,8 +82,8 @@ public class FotosController {
     private Database database = null;
 
     //Image Grid settings
-    private int columns = 5, rows = 5;
-    private int imageTableCount = 1;//How many images there are in the current location
+    private int columns, rows, maxCols = 8;
+    private int imageTableCount = 23;//How many images there are in the current location
     RowConstraints rc = new RowConstraints();
     ColumnConstraints cc = new ColumnConstraints();
     File file = new File("src/main/resources/otp1/otpr21fotosdemo/image/noimage.jpg"); //Missing image picture
@@ -101,10 +106,7 @@ public class FotosController {
         emailVbox.setManaged(false);
         settingsBorderPane.setManaged(false);
         settingsBorderPane.setVisible(false);
-        createPictureGrid();
-
         imageViewStackPane.setVisible(false);
-        //openImageview();
 
         database = new Database();
         testStackPane.setVisible(false);
@@ -112,6 +114,16 @@ public class FotosController {
     }
     public void setMainStage(Stage stage){
         mainStage = stage;
+        //Adjusts the Igrid when the window size changes TODO: Still ignores maximize and minimize
+        centerStackp.widthProperty().addListener((observableValue, oldSceneWidth, newSceneWidth) -> {
+            //System.out.println("Width: " + newSceneWidth);
+            adjustGrid(newSceneWidth);
+        });
+//        centerStackp.heightProperty().addListener(new ChangeListener<Number>() {
+//            @Override public void changed(ObservableValue<? extends Number> observableValue, Number oldSceneHeight, Number newSceneHeight) {
+//                System.out.println("Height: " + newSceneHeight);
+//            }
+//        });
     }
 
     private void openImageview(){
@@ -123,57 +135,65 @@ public class FotosController {
         imageViewStackPane.setVisible(false);
         blurringStackPane.setEffect(null);
     }
-    @FXML
-    private void createPictureGrid(){
-        //TODO: getPictureTable, tableCount = getPictureTable.count
-        //TODO: adjust gridHeight and width, rows = gridWidth/table.count
-        //TODO: fills the whole grid currently, needs to leave some cells empty in some cases
-        //Reset the grid
+
+    private void setGridConstraints(){
         fotosGridPane.getChildren().clear();
         fotosGridPane.getRowConstraints().clear();
         fotosGridPane.getColumnConstraints().clear();
+        //fotosGridPane.setGridLinesVisible(true); //For debug
+
+        //Column constraints
+        cc.setMinWidth(150);
+        cc.setHgrow(Priority.ALWAYS);
+        //Row constraints
+        rc.setMinHeight(150);
+        rc.setVgrow(Priority.ALWAYS);
+    }
+
+    private void adjustGrid(Number parentWidth){
+        //Calc how many columns fit into the parent stackpane
+        int cols = Math.max(3 , Math.min(8 , (int)Math.floor(parentWidth.doubleValue()/160)));
+        if(cols==columns) return;//Continue only if column count changes
+        columns = cols;
+        //System.out.println("columns in Igrid: "+columns); DEBUG
+        rows = (int)Math.ceil((double)imageTableCount/columns);
+        //System.out.println("rows in Igrid: "+rows); DEBUG
+        //TODO: getPictureTable, tableCount = getPictureTable.count
+
+        //Reset and recreate the grid
         setGridConstraints();
         if(imageTableCount < 1) return; //Return if there are no pictures in this location
+        int t = imageTableCount;
         //For each row
         for (int i = 0; i < rows; i++) {
             //For each column
             for (int j = 0; j < columns; j++) {
+                if(t<=0) return;//Stop when all pictures have been added
                 Pane p = new Pane();
                 ImageView iv = new ImageView();
                 p.getChildren().add(iv);
+                p.prefWidthProperty().bind(Bindings.min(fotosGridPane.widthProperty().divide(columns), fotosGridPane.heightProperty().divide(rows)));
+                p.prefHeightProperty().bind(Bindings.min(fotosGridPane.widthProperty().divide(columns), fotosGridPane.heightProperty().divide(rows)));
                 //ImageView settings
-                if(j%2==0)iv.setImage(missingImage);//ifs for testing,TODO: set to next picture in iteration
+                if(j%2==0)iv.setImage(missingImage);//For testing,TODO: set to next picture in iteration (thumbnail)
                 if(j%2==1)iv.setImage(additionImage);
                 iv.setSmooth(true);
                 iv.setPreserveRatio(true);
                 iv.fitWidthProperty().bind(p.widthProperty());
                 iv.fitHeightProperty().bind(p.heightProperty());
                 iv.setOnMouseClicked(event -> {
-                    bigPicture.setImage(iv.getImage());
+                    bigPicture.setImage(iv.getImage());//TODO: Original
                     openImageview();
                 });
                 //Add the created element p to the grid in pos (j,i)
                 fotosGridPane.add(p, j, i);
                 //Add column constraints
                 if(i < 1) fotosGridPane.getColumnConstraints().add(cc);
+                t--;
             }
             //Add row constraints
             fotosGridPane.getRowConstraints().add(rc);
         }
-        fotosGridPane.setGridLinesVisible(true); //For debug
-    }
-
-    private void setGridConstraints(){
-        //Column
-        cc.setMinWidth(250);
-        cc.setMaxWidth(250);
-        cc.setHalignment(HPos.CENTER);
-        cc.setHgrow(Priority.ALWAYS);
-        //Row
-        rc.setMinHeight(250);
-        rc.setMaxHeight(250);
-        rc.setValignment(VPos.CENTER);
-        rc.setVgrow(Priority.ALWAYS);
     }
 
     private void clearLoginFields(){
