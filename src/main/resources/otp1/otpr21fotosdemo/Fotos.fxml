@@ -185,7 +185,7 @@
                   </HBox>
                </left>
                <center>
-                  <StackPane>
+                  <StackPane fx:id="centerStackp">
                      <children>
                         <BorderPane fx:id="settingsBorderPane" prefHeight="200.0" prefWidth="200.0">
                            <center>
@@ -266,7 +266,7 @@
                         </BorderPane>
                          <ScrollPane fx:id="scrollp" fitToWidth="true">
                              <content>
-                                 <GridPane fx:id="fotosGridPane" alignment="CENTER" hgap="10.0" vgap="10.0">
+                                 <GridPane fx:id="fotosGridPane" alignment="CENTER" gridLinesVisible="true" hgap="10.0" vgap="10.0">
 
                      </GridPane>
                              </content>
@@ -341,7 +341,7 @@
       <StackPane fx:id="imageViewStackPane" visible="false">
          <children>
             <Region fx:id="imageviewBackgroundRegion" opacity="0" style="-fx-background-color: #cccccc;" />
-            <BorderPane prefHeight="200.0" prefWidth="200.0">
+            <BorderPane onMouseClicked="#closeImageview" prefHeight="200.0" prefWidth="200.0">
                <top>
                   <StackPane alignment="CENTER_RIGHT" prefHeight="40.0" style="-fx-background-color: #ebebeb;">
                      <children>
@@ -361,7 +361,7 @@
                   </StackPane>
                </top>
                <center>
-                  <ImageView fx:id="bigPicture" fitHeight="573.0" fitWidth="1154.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER" />
+                  <ImageView fx:id="bigPicture" fitHeight="658.0" fitWidth="1154.0" onMouseClicked="#closeImageview" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER" />
                </center>
             </BorderPane>
          </children>
