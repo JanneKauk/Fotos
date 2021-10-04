@@ -8,6 +8,7 @@ import java.awt.*;
 import java.io.*;
 
 import javafx.scene.text.Text;
+import javafx.util.Pair;
 import org.apache.commons.codec.binary.Hex;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
@@ -16,9 +17,10 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 
 import java.sql.*;
-import java.util.Iterator;
-import java.util.List;
+import java.sql.Date;
+import java.util.*;
 import java.awt.image.*;
+import java.util.List;
 
 public class Database {
     private String dbUserName = "otpdb";
@@ -411,10 +413,12 @@ public class Database {
         }
     }
 
-    //Work in progress....
-    public List<File> downloadImages(){
+    //Palauttaa Hashmapin jossa key on imageID ja Value on PAIR-rakenne. Pair-rakenteessa taas key on tiedostonimi ja value on imagedata
+    public Map<Integer, Pair<String, javafx.scene.image.Image>> downloadImages(int folderId){
         Connection conn = null;
-        List<File> files = null;
+        ResultSet result = null;
+        Map<Integer, Pair<String, javafx.scene.image.Image>> images = new HashMap<>();
+
         int userId = 1;
         try {
             // Connection statement
@@ -426,12 +430,20 @@ public class Database {
 
 
                 pstmt = conn.prepareStatement(
-                        "SELECT imageID, fileName, image FROM Image WHERE userID=?;"
+                        "SELECT imageID, fileName, image FROM Fotos.Image WHERE userID=? AND folderID=?;"
                 );
 
                 pstmt.setInt(1, userId );
-                ResultSet result = pstmt.executeQuery();
-              //  (Array)result.getArray(3)
+                pstmt.setInt(2, folderId );
+                result = pstmt.executeQuery();
+
+                while (result.next()) {
+                    int id = result.getInt("imageID");
+                    String filename = result.getString("filename");
+                    javafx.scene.image.Image image = new javafx.scene.image.Image(result.getBinaryStream("image"));
+                    images.put(id, new Pair<>(filename,image));
+
+                }
 
             } catch (Exception e) {
                 System.err.println("Error in query");
@@ -447,11 +459,7 @@ public class Database {
 
                     }
                 }
-
             }
-
-
-
 
         } catch (Exception ex) {
             System.err.println("Cannot connect to database server");
@@ -470,7 +478,7 @@ public class Database {
             }
 
         }
-        return files;
+        return images;
     }
 
 
