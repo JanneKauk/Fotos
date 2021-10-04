@@ -140,6 +140,8 @@ public class FotosController {
     }
 
     private void adjustGrid(Number parentWidth){
+        Map<Integer, Pair<String, Image>> images = database.downloadImages(1);
+        imageTableCount = images.size();
         //Calc how many columns fit into the parent stackpane
         int cols = Math.max(3 , Math.min(8 , (int)Math.floor(parentWidth.doubleValue()/160)));
         if(cols==columns) return;//Continue only if column count changes
@@ -149,14 +151,16 @@ public class FotosController {
         //System.out.println("rows in Igrid: "+rows); DEBUG
         //TODO: getPictureTable, tableCount = getPictureTable.count
 
+
+
         //Reset and recreate the grid
         setGridConstraints();
         if(imageTableCount < 1) return; //Return if there are no pictures in this location
         int t = imageTableCount;
 
         //Palauttaa Hashmapin jossa key on imageID ja Value on PAIR-rakenne. Pair-rakenteessa taas key on tiedostonimi ja value on imagedata
-        Map<Integer, Pair<String, Image>> images = database.downloadImages(1);
 
+        /*
         //Esimerkiksi:  luetellaan tiedostonimet konsolii.
         {
             //iteraattori imageID:iden läpikäymiseen
@@ -173,20 +177,29 @@ public class FotosController {
                 count++;
             }
         }
-
+           */
+        Iterator<Integer> it = images.keySet().iterator();
         //For each row
         for (int i = 0; i < rows; i++) {
             //For each column
             for (int j = 0; j < columns; j++) {
                 if(t<=0) return;//Stop when all pictures have been added
+                if (!it.hasNext()) return;
                 Pane p = new Pane();
                 ImageView iv = new ImageView();
                 p.getChildren().add(iv);
                 p.prefWidthProperty().bind(Bindings.min(fotosGridPane.widthProperty().divide(columns), fotosGridPane.heightProperty().divide(rows)));
                 p.prefHeightProperty().bind(Bindings.min(fotosGridPane.widthProperty().divide(columns), fotosGridPane.heightProperty().divide(rows)));
                 //ImageView settings
+
+                int imageID = it.next();
+                Pair<String, Image> filenameAndImage = images.get(imageID);
+                iv.setImage(filenameAndImage.getValue());
+                System.out.println("Displaying: " + filenameAndImage.getKey());
+                /*
                 if(j%2==0)iv.setImage(missingImage);//For testing,TODO: set to next picture in iteration (thumbnail)
                 if(j%2==1)iv.setImage(additionImage);
+                */
 
                 iv.setSmooth(true);
                 iv.setPreserveRatio(true);
