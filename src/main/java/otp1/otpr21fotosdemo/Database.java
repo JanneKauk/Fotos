@@ -1,27 +1,21 @@
 package otp1.otpr21fotosdemo;
 
-import javafx.scene.control.Label;
-
-import javax.imageio.ImageIO;
-import javax.xml.transform.Result;
-import java.awt.*;
-import java.io.*;
-
 import javafx.scene.text.Text;
 import javafx.util.Pair;
 import org.apache.commons.codec.binary.Hex;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
+
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
-
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.sql.*;
-import java.sql.Date;
-import java.util.*;
-import java.awt.image.*;
 import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class Database {
     private String dbUserName = "otpdb";

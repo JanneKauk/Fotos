@@ -251,7 +251,9 @@ public class FotosController {
 
     @FXML
     private void login() {
-        if (database.userAndPwExists(usernameField.getText(), passwordField.getText()) != 0) {
+        if (Objects.equals(usernameField.getText(), "")) {
+            loginErrorText.setText("Syötä käyttäjätunnus");
+        } else if (database.userAndPwExists(usernameField.getText(), passwordField.getText()) != 0) {
             loggedIn = true;
             omatKuvatButton.setVisible(true);
             jaetutKuvatButton.setVisible(true);
