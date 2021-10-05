@@ -31,6 +31,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
+import static java.lang.Double.valueOf;
+
 public class FotosController {
     @FXML
     private BorderPane rootborderpane, settingsBorderPane;
@@ -73,6 +75,7 @@ public class FotosController {
     private boolean loggedIn = false;
     private Database database = null;
     private Integer privateUserID;
+    private boolean databaseChanged = true;
 
     //Image Grid settings
     private int columns, rows, maxCols = 8;
@@ -138,12 +141,15 @@ public class FotosController {
     }
 
     private void adjustGrid(Number parentWidth){
-        Map<Integer, Pair<String, Image>> images = database.downloadImages(1);
-        imageTableCount = images.size();
+        System.out.println("1 " + databaseChanged);
         //Calc how many columns fit into the parent stackpane
         int cols = Math.max(3 , Math.min(8 , (int)Math.floor(parentWidth.doubleValue()/160)));
-        if(cols==columns) return;//Continue only if column count changes
+        if(cols==columns && !databaseChanged) return;//Continue only if column count changes OR database changed
         columns = cols;
+        databaseChanged = false;
+        System.out.println("2");
+        Map<Integer, Pair<String, Image>> images = database.downloadImages(1);
+        imageTableCount = images.size();
         //System.out.println("columns in Igrid: "+columns); DEBUG
         rows = (int)Math.ceil((double)imageTableCount/columns);
         //System.out.println("rows in Igrid: "+rows); DEBUG
@@ -178,6 +184,7 @@ public class FotosController {
            */
         Iterator<Integer> it = images.keySet().iterator();
         //For each row
+        System.out.println("3");
         for (int i = 0; i < rows; i++) {
             //For each column
             for (int j = 0; j < columns; j++) {
@@ -327,16 +334,9 @@ public class FotosController {
                     kysymys.append("Haluatko varmasti ladata palveluun seuraavat " + files.size() + " kuvaa?\n");
                 }
                 final int rows_in_confirmation = 10;
-                System.out.println("File: " + ((File)files.toArray()[0]).getAbsolutePath());
-
-                System.out.println("File: " + ((File)files.toArray()[0]).getPath());
-
-                System.out.println("File: " + ((File)files.toArray()[0]).toPath());
-                System.out.println("File: " + ((File)files.toArray()[0]).toURI());
 
                 if (files.size() <= rows_in_confirmation) {
                     files.forEach(file -> kysymys.append(file.getName() + '\n'));
-
                 } else {
                     Iterator<File> it = files.iterator();
                     for(int i = 0; i < rows_in_confirmation; i++){
@@ -355,6 +355,10 @@ public class FotosController {
                     //Upload
                     System.out.println ("Upload");
                     database.uploadImages(1,1, files);
+                    System.out.println("uploaded");
+                    databaseChanged = true;
+                    adjustGrid(fotosGridPane.getWidth());
+                    System.out.println("adjusted?");
                 } else {
                     //No upload
                     System.out.println ("No upload");

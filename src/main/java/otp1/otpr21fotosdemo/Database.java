@@ -23,6 +23,7 @@ public class Database {
     private String url = "jdbc:mysql://10.114.32.13:3306/";
     private final int MAX_THUMB_HEIGHT = 200;
     private final int MAX_THUMB_WIDTH = 200;
+    private HashMap<Integer, javafx.scene.image.Image> fullImageCache = new HashMap<>();
 
 
     public Database (){
@@ -470,6 +471,10 @@ public class Database {
     }
 
     public javafx.scene.image.Image downloadFullImage(int imageID){
+        if (fullImageCache.containsKey(imageID)){
+            System.out.println("Full image found in cache. Showing that instead.");
+            return fullImageCache.get(imageID);
+        }
         Connection conn = null;
         ResultSet result = null;
         javafx.scene.image.Image image = null;
@@ -492,6 +497,7 @@ public class Database {
 
                 if (result.next()) {
                     image = new javafx.scene.image.Image(result.getBinaryStream("image"));
+                    fullImageCache.put(imageID,image);
                 }
 
             } catch (Exception e) {
