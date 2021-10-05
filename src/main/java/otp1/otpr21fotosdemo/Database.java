@@ -48,7 +48,7 @@ public class Database {
         String hashedString = Hex.encodeHexString(hashedBytes);
 
         System.out.println(hashedString);
-        new Database(userName, hashedString, email1, email2, loginErrorText);
+        register(userName, hashedString, email1, email2, loginErrorText);
     }
 
     public String saltLogin(String passWord) {
@@ -78,8 +78,8 @@ public class Database {
     }
 
     // For registering
-    public Database(String userName, String passWord, String email1, String email2, Text loginErrorText) {
-        if (userAndPwExists(userName, passWord) != 0) {
+    public void register(String userName, String passWord, String email1, String email2, Text loginErrorText) {
+        if (userAndPwExists(userName, passWord) == 0) {
             // Variables
             Connection conn = null;
             String dbUserName = "otpdb";
