@@ -67,7 +67,7 @@ public class FotosController {
     @FXML
     private StackPane imageViewStackPane, blurringStackPane, addImageButton, testStackPane;
     @FXML
-    private ImageView testImageView;
+    private ImageView testImageView, newFolderButton;
     @FXML
     public Text loginErrorText;
 
@@ -539,5 +539,10 @@ public class FotosController {
             testImageView.setImage(missingImage);
         }
 */
+    }
+
+    @FXML
+    public void onNewFolderButtonClick() {
+
     }
 }
