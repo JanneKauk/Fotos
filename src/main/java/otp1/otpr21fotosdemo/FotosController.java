@@ -2,6 +2,7 @@ package otp1.otpr21fotosdemo;
 
 import javafx.animation.RotateTransition;
 import javafx.animation.TranslateTransition;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
@@ -89,7 +90,8 @@ public class FotosController {
 
     @FXML
     private void initialize() {
-
+        database = new Database();
+        database.setController(this);
         logout();
         //Filtermenu piiloon alussa
         filterMenu.setTranslateX(-200);
@@ -104,7 +106,7 @@ public class FotosController {
         settingsBorderPane.setVisible(false);
         imageViewStackPane.setVisible(false);
 
-        database = new Database();
+
 
     }
     public void setMainStage(Stage stage){
@@ -141,14 +143,21 @@ public class FotosController {
     }
 
     private void adjustGrid(Number parentWidth){
-        System.out.println("1 " + databaseChanged);
         //Calc how many columns fit into the parent stackpane
         int cols = Math.max(3 , Math.min(8 , (int)Math.floor(parentWidth.doubleValue()/160)));
         if(cols==columns && !databaseChanged) return;//Continue only if column count changes OR database changed
         columns = cols;
         databaseChanged = false;
-        System.out.println("2");
-        Map<Integer, Pair<String, Image>> images = database.downloadImages(1);
+        Map<Integer, Pair<String, Image>> images;
+
+        if (privateUserID > 0) {
+            //Käyttäjä on kirjautunut.
+            images = database.downloadImages(1);
+        } else {
+            //käyttäjä ei ole kirjautunut.
+            //TODO lataa julkiset kuvat
+            images = new HashMap<Integer, Pair<String, javafx.scene.image.Image>>();
+        }
         imageTableCount = images.size();
         //System.out.println("columns in Igrid: "+columns); DEBUG
         rows = (int)Math.ceil((double)imageTableCount/columns);
@@ -184,7 +193,7 @@ public class FotosController {
            */
         Iterator<Integer> it = images.keySet().iterator();
         //For each row
-        System.out.println("3");
+        System.out.println("Displaying imagegrid");
         for (int i = 0; i < rows; i++) {
             //For each column
             for (int j = 0; j < columns; j++) {
@@ -200,7 +209,7 @@ public class FotosController {
                 int imageID = it.next();
                 Pair<String, Image> filenameAndImage = images.get(imageID);
                 iv.setImage(filenameAndImage.getValue());
-                System.out.println("Displaying: " + filenameAndImage.getKey());
+                //System.out.println("Displaying: " + filenameAndImage.getKey());
                 /*
                 if(j%2==0)iv.setImage(missingImage);//For testing,TODO: set to next picture in iteration (thumbnail)
                 if(j%2==1)iv.setImage(additionImage);
@@ -239,6 +248,8 @@ public class FotosController {
     }
     private void logout(){
         loggedIn = false;
+        privateUserID = -1;
+        database.setPrivateUserId(-1);
         omatKuvatButton.setVisible(false);
         jaetutKuvatButton.setVisible(false);
         usernameLabel.setText("Kirjaudu/Rekisteröidy");
@@ -257,10 +268,12 @@ public class FotosController {
             loggedIn = true;
             omatKuvatButton.setVisible(true);
             jaetutKuvatButton.setVisible(true);
-            usernameLabel.setText("Käyttäjänimi");
+            usernameLabel.setText(usernameField.getText());
             loginVbox.setVisible(false);
             clearLoginFields();
             loginErrorText.setText("");
+            databaseChanged = true;
+            adjustGrid(fotosGridPane.getWidth());
         } else {
             loginErrorText.setText("Käyttäjänimi tai salasana väärin");
         }
@@ -311,61 +324,73 @@ public class FotosController {
     }
     @FXML
     protected void onAddImgButtonClick() {
-        //Tähän tullaa ku painetaan sinistä pluspallo-kuvaketta kuvan lisäämiseks.
-        System.out.println ("Add image");
-        //Varmistetaan että controller on saanut start-metodilta mainStagen
-        if (mainStage != null) {
-            //Tiedostonvalintaikkuna
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("Valitse kuvatiedosto(t)");
-            fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.gif"),
-                new FileChooser.ExtensionFilter("All Files", "*.*"
-            ));
-            List<File> files = fileChooser.showOpenMultipleDialog(mainStage);
-            //Valittiinko tiedostoja?
-            if (files != null){
-                //Rakennetaan varmistuskysymys
-                Stage dialog = new Stage();
-                StringBuilder kysymys = new StringBuilder();
-                if (files.size() == 1){
-                    kysymys.append("Haluatko varmasti ladata palveluun seuraavan kuvan?\n");
-                } else {
-                    kysymys.append("Haluatko varmasti ladata palveluun seuraavat " + files.size() + " kuvaa?\n");
-                }
-                final int rows_in_confirmation = 10;
-
-                if (files.size() <= rows_in_confirmation) {
-                    files.forEach(file -> kysymys.append(file.getName() + '\n'));
-                } else {
-                    Iterator<File> it = files.iterator();
-                    for(int i = 0; i < rows_in_confirmation; i++){
-                        kysymys.append(it.next().getName() + '\n');
+        if (loggedIn){
+            //Tähän tullaa ku painetaan sinistä pluspallo-kuvaketta kuvan lisäämiseks.
+            System.out.println ("Add image");
+            //Varmistetaan että controller on saanut start-metodilta mainStagen
+            if (mainStage != null) {
+                //Tiedostonvalintaikkuna
+                FileChooser fileChooser = new FileChooser();
+                fileChooser.setTitle("Valitse kuvatiedosto(t)");
+                fileChooser.getExtensionFilters().addAll(
+                    new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.gif"),
+                    new FileChooser.ExtensionFilter("All Files", "*.*"
+                ));
+                List<File> files = fileChooser.showOpenMultipleDialog(mainStage);
+                //Valittiinko tiedostoja?
+                if (files != null){
+                    //Rakennetaan varmistuskysymys
+                    Stage dialog = new Stage();
+                    StringBuilder kysymys = new StringBuilder();
+                    if (files.size() == 1){
+                        kysymys.append("Haluatko varmasti ladata palveluun seuraavan kuvan?\n");
+                    } else {
+                        kysymys.append("Haluatko varmasti ladata palveluun seuraavat " + files.size() + " kuvaa?\n");
                     }
-                    kysymys.append("...\n");
+                    final int rows_in_confirmation = 10;
+
+                    if (files.size() <= rows_in_confirmation) {
+                        files.forEach(file -> kysymys.append(file.getName() + '\n'));
+                    } else {
+                        Iterator<File> it = files.iterator();
+                        for(int i = 0; i < rows_in_confirmation; i++){
+                            kysymys.append(it.next().getName() + '\n');
+                        }
+                        kysymys.append("...\n");
+                    }
+
+                    //Esitetään varmistuskysymys
+                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION, kysymys.toString());
+                    alert.setTitle("Vahvista");
+                    alert.setHeaderText(null);
+
+                    Optional<ButtonType> vastaus = alert.showAndWait();
+                    if(vastaus.isPresent() && vastaus.get() == ButtonType.OK){
+                        //Upload
+                        Runnable uploadTask = () -> {
+                            System.out.println ("Upload for userID " + privateUserID);
+
+                            database.uploadImages(privateUserID,1, files);
+                            System.out.println("uploaded");
+                            databaseChanged = true;
+                            Platform.runLater(() -> {
+                                adjustGrid(fotosGridPane.getWidth());
+                                System.out.println("adjusted?");
+                            });
+
+                        };
+                        Thread uploadThread = new Thread(uploadTask);
+                        uploadThread.setDaemon(true);
+                        uploadThread.start();
+
+                    } else {
+                        //No upload
+                        System.out.println ("No upload");
+                    }
+
+
+
                 }
-
-                //Esitetään varmistuskysymys
-                Alert alert = new Alert(Alert.AlertType.CONFIRMATION, kysymys.toString());
-                alert.setTitle("Vahvista");
-                alert.setHeaderText(null);
-
-                Optional<ButtonType> vastaus = alert.showAndWait();
-                if(vastaus.isPresent() && vastaus.get() == ButtonType.OK){
-                    //Upload
-                    System.out.println ("Upload");
-                    database.uploadImages(1,1, files);
-                    System.out.println("uploaded");
-                    databaseChanged = true;
-                    adjustGrid(fotosGridPane.getWidth());
-                    System.out.println("adjusted?");
-                } else {
-                    //No upload
-                    System.out.println ("No upload");
-                }
-
-
-
             }
         }
     }
