@@ -24,10 +24,17 @@ public class Database {
     private final int MAX_THUMB_HEIGHT = 200;
     private final int MAX_THUMB_WIDTH = 200;
     private HashMap<Integer, javafx.scene.image.Image> fullImageCache = new HashMap<>();
-
+    private int privateUserId;
+    private FotosController controller;
 
     public Database (){
 
+    }
+    public void setController(FotosController c){
+        controller = c;
+    }
+    public void setPrivateUserId (int i){
+        privateUserId = i;
     }
 
     public void saltRegister(String userName, String passWord, String email1, String email2, Text loginErrorText) {
@@ -194,8 +201,8 @@ public class Database {
             }
         }
         // Palauttaa userID ja lähettää sen FotosController variableks
-        FotosController fotosController = new FotosController();
-        fotosController.fetchUserID(found);
+        controller.fetchUserID(found);
+        privateUserId = found;
         return found;
     }
 
@@ -264,6 +271,7 @@ public class Database {
     //TODO Joku "progress bar" -tyyppinen näkymä mistä näkee miten kuvien uploadaus edistyy
     public void uploadImages(int userId, int folderId, List<File> files){
 
+        System.out.println("UploadTask starting.");
         Connection conn = null;
         try {
             // Connection statement
@@ -400,6 +408,9 @@ public class Database {
             }
 
         }
+        System.out.println("UploadTask done.");
+
+
     }
 
     //Palauttaa Hashmapin jossa key on imageID ja Value on PAIR-rakenne. Pair-rakenteessa taas key on tiedostonimi ja value on imagedata
@@ -408,7 +419,7 @@ public class Database {
         ResultSet result = null;
         Map<Integer, Pair<String, javafx.scene.image.Image>> images = new HashMap<>();
 
-        int userId = 1;
+
         try {
             // Connection statement
             conn = DriverManager.getConnection(url, dbUserName, dbPassword);
@@ -422,7 +433,7 @@ public class Database {
                         "SELECT imageID, fileName, image FROM Fotos.Image WHERE userID=? AND folderID=?;"
                 );
 
-                pstmt.setInt(1, userId );
+                pstmt.setInt(1, privateUserId );
                 pstmt.setInt(2, folderId );
                 result = pstmt.executeQuery();
 
