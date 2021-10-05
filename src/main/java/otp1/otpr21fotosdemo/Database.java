@@ -151,21 +151,19 @@ public class Database {
                 pstmt = conn.prepareStatement("SELECT userName,userID FROM Fotos.User WHERE userName=?;");
                 pstmt.setString(1, user);
                 ResultSet result = pstmt.executeQuery();
-                if (result.next()) {
-                    System.out.println("AAAA" + result.getString("userName"));
-                    System.out.println("BBBB" + result.getInt("userID"));
-                }
 
                 pstmt2 = conn.prepareStatement("SELECT COUNT(*) FROM Fotos.User WHERE passWord=?;");
                 pstmt2.setString(1, passWord);
                 ResultSet result2 = pstmt2.executeQuery();
                 result2.next();
 
-                //Tarkistetaan löytyikö yhtään kyseistä usernamea. (Ei pitäisi olla koskaan enempää kuin yksi)
-                if (Objects.equals(result.getString("userName"), user) && result2.getInt(1) > 0) {
+                //Tarkistetaan löytyikö yhtään kyseistä usernamea.
+                if (!result.next()) {
+                    System.err.println("No such username found");
+                } else if (Objects.equals(result.getString("userName"), user) && result2.getInt(1) > 0) {
                     found = result.getInt("userID");
+                    System.out.println("Found " + Objects.equals(result.getString("userName"), user) + " " + user);
                 }
-                System.out.println("Found " + Objects.equals(result.getString("userName"), user) + " " + user);
 
             } catch (Exception e) {
                 System.err.println("Error in query");
