@@ -252,6 +252,8 @@ public class FotosController {
         loggedIn = false;
         privateUserID = -1;
         database.setPrivateUserId(-1);
+        databaseChanged = true;
+        adjustGrid(fotosGridPane.getWidth());
         omatKuvatButton.setVisible(false);
         jaetutKuvatButton.setVisible(false);
         usernameLabel.setText("Kirjaudu/Rekisteröidy");
