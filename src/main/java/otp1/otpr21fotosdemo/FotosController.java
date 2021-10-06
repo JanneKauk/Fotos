@@ -4,11 +4,13 @@ import javafx.animation.RotateTransition;
 import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -44,7 +46,7 @@ public class FotosController {
     @FXML
     private StackPane folderButtonStackPane;
     @FXML
-    private GridPane fotosGridPane;
+    private GridPane fotosGridPane, folderGridPane;
     @FXML
     private HBox filterMenuHbox;
     @FXML
@@ -568,6 +570,9 @@ public class FotosController {
 
     @FXML
     public void onNewFolderButtonClick() {
+        ObservableList<Node> childrens = folderGridPane.getChildren();
+        for (Node node : childrens) {
 
+        }
     }
 }

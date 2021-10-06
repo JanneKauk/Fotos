@@ -82,7 +82,7 @@
                            <children>
                               <ScrollPane fitToHeight="true" hbarPolicy="NEVER" pannable="true" prefHeight="80.0" vbarPolicy="NEVER" StackPane.alignment="CENTER_LEFT">
                                 <content>
-                                    <GridPane>
+                                    <GridPane fx:id="folderGridPane">
                                       <columnConstraints>
                                         <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="80.0" prefWidth="80.0" />
                                         <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="80.0" prefWidth="80.0" />

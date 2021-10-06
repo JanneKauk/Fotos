@@ -547,4 +547,9 @@ public class Database {
         return image;
     }
 
+    /*public int getFolderCount() {
+
+    }
+     */
+
 }
