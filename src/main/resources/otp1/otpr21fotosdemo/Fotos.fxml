@@ -111,43 +111,6 @@
                                       <rowConstraints>
                                         <RowConstraints maxHeight="46.0" minHeight="10.0" prefHeight="33.00000190734863" vgrow="SOMETIMES" />
                                       </rowConstraints>
-                                       <children>
-                                          <VBox alignment="CENTER">
-                                             <children>
-                                                <ImageView fitHeight="47.0" fitWidth="54.0" pickOnBounds="true" preserveRatio="true">
-                                                   <image>
-                                                      <Image url="@image/folder-1484.png" />
-                                                   </image>
-                                                   <VBox.margin>
-                                                      <Insets top="7.0" />
-                                                   </VBox.margin>
-                                                </ImageView>
-                                                <Label text="Kansio1" />
-                                             </children>
-                                          </VBox>
-                                          <VBox alignment="CENTER" prefHeight="72.0" prefWidth="80.0" GridPane.columnIndex="1">
-                                              <ImageView fitHeight="47.0" fitWidth="54.0" pickOnBounds="true" preserveRatio="true">
-                                                  <image>
-                                                      <Image url="@image/folder-1484.png" />
-                                                  </image>
-                                                  <VBox.margin>
-                                                      <Insets top="7.0" />
-                                                  </VBox.margin>
-                                             </ImageView>
-                                              <Label text="Kansio2" />
-                                          </VBox>
-                                          <VBox alignment="CENTER" GridPane.columnIndex="2">
-                                              <ImageView fitHeight="47.0" fitWidth="54.0" pickOnBounds="true" preserveRatio="true">
-                                                  <image>
-                                                      <Image url="@image/folder-1484.png" />
-                                                  </image>
-                                                  <VBox.margin>
-                                                      <Insets top="7.0" />
-                                                  </VBox.margin>
-                                             </ImageView>
-                                              <Label text="Kansio3" />
-                                          </VBox>
-                                       </children>
                                     </GridPane>
                                 </content>
                                  <padding>
