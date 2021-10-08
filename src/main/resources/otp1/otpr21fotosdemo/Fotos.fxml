@@ -331,6 +331,31 @@
                   <Insets right="10.0" top="50.0" />
                </StackPane.margin>
             </VBox>
+             <VBox fx:id="newFolderVbox" blendMode="SRC_ATOP" maxHeight="105.0" maxWidth="160.0" prefHeight="105.0" prefWidth="100.0" style="-fx-background-color: white; -fx-border-width: 1; -fx-border-color: black; -fx-border-radius: 15; -fx-background-radius: 15;" StackPane.alignment="TOP_RIGHT">
+                 <children>
+                     <Label text="Uuden kansion nimi:">
+                     <VBox.margin>
+                        <Insets bottom="5.0" />
+                     </VBox.margin></Label>
+                     <TextField fx:id="folderNameField" />
+                     <Text fx:id="newFolderErrorText" fill="RED" strokeType="OUTSIDE" strokeWidth="0.0">
+                         <VBox.margin>
+                             <Insets top="5.0" />
+                         </VBox.margin>
+                     </Text>
+                     <Button fx:id="newFolderReadyButton" mnemonicParsing="false" onAction="#onNewFolderReadyButtonClick" style="-fx-background-color: #59c3f4;" text="Valmis">
+                         <VBox.margin>
+                             <Insets top="10.0" />
+                         </VBox.margin>
+                     </Button>
+                 </children>
+                 <padding>
+                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                 </padding>
+                 <StackPane.margin>
+                     <Insets right="10.0" top="165.0" />
+                 </StackPane.margin>
+             </VBox>
              <StackPane fx:id="addImageButton" maxHeight="60.0" maxWidth="60.0" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="2" GridPane.valignment="BOTTOM" StackPane.alignment="BOTTOM_RIGHT">
                  <children>
                   <ImageView fitHeight="124.0" fitWidth="127.0" onMouseClicked="#onAddImgButtonClick" pickOnBounds="true" preserveRatio="true" StackPane.alignment="CENTER">

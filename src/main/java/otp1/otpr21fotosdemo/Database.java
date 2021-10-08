@@ -762,4 +762,8 @@ public class Database {
         }
         return folderlist;
     }
+
+    public void uploadNewFolder(String name, int userId) {
+
+    }
 }

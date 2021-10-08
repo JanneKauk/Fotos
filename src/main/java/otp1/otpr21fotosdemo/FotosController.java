@@ -55,9 +55,9 @@ public class FotosController {
     @FXML
     Label usernameLabel;
     @FXML
-    VBox loginVbox, emailVbox;
+    VBox loginVbox, emailVbox, newFolderVbox;
     @FXML
-    TextField usernameField, emailField1, emailField2;
+    TextField usernameField, emailField1, emailField2, folderNameField;
     @FXML
     PasswordField passwordField;
     @FXML
@@ -71,7 +71,7 @@ public class FotosController {
     @FXML
     private ImageView testImageView, newFolderButton;
     @FXML
-    public Text loginErrorText;
+    public Text loginErrorText, newFolderErrorText;
 
     private Stage mainStage = null;
     private boolean loggedIn = false;
@@ -102,17 +102,16 @@ public class FotosController {
         filterButtonStackPane.setRotate(180);
         filterMenu.setManaged(false);
 
-        //Login menu piiloo ja sen sisällä rekisteröitymiseen tarvittavat tekstikentät myös.
+        //Uuden kansion -ja Login menu piiloo ja sen sisällä rekisteröitymiseen tarvittavat tekstikentät myös.
         loginVbox.setVisible(false);
         emailVbox.setVisible(false);
         emailVbox.setManaged(false);
         settingsBorderPane.setManaged(false);
         settingsBorderPane.setVisible(false);
         imageViewStackPane.setVisible(false);
-
-
-
+        newFolderVbox.setVisible(false);
     }
+
     public void setMainStage(Stage stage){
         mainStage = stage;
         //Adjusts the Igrid when the window size changes TODO: Still ignores maximize and minimize
@@ -250,6 +249,12 @@ public class FotosController {
         emailField1.setText("");
         emailField2.setText("");
     }
+
+    private void clearNewFolderMenuFields() {
+        folderNameField.setText("");
+        newFolderErrorText.setText("");
+    }
+
     private void logout(){
         loggedIn = false;
         privateUserID = -1;
@@ -259,6 +264,8 @@ public class FotosController {
         omatKuvatButton.setVisible(false);
         jaetutKuvatButton.setVisible(false);
         usernameLabel.setText("Kirjaudu/Rekisteröidy");
+        folderGridPane.getChildren().clear();
+        newFolderButton.setVisible(false);
         switchToDefaultScene();
     }
 
@@ -278,6 +285,7 @@ public class FotosController {
             jaetutKuvatButton.setVisible(true);
             usernameLabel.setText(usernameField.getText());
             loginVbox.setVisible(false);
+            newFolderButton.setVisible(true);
             clearLoginFields();
             loginErrorText.setText("");
             databaseChanged = true;
@@ -327,7 +335,13 @@ public class FotosController {
             emailVbox.setVisible(false);
             loginVbox.setVisible(false);
             clearLoginFields();
+        }
 
+        if (!(event.getTarget().equals(newFolderButton))) {
+            newFolderVbox.setVisible(false);
+            newFolderErrorText.setVisible(false);
+            newFolderErrorText.setManaged(false);
+            clearNewFolderMenuFields();
         }
     }
     @FXML
@@ -608,5 +622,24 @@ public class FotosController {
 
         }
         */
+        System.out.println("Uuden kansion kuvaketta painettu");
+        newFolderVbox.setVisible(true);
+        newFolderErrorText.setVisible(false);
+        newFolderErrorText.setManaged(false);
+    }
+
+    @FXML
+    //Kun käyttäjä klikkaa valmis-nappia kun ollaan tekemässä uutta kansiota.
+    public void onNewFolderReadyButtonClick() {
+        String newfoldername;
+
+        if (folderNameField.getText().equals("")) {
+            newFolderErrorText.setText("Anna kansiolle nimi");
+            newFolderErrorText.setVisible(true);
+            newFolderErrorText.setManaged(true);
+        } else {
+            newfoldername = folderNameField.getText();
+            //database.uploadNewFolder(newfoldername, userid);
+        }
     }
 }
