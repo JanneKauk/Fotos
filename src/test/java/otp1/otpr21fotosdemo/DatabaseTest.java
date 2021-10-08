@@ -6,16 +6,19 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.*;
 
 
 // TODO: Connect testing methods with values for correct testing
@@ -244,9 +247,28 @@ public class DatabaseTest {
 
     @DisplayName("Testataan userExists metodi useammalla käyttäjätunnuksella.")
     @ParameterizedTest (name="Testataan loytyyko username {0}")
-    @CsvSource({"ppouta, false", "noexist, false", "8u34958u342985u89t3hf89ht298t48h, false","-1,false", "NULL, false" })
+    @CsvSource({"ppouta, false", "1test, true", "noexist, false", "8u34958u342985u89t3hf89ht298t48h, false","-1,false", "NULL, false" })
     public void userExistsTest(String userName, boolean result){
         Database base = new Database();
         assertEquals(result, base.userExists(userName), "UserExiststest failed with username " + userName);
+    }
+
+    @Test
+    @DisplayName("Testataan yhden kuvan uploadaus, etsiminen(imageExists) ja poisto.")
+    public void uploadImagesTest(){
+        Database base = new Database();
+        File file = new File("src/main/resources/otp1/otpr21fotosdemo/image/addition-icon.png");
+        List<File> fileList = new ArrayList<File>();
+        fileList.add(file);
+
+        assertAll(() -> {
+            List<Integer> imageIDt = base.uploadImages(1,1,fileList);
+            if(imageIDt.size() > 0){
+                //Testataan löytyykö lisätty kuva
+                assertTrue( base.imageExists(imageIDt.get(0)), "Lisättyä kuvaa ei löytynyt!");
+                //Poistetaan lisätty kuva
+                assertTrue(base.deleteImage(imageIDt.get(0)), "Kuvan poisto ei onnistunut!");
+            }
+        });
     }
 }

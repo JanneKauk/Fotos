@@ -270,11 +270,172 @@ public class Database {
 
     }
 
+    public boolean imageExists(int imageID){
+        boolean foundThumb = false;
+        boolean foundFullres = false;
+        Connection conn = null;
+        try {
+            // Connection statement
+            conn = DriverManager.getConnection(url, dbUserName, dbPassword);
+            System.out.println("Database Connection Established...");
+            PreparedStatement pstmt = null;
+            PreparedStatement pstmt2 = null;
+            try {
+                pstmt = conn.prepareStatement("SELECT COUNT(*) FROM Fotos.Image WHERE imageID=?;");
+                pstmt.setInt(1, imageID);
+                ResultSet result = pstmt.executeQuery();
+                result.next();
+
+                //Tarkistetaan löytyikö yhtään kyseistä imageID:tä. (Ei pitäisi olla koskaan enempää kuin yksi)
+                if (result.getInt(1) > 0) {
+                    foundThumb = true;
+                }
+                System.out.println("Found imageID " + imageID + " in Fotos.Image");
+
+                pstmt2 = conn.prepareStatement("SELECT COUNT(*) FROM Fotos.Full_Image WHERE imageID=?;");
+                pstmt2.setInt(1, imageID);
+                ResultSet result2 = pstmt2.executeQuery();
+                result2.next();
+
+                //Tarkistetaan löytyikö yhtään kyseistä imageID:tä. (Ei pitäisi olla koskaan enempää kuin yksi)
+                if (result2.getInt(1) > 0) {
+                    foundFullres = true;
+                }
+                System.out.println("Found imageID " + imageID + " in Fotos.Full_Image");
+
+            } catch (Exception e) {
+                System.err.println("Error in query");
+                e.printStackTrace();
+
+            } finally {
+                if (pstmt != null) {
+                    try {
+                        pstmt.close();
+
+                    } catch (Exception ex) {
+                        System.out.println("Error in statement 1 termination!");
+
+                    }
+                }
+                if (pstmt2 != null) {
+                    try {
+                        pstmt2.close();
+
+                    } catch (Exception ex) {
+                        System.out.println("Error in statement 2 termination!");
+
+                    }
+                }
+
+            }
+
+
+        } catch (Exception ex) {
+            System.err.println("Cannot connect to database server");
+            ex.printStackTrace();
+        } finally {
+            if (conn != null) {
+                try {
+                    System.out.println("***** Let terminate the Connection *****");
+                    conn.close();
+                    System.out.println("Database connection terminated...");
+
+                } catch (Exception ex) {
+                    System.out.println("Error in connection termination!");
+
+                }
+            }
+
+        }
+        return (foundThumb && foundFullres);
+    }
+
+    public boolean deleteImage(int imageID){
+        boolean deleted = false;
+        //boolean deletedFullRes = false;
+        Connection conn = null;
+        try {
+            // Connection statement
+            conn = DriverManager.getConnection(url, dbUserName, dbPassword);
+            System.out.println("Database Connection Established...");
+            PreparedStatement pstmt = null;
+            //PreparedStatement pstmt2 = null;
+            try {
+                pstmt = conn.prepareStatement("DELETE FROM Fotos.Image WHERE  imageID=?;");
+                pstmt.setInt(1, imageID);
+                pstmt.execute();
+                System.out.println("Poistettiin " + pstmt.getUpdateCount() + " riviä taulusta Fotos.Image");
+                if (pstmt.getUpdateCount() > 0) {
+                    deleted = true;
+                }
+
+                /*
+                Full_Image taulusta ei tarvitse poistaa erikseen, koska
+                tietokanta poistaa tuon entryn, kun se poistetaan Image-taulusta...
+
+                pstmt2 = conn.prepareStatement("DELETE FROM Fotos.Full_Image WHERE  imageID=?;");
+                pstmt2.setInt(1, imageID);
+                pstmt2.execute();
+                System.out.println("Poistettiin " + pstmt2.getUpdateCount() + " riviä taulusta Fotos.Full_Image");
+                if (pstmt2.getUpdateCount() > 0) {
+                    deletedFullRes = true;
+                }
+                */
+
+            } catch (Exception e) {
+                System.err.println("Error in query");
+                e.printStackTrace();
+
+            } finally {
+                if (pstmt != null) {
+                    try {
+                        pstmt.close();
+
+                    } catch (Exception ex) {
+                        System.out.println("Error in statement 1 termination!");
+
+                    }
+                }
+                /*
+                if (pstmt2 != null) {
+                    try {
+                        pstmt2.close();
+
+                    } catch (Exception ex) {
+                        System.out.println("Error in statement 2 termination!");
+
+                    }
+                }*/
+
+            }
+
+
+        } catch (Exception ex) {
+            System.err.println("Cannot connect to database server");
+            ex.printStackTrace();
+        } finally {
+            if (conn != null) {
+                try {
+                    System.out.println("***** Let terminate the Connection *****");
+                    conn.close();
+                    System.out.println("Database connection terminated...");
+
+                } catch (Exception ex) {
+                    System.out.println("Error in connection termination!");
+
+                }
+            }
+
+        }
+        return deleted;
+    }
+
     //TODO Joku "progress bar" -tyyppinen näkymä mistä näkee miten kuvien uploadaus edistyy
-    public void uploadImages(int userId, int folderId, List<File> files) {
+    public List<Integer> uploadImages(int userId, int folderId, List<File> files) {
 
         System.out.println("UploadTask starting.");
         Connection conn = null;
+        ArrayList<Integer> newImageIDs = new ArrayList<>();
         try {
             // Connection statement
             conn = DriverManager.getConnection(url, dbUserName, dbPassword);
@@ -349,7 +510,7 @@ public class Database {
                     ResultSet key = pstmt.getGeneratedKeys();
                     key.next();
                     System.out.println("Sent " + thumbSize + " bytes. New imageID: " + key.getInt(1) + " Filename: " + filename);
-
+                    newImageIDs.add(key.getInt(1));
                     //Uploadataan täyden reson kuva
                     FileInputStream fis2 = new FileInputStream(originalFile);
                     pstmt2 = conn.prepareStatement(
@@ -409,7 +570,7 @@ public class Database {
 
         }
         System.out.println("UploadTask done.");
-
+        return newImageIDs;
 
     }
 

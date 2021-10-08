@@ -88,7 +88,10 @@ public class FotosController {
     File file2 = new File("src/main/resources/otp1/otpr21fotosdemo/image/addition-icon.png");
     Image missingImage = new Image(file.toURI().toString());
     Image additionImage = new Image(file2.toURI().toString());
-
+    @FXML
+    private void deleteTest(){
+        database.deleteImage(118);
+    }
     @FXML
     private void initialize() {
         database = new Database();
