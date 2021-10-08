@@ -4,11 +4,14 @@ import javafx.animation.RotateTransition;
 import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -18,16 +21,14 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Circle;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.Pair;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
@@ -44,7 +45,7 @@ public class FotosController {
     @FXML
     private StackPane folderButtonStackPane;
     @FXML
-    private GridPane fotosGridPane;
+    private GridPane fotosGridPane, folderGridPane;
     @FXML
     private HBox filterMenuHbox;
     @FXML
@@ -68,7 +69,7 @@ public class FotosController {
     @FXML
     private StackPane imageViewStackPane, blurringStackPane, addImageButton, testStackPane;
     @FXML
-    private ImageView testImageView;
+    private ImageView testImageView, newFolderButton;
     @FXML
     public Text loginErrorText;
 
@@ -267,6 +268,8 @@ public class FotosController {
         if (Objects.equals(usernameField.getText(), "")) {
             loginErrorText.setText("Syötä käyttäjätunnus");
         } else if (database.userAndPwExists(usernameField.getText(), passwordField.getText()) != 0) {
+            int userid = database.userAndPwExists(usernameField.getText(), passwordField.getText());
+            loadUserFolders(userid);
             loggedIn = true;
             omatKuvatButton.setVisible(true);
             jaetutKuvatButton.setVisible(true);
@@ -565,5 +568,42 @@ public class FotosController {
             testImageView.setImage(missingImage);
         }
 */
+    }
+
+    @FXML
+    //Käyttäjän kansioiden lataamiseen
+    public void loadUserFolders(int userId) {
+        //Haetaan tietokannasta
+        System.out.println("Ladataan kansioita...");
+        ArrayList <String> foldernames;
+        foldernames = database.getUserFolders(userId);
+        int i = 0;
+        //Asetetaan kansiot käyttöliittymään
+        for (String foldername: foldernames) {
+            Image img = new Image("file:src/main/resources/otp1/otpr21fotosdemo/image/folder-1484.png");
+            ImageView imgview = new ImageView(img);
+            imgview.setFitWidth(54);
+            imgview.setFitHeight(47);
+            Label label = new Label(foldername);
+            VBox vbox = new VBox(imgview, label);
+            label.setFont(new Font("System", 12));
+            vbox.setPrefWidth(80);
+            vbox.setPrefHeight(72);
+            vbox.setAlignment(Pos.CENTER);
+            VBox.setMargin(imgview, new Insets(7, 0, 0, 0));
+            folderGridPane.add(vbox, i, 0, 1, 1);
+            i++;
+        }
+    }
+
+    @FXML
+    //Uuden kansion luontiin
+    public void onNewFolderButtonClick() {
+        /*
+        ObservableList<Node> childrens = folderGridPane.getChildren();
+        for (Node node : childrens) {
+
+        }
+        */
     }
 }

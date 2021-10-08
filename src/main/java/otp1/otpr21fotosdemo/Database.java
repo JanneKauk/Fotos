@@ -27,13 +27,15 @@ public class Database {
     private int privateUserId;
     private FotosController controller;
 
-    public Database (){
+    public Database() {
 
     }
-    public void setController(FotosController c){
+
+    public void setController(FotosController c) {
         controller = c;
     }
-    public void setPrivateUserId (int i){
+
+    public void setPrivateUserId(int i) {
         privateUserId = i;
     }
 
@@ -65,15 +67,15 @@ public class Database {
         return hashedString;
     }
 
-    public byte[] hashPassword( final char[] password, final byte[] salt, final int iterations, final int keyLength ) {
+    public byte[] hashPassword(final char[] password, final byte[] salt, final int iterations, final int keyLength) {
         try {
-            SecretKeyFactory skf = SecretKeyFactory.getInstance( "PBKDF2WithHmacSHA512" );
-            PBEKeySpec spec = new PBEKeySpec( password, salt, iterations, keyLength );
-            SecretKey key = skf.generateSecret( spec );
-            byte[] res = key.getEncoded( );
+            SecretKeyFactory skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512");
+            PBEKeySpec spec = new PBEKeySpec(password, salt, iterations, keyLength);
+            SecretKey key = skf.generateSecret(spec);
+            byte[] res = key.getEncoded();
             return res;
-        } catch ( NoSuchAlgorithmException | InvalidKeySpecException e ) {
-            throw new RuntimeException( e );
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -269,7 +271,7 @@ public class Database {
     }
 
     //TODO Joku "progress bar" -tyyppinen näkymä mistä näkee miten kuvien uploadaus edistyy
-    public void uploadImages(int userId, int folderId, List<File> files){
+    public void uploadImages(int userId, int folderId, List<File> files) {
 
         System.out.println("UploadTask starting.");
         Connection conn = null;
@@ -280,18 +282,18 @@ public class Database {
 
             Iterator<File> it = files.iterator();
             //Jokainen tiedosto lähetetään erikseen
-            while(it.hasNext()) {
+            while (it.hasNext()) {
                 File originalFile = it.next();
 
                 //Rajataan tiedostonimeä jos se on pidempi kuin tietokannan raja
                 String filename = originalFile.getName();
-                if (filename.length() > 64){
+                if (filename.length() > 64) {
                     System.out.println("Filename length1: " + filename.length());
                     System.out.println("Filename: " + filename);
 
                     StringBuilder builder = new StringBuilder();
                     String end = filename.substring(filename.lastIndexOf("."));
-                    builder.append(filename.substring(0,(63 - end.length() - 3)));
+                    builder.append(filename.substring(0, (63 - end.length() - 3)));
                     builder.append("---" + end);
                     filename = builder.toString();
 
@@ -305,17 +307,17 @@ public class Database {
                 int origWidth = originalBufferedImage.getWidth();
                 int origHeight = originalBufferedImage.getHeight();
                 int thumbWidth, thumbHeight;
-                if (origHeight > origWidth){
+                if (origHeight > origWidth) {
                     thumbHeight = MAX_THUMB_HEIGHT;
-                    thumbWidth = Math.round((float)thumbHeight/origHeight * origWidth);
+                    thumbWidth = Math.round((float) thumbHeight / origHeight * origWidth);
                 } else {
                     thumbWidth = MAX_THUMB_WIDTH;
-                    thumbHeight = Math.round((float)thumbWidth/origWidth * origHeight);
+                    thumbHeight = Math.round((float) thumbWidth / origWidth * origHeight);
                 }
 
                 BufferedImage thumb = new BufferedImage(thumbWidth, thumbHeight, BufferedImage.TYPE_INT_RGB);
                 Graphics2D g = thumb.createGraphics();
-                g.drawImage(originalBufferedImage.getScaledInstance(thumbWidth, thumbHeight, Image.SCALE_SMOOTH),0,0,null);
+                g.drawImage(originalBufferedImage.getScaledInstance(thumbWidth, thumbHeight, Image.SCALE_SMOOTH), 0, 0, null);
                 g.dispose();
                 ByteArrayOutputStream os = new ByteArrayOutputStream();
                 ImageIO.write(thumb, "jpg", os);
@@ -332,7 +334,7 @@ public class Database {
                             Statement.RETURN_GENERATED_KEYS
                     );
 
-                    pstmt.setInt(1, 0 );
+                    pstmt.setInt(1, 0);
                     pstmt.setString(2, filename);
                     pstmt.setBinaryStream(3, is);
 
@@ -346,7 +348,7 @@ public class Database {
 
                     ResultSet key = pstmt.getGeneratedKeys();
                     key.next();
-                    System.out.println("Sent " + thumbSize + " bytes. New imageID: " + key.getInt(1)+ " Filename: " + filename);
+                    System.out.println("Sent " + thumbSize + " bytes. New imageID: " + key.getInt(1) + " Filename: " + filename);
 
                     //Uploadataan täyden reson kuva
                     FileInputStream fis2 = new FileInputStream(originalFile);
@@ -354,19 +356,18 @@ public class Database {
                             "INSERT INTO Fotos.Full_Image(imageID, image) values (?, ?)"
                     );
                     //Tähä laitetaa edellisessä insertissä saatu autogeneroitu key
-                    pstmt2.setInt(1, key.getInt(1) );
+                    pstmt2.setInt(1, key.getInt(1));
                     pstmt2.setBinaryStream(2, fis2, (int) originalFile.length());
                     System.out.println("Executing statement 2...");
                     pstmt2.execute();
                     System.out.println("Sent " + originalFile.length() + " bytes.");
 
 
-
                 } catch (Exception e) {
                     System.err.println("Error in query");
                     e.printStackTrace();
 
-                }  finally {
+                } finally {
                     if (pstmt != null) {
                         try {
                             pstmt.close();
@@ -388,7 +389,6 @@ public class Database {
 
                 }
             }
-
 
 
         } catch (Exception ex) {
@@ -414,7 +414,7 @@ public class Database {
     }
 
     //Palauttaa Hashmapin jossa key on imageID ja Value on PAIR-rakenne. Pair-rakenteessa taas key on tiedostonimi ja value on imagedata
-    public Map<Integer, Pair<String, javafx.scene.image.Image>> downloadImages(int folderId){
+    public Map<Integer, Pair<String, javafx.scene.image.Image>> downloadImages(int folderId) {
         Connection conn = null;
         ResultSet result = null;
         Map<Integer, Pair<String, javafx.scene.image.Image>> images = new HashMap<>();
@@ -433,15 +433,15 @@ public class Database {
                         "SELECT imageID, fileName, image FROM Fotos.Image WHERE userID=? AND folderID=?;"
                 );
 
-                pstmt.setInt(1, privateUserId );
-                pstmt.setInt(2, folderId );
+                pstmt.setInt(1, privateUserId);
+                pstmt.setInt(2, folderId);
                 result = pstmt.executeQuery();
 
                 while (result.next()) {
                     int id = result.getInt("imageID");
                     String filename = result.getString("filename");
                     javafx.scene.image.Image image = new javafx.scene.image.Image(result.getBinaryStream("image"));
-                    images.put(id, new Pair<>(filename,image));
+                    images.put(id, new Pair<>(filename, image));
 
                 }
 
@@ -449,7 +449,7 @@ public class Database {
                 System.err.println("Error in query");
                 e.printStackTrace();
 
-            }  finally {
+            } finally {
                 if (pstmt != null) {
                     try {
                         pstmt.close();
@@ -481,8 +481,8 @@ public class Database {
         return images;
     }
 
-    public javafx.scene.image.Image downloadFullImage(int imageID){
-        if (fullImageCache.containsKey(imageID)){
+    public javafx.scene.image.Image downloadFullImage(int imageID) {
+        if (fullImageCache.containsKey(imageID)) {
             System.out.println("Full image found in cache. Showing that instead.");
             return fullImageCache.get(imageID);
         }
@@ -503,19 +503,19 @@ public class Database {
                 pstmt = conn.prepareStatement(
                         "SELECT image FROM Fotos.Full_Image WHERE imageID=?;"
                 );
-                pstmt.setInt(1, imageID );
+                pstmt.setInt(1, imageID);
                 result = pstmt.executeQuery();
 
                 if (result.next()) {
                     image = new javafx.scene.image.Image(result.getBinaryStream("image"));
-                    fullImageCache.put(imageID,image);
+                    fullImageCache.put(imageID, image);
                 }
 
             } catch (Exception e) {
                 System.err.println("Error in query");
                 e.printStackTrace();
 
-            }  finally {
+            } finally {
                 if (pstmt != null) {
                     try {
                         pstmt.close();
@@ -547,4 +547,58 @@ public class Database {
         return image;
     }
 
+    public ArrayList<String> getUserFolders(int userId) {
+        Connection conn = null;
+        ResultSet result = null;
+        ArrayList<String> folderlist = new ArrayList<String>();
+
+        try {
+            // Connection statement
+            conn = DriverManager.getConnection(url, dbUserName, dbPassword);
+            System.out.println("\nDatabase Connection Established...");
+
+            PreparedStatement myStatement = null;
+
+            try {
+                myStatement = conn.prepareStatement(
+                        "SELECT name FROM Fotos.Folder WHERE userID=?;"
+                );
+                myStatement.setInt(1, userId);
+                result = myStatement.executeQuery();
+                while (result.next()) {
+                    String foldername = result.getString("name");
+                    folderlist.add(foldername);
+                }
+
+            } catch (Exception e) {
+                System.err.println("Error in query");
+            } finally {
+                if (myStatement != null) {
+                    try {
+                        myStatement.close();
+                    } catch (Exception ex) {
+                        System.out.println("Error in statement termination!");
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            System.err.println("Cannot connect to database server");
+            e.printStackTrace();
+        } finally {
+            if (conn != null) {
+                try {
+                    System.out.println("\n***** Let terminate the Connection *****");
+                    conn.close();
+                    System.out.println("\nDatabase connection terminated...");
+
+                } catch (Exception ex) {
+                    System.out.println("Error in connection termination!");
+
+                }
+            }
+
+        }
+        return folderlist;
+    }
 }
