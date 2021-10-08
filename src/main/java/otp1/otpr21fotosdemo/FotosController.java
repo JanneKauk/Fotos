@@ -368,12 +368,11 @@ public class FotosController {
 
                     Optional<ButtonType> vastaus = alert.showAndWait();
                     if(vastaus.isPresent() && vastaus.get() == ButtonType.OK){
-                        //Upload
+                        //Upload on another thread
                         Runnable uploadTask = () -> {
                             System.out.println ("Upload for userID " + privateUserID);
-
                             database.uploadImages(privateUserID,1, files);
-                            System.out.println("uploaded");
+                            System.out.println("Uploaded.");
                             databaseChanged = true;
                             Platform.runLater(() -> {
                                 adjustGrid(fotosGridPane.getWidth());

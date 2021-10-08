@@ -267,7 +267,7 @@ public class Database {
         return found;
 
     }
-    //TODO Koko metodin suoritus omaan threadiin ettei freesaa muuta äppiä.
+
     //TODO Joku "progress bar" -tyyppinen näkymä mistä näkee miten kuvien uploadaus edistyy
     public void uploadImages(int userId, int folderId, List<File> files){
 
