@@ -639,7 +639,10 @@ public class FotosController {
             newFolderErrorText.setManaged(true);
         } else {
             newfoldername = folderNameField.getText();
-            //database.uploadNewFolder(newfoldername, userid);
+            database.uploadNewFolder(newfoldername, privateUserID);
+            newFolderVbox.setVisible(false);
+            clearNewFolderMenuFields();
+            loadUserFolders(privateUserID);
         }
     }
 }

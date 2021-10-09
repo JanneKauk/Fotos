@@ -764,6 +764,39 @@ public class Database {
     }
 
     public void uploadNewFolder(String name, int userId) {
+        Connection conn = null;
 
+        try {
+            // Connection statement
+            conn = DriverManager.getConnection(url, dbUserName, dbPassword);
+            System.out.println("\nDatabase Connection Established...");
+
+            PreparedStatement myStatement = null;
+            try {
+                myStatement = conn.prepareStatement("INSERT INTO Fotos.Folder(NAME, EDITDATE, USERID) VALUES (?, CURDATE(), ?)");
+                myStatement.setString(1, name);
+                myStatement.setInt(2, userId);
+                myStatement.executeUpdate();
+                System.out.println("Uusi kansio viety tietokantaan.");
+            } catch (Exception e) {
+                System.err.println("Error in query");
+                e.printStackTrace();
+            }
+        } catch (Exception e) {
+            System.out.println("Cannot connect to database server");
+            e.printStackTrace();
+        } finally {
+            if (conn != null) {
+                try {
+                    System.out.println("\n***** Let terminate the Connection *****");
+                    conn.close();
+                    System.out.println("\nDatabase connection terminated...");
+
+                } catch (Exception ex) {
+                    System.out.println("Error in connection termination!");
+
+                }
+            }
+        }
     }
 }
