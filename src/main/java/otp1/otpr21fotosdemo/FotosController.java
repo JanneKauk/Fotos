@@ -19,6 +19,8 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
@@ -592,16 +594,16 @@ public class FotosController {
     public void loadUserFolders(int userId) {
         //Haetaan tietokannasta
         System.out.println("Ladataan kansioita...");
-        ArrayList <String> foldernames;
-        foldernames = database.getUserFolders(userId);
+        HashMap <Integer, String> folderinfo;
+        folderinfo = database.getUserFolders(userId);
         int i = 0;
         //Asetetaan kansiot käyttöliittymään
-        for (String foldername: foldernames) {
+        for (Integer folder: folderinfo.keySet()) {
             Image img = new Image("file:src/main/resources/otp1/otpr21fotosdemo/image/folder-1484.png");
             ImageView imgview = new ImageView(img);
             imgview.setFitWidth(54);
             imgview.setFitHeight(47);
-            Label label = new Label(foldername);
+            Label label = new Label(folderinfo.get(folder));
             VBox vbox = new VBox(imgview, label);
             label.setFont(new Font("System", 12));
             vbox.setPrefWidth(80);
@@ -610,6 +612,25 @@ public class FotosController {
             VBox.setMargin(imgview, new Insets(7, 0, 0, 0));
             folderGridPane.add(vbox, i, 0, 1, 1);
             i++;
+
+            //Kansion poistamiseen
+            vbox.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent mouseEvent) {
+                    if (mouseEvent.getButton() == MouseButton.SECONDARY) {
+                        ContextMenu menu = new ContextMenu();
+                        MenuItem menuitem1 = new MenuItem("Poista");
+                        menu.getItems().addAll(menuitem1);
+                        menuitem1.setOnAction(new EventHandler<ActionEvent>() {
+                            @Override
+                            public void handle(ActionEvent event) {
+                                onDeleteFolderButtonClick(folder);
+                            }
+                        });
+                        menu.show(vbox, mouseEvent.getScreenX(), mouseEvent.getScreenY());
+                    }
+                }
+            });
         }
     }
 
@@ -642,7 +663,16 @@ public class FotosController {
             database.uploadNewFolder(newfoldername, privateUserID);
             newFolderVbox.setVisible(false);
             clearNewFolderMenuFields();
+            folderGridPane.getChildren().clear();
             loadUserFolders(privateUserID);
         }
+    }
+
+    @FXML
+    //Kansioiden poistaminen
+    public void onDeleteFolderButtonClick(Integer folderid) {
+        database.deleteFolder(folderid);
+        folderGridPane.getChildren().clear();
+        loadUserFolders(privateUserID);
     }
 }

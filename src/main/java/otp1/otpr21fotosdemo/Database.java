@@ -708,10 +708,11 @@ public class Database {
         return image;
     }
 
-    public ArrayList<String> getUserFolders(int userId) {
+    public HashMap <Integer, String> getUserFolders(int userId) {
         Connection conn = null;
         ResultSet result = null;
-        ArrayList<String> folderlist = new ArrayList<String>();
+        //ArrayList<String> folderlist = new ArrayList<String>();
+        HashMap <Integer, String> folders = new HashMap <Integer, String>();
 
         try {
             // Connection statement
@@ -722,17 +723,20 @@ public class Database {
 
             try {
                 myStatement = conn.prepareStatement(
-                        "SELECT name FROM Fotos.Folder WHERE userID=?;"
+                        "SELECT name, folderID FROM Fotos.Folder WHERE userID=?;"
                 );
                 myStatement.setInt(1, userId);
                 result = myStatement.executeQuery();
                 while (result.next()) {
                     String foldername = result.getString("name");
-                    folderlist.add(foldername);
+                    int folderid = result.getInt("folderID");
+                    //folderlist.add(foldername);
+                    folders.put(folderid, foldername);
                 }
 
             } catch (Exception e) {
                 System.err.println("Error in query");
+                e.printStackTrace();
             } finally {
                 if (myStatement != null) {
                     try {
@@ -760,7 +764,8 @@ public class Database {
             }
 
         }
-        return folderlist;
+        //return folderlist;
+        return folders;
     }
 
     public void uploadNewFolder(String name, int userId) {
@@ -778,6 +783,42 @@ public class Database {
                 myStatement.setInt(2, userId);
                 myStatement.executeUpdate();
                 System.out.println("Uusi kansio viety tietokantaan.");
+            } catch (Exception e) {
+                System.err.println("Error in query");
+                e.printStackTrace();
+            }
+        } catch (Exception e) {
+            System.out.println("Cannot connect to database server");
+            e.printStackTrace();
+        } finally {
+            if (conn != null) {
+                try {
+                    System.out.println("\n***** Let terminate the Connection *****");
+                    conn.close();
+                    System.out.println("\nDatabase connection terminated...");
+
+                } catch (Exception ex) {
+                    System.out.println("Error in connection termination!");
+
+                }
+            }
+        }
+    }
+
+    public void deleteFolder(int folderid) {
+        Connection conn = null;
+
+        try {
+            // Connection statement
+            conn = DriverManager.getConnection(url, dbUserName, dbPassword);
+            System.out.println("\nDatabase Connection Established...");
+
+            PreparedStatement myStatement = null;
+            try {
+                myStatement = conn.prepareStatement("DELETE FROM Fotos.Folder WHERE folderID=?");
+                myStatement.setInt(1, folderid);
+                myStatement.executeUpdate();
+                System.out.println("Kansio poistettu tietokannasta.");
             } catch (Exception e) {
                 System.err.println("Error in query");
                 e.printStackTrace();
