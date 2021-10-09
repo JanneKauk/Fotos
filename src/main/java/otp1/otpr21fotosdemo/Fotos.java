@@ -13,7 +13,6 @@ public class Fotos extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader(Fotos.class.getResource("Fotos.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 1280, 800);
         stage.setTitle("Fotos!");
-        stage.setMaximized(true);
         stage.setScene(scene);
         FotosController controller = fxmlLoader.getController();
         controller.setMainStage(stage);

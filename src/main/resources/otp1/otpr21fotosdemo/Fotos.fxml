@@ -274,8 +274,10 @@
                          <ScrollPane fx:id="scrollp" fitToWidth="true">
                              <content>
                                  <GridPane fx:id="fotosGridPane" alignment="CENTER" gridLinesVisible="true" hgap="10.0" vgap="10.0">
+                                    <rowConstraints>
 
-                     </GridPane>
+                                    </rowConstraints>
+                                 </GridPane>
                              </content>
                          </ScrollPane>
                      </children>
@@ -376,7 +378,7 @@
       </StackPane>
       <StackPane fx:id="imageViewStackPane" visible="false">
          <children>
-            <Region fx:id="imageviewBackgroundRegion" opacity="0" style="-fx-background-color: #cccccc;" />
+            <Region fx:id="imageviewBackgroundRegion" opacity="0.4" style="-fx-background-color: #000000;" />
             <BorderPane onMouseClicked="#closeImageview" prefHeight="200.0" prefWidth="200.0">
                <top>
                   <StackPane alignment="CENTER_RIGHT" prefHeight="40.0" style="-fx-background-color: #ebebeb;">

@@ -4,14 +4,13 @@ import javafx.animation.RotateTransition;
 import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.control.*;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -22,7 +21,9 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
@@ -31,8 +32,6 @@ import javafx.util.Duration;
 import javafx.util.Pair;
 
 import java.io.*;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.*;
 
 import static java.lang.Double.valueOf;
@@ -83,7 +82,7 @@ public class FotosController {
     private boolean databaseChanged = true;
 
     //Image Grid settings
-    private int columns, rows, maxCols = 8;
+    private int currentColumnCount, rows, maxCols = 8;
     private int imageTableCount = 23;//How many images there are in the current location
     RowConstraints rc = new RowConstraints();
     ColumnConstraints cc = new ColumnConstraints();
@@ -117,11 +116,17 @@ public class FotosController {
 
     public void setMainStage(Stage stage){
         mainStage = stage;
-        //Adjusts the Igrid when the window size changes TODO: Still ignores maximize and minimize
+        setGridConstraints();
+        //Adjusts the Igrid when the window size changes
         centerStackp.widthProperty().addListener((observableValue, oldSceneWidth, newSceneWidth) -> {
             //System.out.println("Width: " + newSceneWidth);
-            adjustGrid(newSceneWidth);
+            adjustImageGrid();
         });
+        stage.maximizedProperty().addListener(((observableValue, oldVal, newVal) -> {
+            //System.out.println("isMaxed?"+newVal);
+            adjustImageGrid();
+        }));
+        stage.setMaximized(true);
     }
 
     private void openImageview(){
@@ -138,7 +143,6 @@ public class FotosController {
         fotosGridPane.getChildren().clear();
         fotosGridPane.getRowConstraints().clear();
         fotosGridPane.getColumnConstraints().clear();
-        //fotosGridPane.setGridLinesVisible(true); //For debug
 
         //Column constraints
         cc.setMinWidth(150);
@@ -148,14 +152,15 @@ public class FotosController {
         //rc.setVgrow(Priority.ALWAYS);
     }
 
-    private void adjustGrid(Number parentWidth){
+    private void adjustImageGrid(){
         //Calc how many columns fit into the parent stackpane
-        int cols = Math.max(3 , Math.min(8 , (int)Math.floor(parentWidth.doubleValue()/160)));
-        if(cols==columns && !databaseChanged) return;//Continue only if column count changes OR database changed
-        columns = cols;
-        databaseChanged = false;
-        Map<Integer, Pair<String, Image>> images;
+        double parentWidth = fotosGridPane.widthProperty().getValue();
+        System.out.println("pwidth:"+parentWidth);
+        System.out.println();
+        int columnFitCount = Math.max(3 , Math.min(8 , (int)Math.floor(parentWidth/(cc.getMinWidth()+fotosGridPane.getHgap()))));
+        if(columnFitCount == currentColumnCount && !databaseChanged) return;//Continue only if column count OR database changed
 
+        Map<Integer, Pair<String, Image>> images;
         if (privateUserID > 0) {
             //Käyttäjä on kirjautunut.
             images = database.downloadImages(1);
@@ -165,21 +170,17 @@ public class FotosController {
             images = new HashMap<Integer, Pair<String, javafx.scene.image.Image>>();
         }
         imageTableCount = images.size();
-        //System.out.println("columns in Igrid: "+columns); DEBUG
-        rows = (int)Math.ceil((double)imageTableCount/columns);
-        //System.out.println("rows in Igrid: "+rows); DEBUG
-        //TODO: getPictureTable, tableCount = getPictureTable.count
-
-
-
-        //Reset and recreate the grid
-        setGridConstraints();
         if(imageTableCount < 1) return; //Return if there are no pictures in this location
-        int t = imageTableCount;
 
-        //Palauttaa Hashmapin jossa key on imageID ja Value on PAIR-rakenne. Pair-rakenteessa taas key on tiedostonimi ja value on imagedata
+        //Set rows and columns
+        currentColumnCount = columnFitCount;
+        //System.out.println("columns in Igrid: "+columns); DEBUG
+        rows = (int)Math.ceil((double)imageTableCount / currentColumnCount);
+        //System.out.println("rows in Igrid: "+rows); DEBUG
 
+        Iterator<Integer> it = images.keySet().iterator();
         /*
+        //Palauttaa Hashmapin jossa key on imageID ja Value on PAIR-rakenne. Pair-rakenteessa taas key on tiedostonimi ja value on imagedata
         //Esimerkiksi:  luetellaan tiedostonimet konsolii.
         {
             //iteraattori imageID:iden läpikäymiseen
@@ -196,33 +197,37 @@ public class FotosController {
                 count++;
             }
         }
-           */
-        Iterator<Integer> it = images.keySet().iterator();
+
+        */
+        //Reset and recreate the grid
+        setGridConstraints();
+        System.out.println("Creating imagegrid");
         //For each row
-        System.out.println("Displaying imagegrid");
         for (int i = 0; i < rows; i++) {
             //For each column
-            for (int j = 0; j < columns; j++) {
-                if(t<=0) return;//Stop when all pictures have been added
-                if (!it.hasNext()) return;
+            for (int j = 0; j < currentColumnCount; j++) {
+                if (!it.hasNext()) break;//Stop when all pictures have been added
+                //New elements
                 Pane p = new Pane();
                 ImageView iv = new ImageView();
                 p.getChildren().add(iv);
-                p.prefWidthProperty().bind(Bindings.min(fotosGridPane.widthProperty().divide(columns), fotosGridPane.heightProperty().divide(rows)));
-                p.prefHeightProperty().bind(Bindings.min(fotosGridPane.widthProperty().divide(columns), fotosGridPane.heightProperty().divide(rows)));
+                p.prefWidthProperty().bind(Bindings.min(fotosGridPane.widthProperty().divide(currentColumnCount), fotosGridPane.heightProperty().divide(rows)));
+                p.prefHeightProperty().bind(Bindings.min(fotosGridPane.widthProperty().divide(currentColumnCount), fotosGridPane.heightProperty().divide(rows)));
                 //ImageView settings
-
                 int imageID = it.next();
                 Pair<String, Image> filenameAndImage = images.get(imageID);
                 iv.setImage(filenameAndImage.getValue());
                 //System.out.println("Displaying: " + filenameAndImage.getKey());
-                /*
-                if(j%2==0)iv.setImage(missingImage);//For testing,TODO: set to next picture in iteration (thumbnail)
-                if(j%2==1)iv.setImage(additionImage);
-                */
-
                 iv.setSmooth(true);
-                iv.setPreserveRatio(true);
+                iv.setPreserveRatio(false);
+                double w = iv.getImage().getWidth();
+                double h = iv.getImage().getHeight();
+                if(w<h) h=w;
+                else w=h;
+                double x = 0;
+                if(w < iv.getImage().getWidth()) x = (iv.getImage().getWidth()/2)-(w/2);
+                Rectangle2D viewportRect = new Rectangle2D(x , 0, w, h);
+                iv.setViewport(viewportRect);
                 iv.fitWidthProperty().bind(p.widthProperty());
                 iv.fitHeightProperty().bind(p.heightProperty());
                 iv.setOnMouseClicked(event -> {
@@ -232,18 +237,19 @@ public class FotosController {
                     } else {
                         bigPicture.setImage(iv.getImage());
                     }
-
                     openImageview();
                 });
                 //Add the created element p to the grid in pos (j,i)
                 fotosGridPane.add(p, j, i);
                 //Add column constraints
                 if(i < 1) fotosGridPane.getColumnConstraints().add(cc);
-                t--;
             }
             //Add row constraints
             fotosGridPane.getRowConstraints().add(rc);
         }
+        fotosGridPane.setGridLinesVisible(false); //For debug
+        fotosGridPane.setGridLinesVisible(true); //For debug
+        databaseChanged = false;
     }
 
     private void clearLoginFields(){
@@ -263,7 +269,7 @@ public class FotosController {
         privateUserID = -1;
         database.setPrivateUserId(-1);
         databaseChanged = true;
-        adjustGrid(fotosGridPane.getWidth());
+        adjustImageGrid();
         omatKuvatButton.setVisible(false);
         jaetutKuvatButton.setVisible(false);
         usernameLabel.setText("Kirjaudu/Rekisteröidy");
@@ -292,7 +298,7 @@ public class FotosController {
             clearLoginFields();
             loginErrorText.setText("");
             databaseChanged = true;
-            adjustGrid(fotosGridPane.getWidth());
+            adjustImageGrid();
         } else {
             loginErrorText.setText("Käyttäjänimi tai salasana väärin");
         }
@@ -401,7 +407,7 @@ public class FotosController {
                             System.out.println("Uploaded.");
                             databaseChanged = true;
                             Platform.runLater(() -> {
-                                adjustGrid(fotosGridPane.getWidth());
+                                adjustImageGrid();
                                 System.out.println("adjusted?");
                             });
 
