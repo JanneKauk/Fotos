@@ -723,15 +723,18 @@ public class Database {
 
             try {
                 myStatement = conn.prepareStatement(
-                        "SELECT name, folderID FROM Fotos.Folder WHERE userID=?;"
+                        "SELECT * FROM Fotos.Folder WHERE userID=?;"
                 );
                 myStatement.setInt(1, userId);
                 result = myStatement.executeQuery();
                 while (result.next()) {
                     String foldername = result.getString("name");
                     int folderid = result.getInt("folderID");
-                    //folderlist.add(foldername);
-                    folders.put(folderid, foldername);
+                    if (result.getInt("parentFolderID") != 0) {
+                        //if (result.getInt("parentFolderID".equals(null)))
+                        //folderlist.add(foldername);
+                        folders.put(folderid, foldername);
+                    }
                 }
 
             } catch (Exception e) {
@@ -778,7 +781,13 @@ public class Database {
 
             PreparedStatement myStatement = null;
             try {
-                myStatement = conn.prepareStatement("INSERT INTO Fotos.Folder(NAME, EDITDATE, USERID) VALUES (?, CURDATE(), ?)");
+
+                if (name.equals("root")) {
+                    myStatement = conn.prepareStatement("INSERT INTO Fotos.Folder(NAME, EDITDATE, USERID) VALUES (?, CURDATE(), ?)");
+                } else {
+                    myStatement = conn.prepareStatement("INSERT INTO Fotos.Folder(NAME, EDITDATE, USERID, PARENTFOLDERID) VALUES (?, CURDATE(), ?, ?)");
+                    myStatement.setInt(3, getParentFolderId(userId));
+                }
                 myStatement.setString(1, name);
                 myStatement.setInt(2, userId);
                 myStatement.executeUpdate();
@@ -840,4 +849,60 @@ public class Database {
             }
         }
     }
+
+    private int getParentFolderId(int userId) {
+        Connection conn = null;
+        ResultSet result = null;
+        int parentfolderid = 0;
+
+        try {
+            // Connection statement
+            conn = DriverManager.getConnection(url, dbUserName, dbPassword);
+            System.out.println("\nDatabase Connection Established...");
+
+            PreparedStatement myStatement = null;
+
+            try {
+                myStatement = conn.prepareStatement(
+                        "SELECT folderID FROM Fotos.Folder WHERE userID=? AND parentFolderID IS NULL;"
+                );
+                myStatement.setInt(1, userId);
+                result = myStatement.executeQuery();
+                while (result.next()) {
+                    parentfolderid = result.getInt("folderID");
+                }
+
+            } catch (Exception e) {
+                System.err.println("Error in query");
+                e.printStackTrace();
+            } finally {
+                if (myStatement != null) {
+                    try {
+                        myStatement.close();
+                    } catch (Exception ex) {
+                        System.out.println("Error in statement termination!");
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            System.err.println("Cannot connect to database server");
+            e.printStackTrace();
+        } finally {
+            if (conn != null) {
+                try {
+                    System.out.println("\n***** Let terminate the Connection *****");
+                    conn.close();
+                    System.out.println("\nDatabase connection terminated...");
+
+                } catch (Exception ex) {
+                    System.out.println("Error in connection termination!");
+
+                }
+            }
+
+        }
+        return parentfolderid;
+    }
+
 }

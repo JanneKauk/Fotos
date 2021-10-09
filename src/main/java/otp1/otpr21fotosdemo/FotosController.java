@@ -79,6 +79,7 @@ public class FotosController {
     private boolean loggedIn = false;
     private Database database = null;
     private Integer privateUserID;
+    private int selectedFolder;
     private boolean databaseChanged = true;
 
     //Image Grid settings
@@ -304,6 +305,9 @@ public class FotosController {
             // Lähetetään pyyntö back-end koodin puolelle, jossa toteutetaan tarkistukset ja datan pusku palvelimelle
             if (!database.userExists(usernameField.getText())) {
                 database.saltRegister(usernameField.getText(), passwordField.getText(), emailField1.getText(), emailField2.getText(), loginErrorText);
+                //Tehdään root-kansio uudelle käyttäjälle
+                int userid = database.userAndPwExists(usernameField.getText(), passwordField.getText());
+                database.uploadNewFolder("root", userid);
             } else {
                 loginErrorText.setText("Tämä käyttäjä on jo olemassa");
             }
@@ -637,12 +641,6 @@ public class FotosController {
     @FXML
     //Uuden kansion luontiin
     public void onNewFolderButtonClick() {
-        /*
-        ObservableList<Node> childrens = folderGridPane.getChildren();
-        for (Node node : childrens) {
-
-        }
-        */
         System.out.println("Uuden kansion kuvaketta painettu");
         newFolderVbox.setVisible(true);
         newFolderErrorText.setVisible(false);
@@ -656,6 +654,10 @@ public class FotosController {
 
         if (folderNameField.getText().equals("")) {
             newFolderErrorText.setText("Anna kansiolle nimi");
+            newFolderErrorText.setVisible(true);
+            newFolderErrorText.setManaged(true);
+        } else if (folderNameField.getText().equals("root") || folderNameField.getText().equals("ROOT")) {
+            newFolderErrorText.setText("Kansiolle ei voi antaa nimeksi root");
             newFolderErrorText.setVisible(true);
             newFolderErrorText.setManaged(true);
         } else {
