@@ -850,7 +850,7 @@ public class Database {
         }
     }
 
-    private int getParentFolderId(int userId) {
+    public int getParentFolderId(int userId) {
         Connection conn = null;
         ResultSet result = null;
         int parentfolderid = 0;

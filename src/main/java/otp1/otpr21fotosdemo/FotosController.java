@@ -79,7 +79,7 @@ public class FotosController {
     private boolean loggedIn = false;
     private Database database = null;
     private Integer privateUserID;
-    private int selectedFolder;
+    private int selectedFolderID;
     private boolean databaseChanged = true;
 
     //Image Grid settings
@@ -162,13 +162,16 @@ public class FotosController {
         Map<Integer, Pair<String, Image>> images;
         if (privateUserID > 0) {
             //Käyttäjä on kirjautunut.
-            images = database.downloadImages(1);
+            images = database.downloadImages(selectedFolderID);
         } else {
             //käyttäjä ei ole kirjautunut.
             //TODO lataa julkiset kuvat
             images = new HashMap<Integer, Pair<String, javafx.scene.image.Image>>();
         }
+        //Reset and recreate the grid
+        setGridConstraints();
         imageTableCount = images.size();
+        System.out.println("IMAGE TABLE COUNT: " + imageTableCount);
         if(imageTableCount < 1) return; //Return if there are no pictures in this location
 
         //Set rows and columns
@@ -198,8 +201,6 @@ public class FotosController {
         }
         */
 
-        //Reset and recreate the grid
-        setGridConstraints();
         int t = 0;
         System.out.println("Creating imagegrid");
         //For each row
@@ -259,6 +260,7 @@ public class FotosController {
         databaseChanged = false;
         System.out.println("Grid done");
     }
+
     @FXML
     private void cycleImageBack(){
 
@@ -285,13 +287,13 @@ public class FotosController {
         privateUserID = -1;
         database.setPrivateUserId(-1);
         databaseChanged = true;
-        adjustImageGrid();
         omatKuvatButton.setVisible(false);
         jaetutKuvatButton.setVisible(false);
         usernameLabel.setText("Kirjaudu/Rekisteröidy");
         folderGridPane.getChildren().clear();
         newFolderButton.setVisible(false);
         switchToDefaultScene();
+        adjustImageGrid();
     }
 
     public void fetchUserID(int methodUserID) {
@@ -315,6 +317,7 @@ public class FotosController {
             loginErrorText.setText("");
             databaseChanged = true;
             adjustImageGrid();
+            loadUserRootFolder();
         } else {
             loginErrorText.setText("Käyttäjänimi tai salasana väärin");
         }
@@ -419,7 +422,7 @@ public class FotosController {
                         //Upload on another thread
                         Runnable uploadTask = () -> {
                             System.out.println ("Upload for userID " + privateUserID);
-                            database.uploadImages(privateUserID,1, files);
+                            database.uploadImages(privateUserID, selectedFolderID, files);
                             System.out.println("Uploaded.");
                             databaseChanged = true;
                             Platform.runLater(() -> {
@@ -616,7 +619,7 @@ public class FotosController {
         folderMenu.setVisible(true);
         folderMenuHideButton.setManaged(true);
         folderMenuHideButton.setVisible(true);
-
+        loadUserRootFolder();
         /*
         //Laitetaan etusivun elementit takaisin näkyviin.
         folderMenu.setVisible(true);
@@ -682,6 +685,8 @@ public class FotosController {
                             }
                         });
                         menu.show(vbox, mouseEvent.getScreenX(), mouseEvent.getScreenY());
+                    } else if (mouseEvent.getButton() == MouseButton.PRIMARY) {
+                        onFolderClick(folder);
                     }
                 }
             });
@@ -726,5 +731,22 @@ public class FotosController {
         database.deleteFolder(folderid);
         folderGridPane.getChildren().clear();
         loadUserFolders(privateUserID);
+    }
+
+    @FXML
+    //Kun kansiota klikataan
+    public void onFolderClick(Integer folderid) {
+        selectedFolderID = folderid;
+        System.out.println("Näytetään folderid: " + selectedFolderID);
+        databaseChanged = true;
+        adjustImageGrid();
+    }
+
+    @FXML
+    //käyttäjän root-kansion näyttämiseen
+    public void loadUserRootFolder() {
+        selectedFolderID = database.getParentFolderId(privateUserID);
+        databaseChanged = true;
+        adjustImageGrid();
     }
 }
