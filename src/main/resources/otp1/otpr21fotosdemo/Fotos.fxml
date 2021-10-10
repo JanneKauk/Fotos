@@ -273,10 +273,8 @@
                         </BorderPane>
                          <ScrollPane fx:id="scrollp" fitToWidth="true">
                              <content>
-                                 <GridPane fx:id="fotosGridPane" alignment="CENTER" gridLinesVisible="true" hgap="10.0" vgap="10.0">
-                                    <rowConstraints>
+                                 <GridPane fx:id="fotosGridPane" alignment="TOP_CENTER"  gridLinesVisible="true" hgap="10.0" vgap="10.0">
 
-                                    </rowConstraints>
                                  </GridPane>
                              </content>
                          </ScrollPane>

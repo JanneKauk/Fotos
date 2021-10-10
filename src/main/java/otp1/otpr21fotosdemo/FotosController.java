@@ -6,6 +6,7 @@ import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
+import javafx.event.EventDispatcher;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
@@ -80,6 +81,9 @@ public class FotosController {
     private Integer privateUserID;
     private int selectedFolder;
     private boolean databaseChanged = true;
+    boolean sceneResized = false;
+    Number newSceneWidth;
+    Number newSceneHeight;
 
     //Image Grid settings
     private int currentColumnCount, rows, maxCols = 8;
@@ -118,14 +122,25 @@ public class FotosController {
         mainStage = stage;
         setGridConstraints();
         //Adjusts the Igrid when the window size changes
-        centerStackp.widthProperty().addListener((observableValue, oldSceneWidth, newSceneWidth) -> {
-            //System.out.println("Width: " + newSceneWidth);
+        centerStackp.widthProperty().addListener((observableValue, oldSceneWidth, newSceneW) -> {
+//            System.out.println("Width: " + newSceneW);
+//            sceneResized = true;
+//            newSceneWidth = newSceneW;
             adjustImageGrid();
+//            sceneResized = false;
         });
-        stage.maximizedProperty().addListener(((observableValue, oldVal, newVal) -> {
-            //System.out.println("isMaxed?"+newVal);
+        centerStackp.heightProperty().addListener((observableValue, oldSceneHeight, newSceneH) -> {
+//            System.out.println("Height: " + newSceneH);
+//            sceneResized = true;
+//            newSceneHeight = newSceneH;
             adjustImageGrid();
-        }));
+//            sceneResized = false;
+        });
+//        stage.maximizedProperty().addListener(((observableValue, oldVal, newVal) -> {
+//            //System.out.println("isMaxed?"+newVal);
+//            //stage.setWidth(stage.getWidth());
+//            adjustImageGrid();
+//        }));
         stage.setMaximized(true);
     }
 
@@ -153,10 +168,16 @@ public class FotosController {
     }
 
     private void adjustImageGrid(){
+//        if(sceneResized) {
+//            sceneResized = false;
+////            parentWidth =
+//        }
         //Calc how many columns fit into the parent stackpane
-        double parentWidth = fotosGridPane.widthProperty().getValue();
+        double parentWidth = centerStackp.getWidth();
+        double parentHeight =  centerStackp.getHeight();
         System.out.println("pwidth:"+parentWidth);
-        System.out.println();
+        System.out.println("pheight:"+parentHeight);
+        fotosGridPane.setMinHeight(parentHeight);
         int columnFitCount = Math.max(3 , Math.min(8 , (int)Math.floor(parentWidth/(cc.getMinWidth()+fotosGridPane.getHgap()))));
         if(columnFitCount == currentColumnCount && !databaseChanged) return;//Continue only if column count OR database changed
 
@@ -250,6 +271,7 @@ public class FotosController {
         fotosGridPane.setGridLinesVisible(false); //For debug
         fotosGridPane.setGridLinesVisible(true); //For debug
         databaseChanged = false;
+        System.out.println("Grid done");
     }
 
     private void clearLoginFields(){
