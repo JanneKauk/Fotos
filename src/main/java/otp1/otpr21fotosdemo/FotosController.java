@@ -81,19 +81,13 @@ public class FotosController {
     private Integer privateUserID;
     private int selectedFolder;
     private boolean databaseChanged = true;
-    boolean sceneResized = false;
-    Number newSceneWidth;
-    Number newSceneHeight;
 
     //Image Grid settings
     private int currentColumnCount, rows, maxCols = 8;
     private int imageTableCount = 23;//How many images there are in the current location
     RowConstraints rc = new RowConstraints();
     ColumnConstraints cc = new ColumnConstraints();
-    File file = new File("src/main/resources/otp1/otpr21fotosdemo/image/noimage.jpg"); //Missing image picture
-    File file2 = new File("src/main/resources/otp1/otpr21fotosdemo/image/addition-icon.png");
-    Image missingImage = new Image(file.toURI().toString());
-    Image additionImage = new Image(file2.toURI().toString());
+
     @FXML
     private void deleteTest(){
         database.deleteImage(118);
@@ -123,24 +117,11 @@ public class FotosController {
         setGridConstraints();
         //Adjusts the Igrid when the window size changes
         centerStackp.widthProperty().addListener((observableValue, oldSceneWidth, newSceneW) -> {
-//            System.out.println("Width: " + newSceneW);
-//            sceneResized = true;
-//            newSceneWidth = newSceneW;
             adjustImageGrid();
-//            sceneResized = false;
         });
         centerStackp.heightProperty().addListener((observableValue, oldSceneHeight, newSceneH) -> {
-//            System.out.println("Height: " + newSceneH);
-//            sceneResized = true;
-//            newSceneHeight = newSceneH;
             adjustImageGrid();
-//            sceneResized = false;
         });
-//        stage.maximizedProperty().addListener(((observableValue, oldVal, newVal) -> {
-//            //System.out.println("isMaxed?"+newVal);
-//            //stage.setWidth(stage.getWidth());
-//            adjustImageGrid();
-//        }));
         stage.setMaximized(true);
     }
 
@@ -161,22 +142,13 @@ public class FotosController {
 
         //Column constraints
         cc.setMinWidth(150);
-        //cc.setHgrow(Priority.ALWAYS);
-        //Row constraints
         rc.setMinHeight(150);
-        //rc.setVgrow(Priority.ALWAYS);
     }
 
     private void adjustImageGrid(){
-//        if(sceneResized) {
-//            sceneResized = false;
-////            parentWidth =
-//        }
         //Calc how many columns fit into the parent stackpane
         double parentWidth = centerStackp.getWidth();
         double parentHeight =  centerStackp.getHeight();
-        System.out.println("pwidth:"+parentWidth);
-        System.out.println("pheight:"+parentHeight);
         fotosGridPane.setMinHeight(parentHeight);
         int columnFitCount = Math.max(3 , Math.min(8 , (int)Math.floor(parentWidth/(cc.getMinWidth()+fotosGridPane.getHgap()))));
         if(columnFitCount == currentColumnCount && !databaseChanged) return;//Continue only if column count OR database changed
@@ -218,8 +190,8 @@ public class FotosController {
                 count++;
             }
         }
-
         */
+
         //Reset and recreate the grid
         setGridConstraints();
         System.out.println("Creating imagegrid");
@@ -241,6 +213,7 @@ public class FotosController {
                 //System.out.println("Displaying: " + filenameAndImage.getKey());
                 iv.setSmooth(true);
                 iv.setPreserveRatio(false);
+                //Viewport settings
                 double w = iv.getImage().getWidth();
                 double h = iv.getImage().getHeight();
                 if(w<h) h=w;
@@ -268,8 +241,8 @@ public class FotosController {
             //Add row constraints
             fotosGridPane.getRowConstraints().add(rc);
         }
-        fotosGridPane.setGridLinesVisible(false); //For debug
-        fotosGridPane.setGridLinesVisible(true); //For debug
+//        fotosGridPane.setGridLinesVisible(false); //For debug
+//        fotosGridPane.setGridLinesVisible(true); //For debug
         databaseChanged = false;
         System.out.println("Grid done");
     }
