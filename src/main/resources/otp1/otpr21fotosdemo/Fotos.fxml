@@ -1,13 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.shape.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.SplitMenuButton?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.shape.Polygon?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
 
-<StackPane xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="otp1.otpr21fotosdemo.FotosController">
+<StackPane xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="otp1.otpr21fotosdemo.FotosController">
    <children>
       <StackPane fx:id="blurringStackPane">
          <children>
@@ -147,7 +166,7 @@
                <left>
                   <HBox fx:id="filterMenuHbox" maxHeight="600.0" BorderPane.alignment="TOP_CENTER">
                      <children>
-                        <Pane fx:id="filterMenu" prefWidth="200.0" style="-fx-border-color: grey;">
+                        <Pane fx:id="filterMenu" prefWidth="200.0" style="-fx-border-color: grey; -fx-background-color: white">
                            <children>
                               <Label layoutX="60.0" layoutY="140.0" text="Päivämäärä">
                                  <font>
@@ -271,9 +290,9 @@
                                   </GridPane>
                            </bottom>
                         </BorderPane>
-                         <ScrollPane fx:id="scrollp" fitToWidth="true">
+                         <ScrollPane fx:id="scrollp" fitToWidth="true" style="-fx-border-width: 0; -fx-border-style: none">
                              <content>
-                                 <GridPane fx:id="fotosGridPane" alignment="TOP_CENTER"  gridLinesVisible="true" hgap="10.0" vgap="10.0">
+                                 <GridPane fx:id="fotosGridPane" alignment="TOP_CENTER" gridLinesVisible="true" hgap="10.0" vgap="10.0">
 
                                  </GridPane>
                              </content>
@@ -377,16 +396,16 @@
       <StackPane fx:id="imageViewStackPane" visible="false">
          <children>
             <Region fx:id="imageviewBackgroundRegion" opacity="0.4" style="-fx-background-color: #000000;" />
-            <BorderPane onMouseClicked="#closeImageview" prefHeight="200.0" prefWidth="200.0">
+            <BorderPane prefHeight="200.0" prefWidth="200.0">
                <top>
                   <StackPane alignment="CENTER_RIGHT" prefHeight="40.0" style="-fx-background-color: #ebebeb;">
                      <children>
                         <HBox alignment="CENTER_RIGHT" maxWidth="400.0" nodeOrientation="LEFT_TO_RIGHT">
                            <children>
-                              <Button mnemonicParsing="false" style="-fx-background-radius: 10;" text="Kuvan tiedot" />
+                              <Button mnemonicParsing="false" onMouseClicked="#onPictureInfoShowHideButtonClick" style="-fx-background-radius: 10;" text="Kuvan tiedot" />
                               <Region HBox.hgrow="ALWAYS" />
-                              <Button mnemonicParsing="false" style="-fx-background-radius: 10;" text="&lt;" />
-                              <Button mnemonicParsing="false" style="-fx-background-radius: 10;" text="&gt;" />
+                              <Button fx:id="cycleBack" mnemonicParsing="false" onMouseClicked="#cycleImageBack" style="-fx-background-radius: 10;" text="&lt;" />
+                              <Button fx:id="cycleForward" mnemonicParsing="false" onMouseClicked="#cycleImageForward" style="-fx-background-radius: 10;" text="&gt;" />
                               <Region HBox.hgrow="ALWAYS" />
                               <Button mnemonicParsing="false" style="-fx-background-radius: 10;" text="Lataa" />
                               <Button mnemonicParsing="false" style="-fx-background-radius: 10; -fx-background-color: #59c3f4;" text="Jaa" />
@@ -397,8 +416,66 @@
                   </StackPane>
                </top>
                <center>
-                  <ImageView fx:id="bigPicture" fitHeight="658.0" fitWidth="1154.0" onMouseClicked="#closeImageview" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER" />
+                  <VBox alignment="CENTER" onMouseClicked="#closeImageview" BorderPane.alignment="CENTER">
+                     <children>
+                        <ImageView fx:id="bigPicture" fitHeight="658.0" fitWidth="1154.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </VBox>
                </center>
+               <left>
+                  <HBox fx:id="pictureInfoBox" maxHeight="600.0" BorderPane.alignment="CENTER">
+                     <children>
+                        <Pane fx:id="pictureInfo" prefWidth="200.0" style="-fx-border-color: grey; -fx-background-color: white">
+                           <children>
+                              <Label layoutX="45.0" layoutY="14.0" text="Kuvan tiedot" textAlignment="CENTER">
+                                 <font>
+                                    <Font size="18.0" />
+                                 </font>
+                              </Label>
+                              <Label layoutX="26.0" layoutY="76.0" text="Päivämäärä: 10/10/2021" textAlignment="CENTER">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                              </Label>
+                              <Label layoutX="25.0" layoutY="96.0" text="Koko: 5MB" textAlignment="CENTER">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                              </Label>
+                              <Label layoutX="25.0" layoutY="116.0" text="Tyyppi: JPG" textAlignment="CENTER">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                              </Label>
+                              <Label layoutX="25.0" layoutY="136.0" text="Omistaja: 1Testi" textAlignment="CENTER">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                              </Label>
+                              <Label layoutX="25.0" layoutY="156.0" text="Resoluutio: 1920x1080" textAlignment="CENTER">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </Pane>
+                        <StackPane>
+                           <children>
+                              <StackPane fx:id="pictureInfoArrow" prefWidth="40.0">
+                                 <children>
+                                    <Circle fill="#5aaaf6" onMouseClicked="#onPictureInfoShowHideButtonClick" radius="20.0" stroke="WHITE" strokeType="INSIDE" />
+                                    <Polygon fill="WHITE" onMouseClicked="#onPictureInfoShowHideButtonClick" points="                            -20, 0,                             0, 10,                             0, -10" stroke="WHITE" strokeType="INSIDE">
+                                       <StackPane.margin>
+                                          <Insets right="4.0" />
+                                       </StackPane.margin>
+                                    </Polygon>
+                                 </children>
+                              </StackPane>
+                           </children>
+                        </StackPane>
+                     </children>
+                  </HBox>
+               </left>
             </BorderPane>
          </children>
       </StackPane>

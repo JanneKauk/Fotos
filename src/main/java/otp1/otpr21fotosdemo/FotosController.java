@@ -6,12 +6,13 @@ import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
-import javafx.event.EventDispatcher;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -22,9 +23,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
@@ -53,7 +52,7 @@ public class FotosController {
     @FXML
     ScrollPane scrollp;
     @FXML
-    Button omatKuvatButton, julkisetKuvatButton, jaetutKuvatButton, loginButton;
+    Button omatKuvatButton, julkisetKuvatButton, jaetutKuvatButton, loginButton, cycleBack, cycleForward;
     @FXML
     Label usernameLabel;
     @FXML
@@ -74,6 +73,7 @@ public class FotosController {
     private ImageView testImageView, newFolderButton;
     @FXML
     public Text loginErrorText, newFolderErrorText;
+    @FXML
 
     private Stage mainStage = null;
     private boolean loggedIn = false;
@@ -87,6 +87,7 @@ public class FotosController {
     private int imageTableCount = 23;//How many images there are in the current location
     RowConstraints rc = new RowConstraints();
     ColumnConstraints cc = new ColumnConstraints();
+    Number currentImageID = null;
 
     @FXML
     private void deleteTest(){
@@ -99,8 +100,12 @@ public class FotosController {
         logout();
         //Filtermenu piiloon alussa
         filterMenu.setTranslateX(-200);
+        pictureInfo.setTranslateX(-200);
+
         filterButtonStackPane.setRotate(180);
+        pictureInfoArrow.setRotate(180);
         filterMenu.setManaged(false);
+        pictureInfo.setManaged(false);
 
         //Uuden kansion -ja Login menu piiloo ja sen sisällä rekisteröitymiseen tarvittavat tekstikentät myös.
         loginVbox.setVisible(false);
@@ -133,6 +138,7 @@ public class FotosController {
     private void closeImageview(){
         imageViewStackPane.setVisible(false);
         blurringStackPane.setEffect(null);
+        currentImageID = null;
     }
 
     private void setGridConstraints(){
@@ -194,6 +200,7 @@ public class FotosController {
 
         //Reset and recreate the grid
         setGridConstraints();
+        int t = 0;
         System.out.println("Creating imagegrid");
         //For each row
         for (int i = 0; i < rows; i++) {
@@ -224,6 +231,7 @@ public class FotosController {
                 iv.setViewport(viewportRect);
                 iv.fitWidthProperty().bind(p.widthProperty());
                 iv.fitHeightProperty().bind(p.heightProperty());
+                int finalT = t;
                 iv.setOnMouseClicked(event -> {
                     Image fullImage = database.downloadFullImage(imageID);
                     if (fullImage != null){
@@ -231,10 +239,15 @@ public class FotosController {
                     } else {
                         bigPicture.setImage(iv.getImage());
                     }
+                    currentImageID = imageID;
+                    System.out.println("ID:"+currentImageID);
+                    int index = finalT;
+                    System.out.println("Index:"+index);
                     openImageview();
                 });
                 //Add the created element p to the grid in pos (j,i)
                 fotosGridPane.add(p, j, i);
+                t++;
                 //Add column constraints
                 if(i < 1) fotosGridPane.getColumnConstraints().add(cc);
             }
@@ -245,6 +258,14 @@ public class FotosController {
 //        fotosGridPane.setGridLinesVisible(true); //For debug
         databaseChanged = false;
         System.out.println("Grid done");
+    }
+    @FXML
+    private void cycleImageBack(){
+
+    }
+    @FXML
+    private void cycleImageForward(){
+        fotosGridPane.getChildren().get(5+1);
     }
 
     private void clearLoginFields(){
@@ -467,9 +488,9 @@ public class FotosController {
     }
 
     @FXML
-    private Pane filterMenu;
+    private Pane filterMenu, pictureInfo;
     @FXML
-    private StackPane filterButtonStackPane;
+    private StackPane filterButtonStackPane, pictureInfoArrow;
     @FXML
     private void onFilterShowHidebuttonClick(){
         TranslateTransition transitionMenu = new TranslateTransition(new Duration(500), filterMenu);
@@ -497,6 +518,34 @@ public class FotosController {
                 System.out.println("TranslateX: " + filterMenu.getTranslateX());
             });
 
+        }
+    }
+    @FXML
+    private void onPictureInfoShowHideButtonClick(){
+        TranslateTransition transitionMenu = new TranslateTransition(new Duration(500), pictureInfo);
+        RotateTransition rotateButton = new RotateTransition(new Duration(500), pictureInfoArrow);
+        if (pictureInfo.getTranslateX() != 0){
+            //Avataan kiinni oleva menu
+            System.out.println("Kuva infot auki!");
+            transitionMenu.setToX(0);
+            transitionMenu.play();
+            rotateButton.setByAngle(180);
+            rotateButton.play();
+            pictureInfo.setManaged(true);
+            System.out.println("LayoutX: " + pictureInfo.getLayoutX());
+            System.out.println("TranslateX: " + pictureInfo.getTranslateX());
+        } else {
+            //Suljetaan auki oleva menu
+            System.out.println("Kuva infot kiinni!");
+            transitionMenu.setToX(-(pictureInfo.getWidth()));
+            transitionMenu.play();
+            rotateButton.setByAngle(180);
+            rotateButton.play();
+            transitionMenu.setOnFinished(event -> {
+                pictureInfo.setManaged(false);
+                System.out.println("LayoutX: " + pictureInfo.getLayoutX());
+                System.out.println("TranslateX: " + pictureInfo.getTranslateX());
+            });
         }
     }
 
