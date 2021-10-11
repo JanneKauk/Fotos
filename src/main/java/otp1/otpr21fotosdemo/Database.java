@@ -174,7 +174,7 @@ public class Database {
 
                 //Tarkistetaan löytyikö yhtään kyseistä usernamea.
                 if (!result.next()) {
-                    System.err.println("No such username found");
+                    System.out.println("No such username found");
                 } else if (Objects.equals(result.getString("userName"), user) && result2.getInt(1) > 0) {
                     found = result.getInt("userID");
                     userSurName = result.getString("surName");
