@@ -1,5 +1,6 @@
 package otp1.otpr21fotosdemo;
 
+import javafx.scene.text.Text;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -27,11 +28,18 @@ public class DatabaseTest {
     String url = "jdbc:mysql://10.114.32.13:3306/Fotos";
     private Database database = new Database();
 
+    @BeforeAll
+    public void setDatabaseController() {
+        database.setController(new FotosController());
+    }
+
+
     @Test
     @AfterAll
     public void resetDbChanges() {
         System.out.println("Removing test data from DB");
         Connection conn = null;
+        int userid = database.userAndPwExists("test", "1234");
 
         try {
             // Connection statement
@@ -39,15 +47,18 @@ public class DatabaseTest {
             System.out.println("\nDatabase Connection Established...");
 
             // Deleting entry from Image table
-            PreparedStatement pstmtImage = conn.prepareStatement("DELETE FROM Image WHERE userID = 99999;");
+            PreparedStatement pstmtImage = conn.prepareStatement("DELETE FROM Image WHERE userID = ?;");
+            pstmtImage.setInt(1, userid);
             pstmtImage.execute();
 
-            // Deleting entry from Image table
-            PreparedStatement pstmtFolder = conn.prepareStatement("DELETE FROM Folder WHERE userID = 99999;");
+           // Deleting entry from Folder table
+            PreparedStatement pstmtFolder = conn.prepareStatement("DELETE FROM Folder WHERE userID = ?;");
+            pstmtFolder.setInt(1, userid);
             pstmtFolder.execute();
 
-            // Deleting entry from Image table
-            PreparedStatement pstmtUser = conn.prepareStatement("DELETE FROM User WHERE userID = 99999;");
+            // Deleting entry from User table
+            PreparedStatement pstmtUser = conn.prepareStatement("DELETE FROM User WHERE userID = ?;");
+            pstmtUser.setInt(1, userid);
             pstmtUser.execute();
 
 
@@ -99,7 +110,7 @@ public class DatabaseTest {
     }
 
     @Test
-    @Order(2)
+    @Disabled
     public void dbUserTest() {
         // Variables
         Connection conn = null;
@@ -111,23 +122,52 @@ public class DatabaseTest {
 
             // USER statement VALUES(userID (int11), frontName (varchar32), surName(varchar32), userLevel(int11)
             // email(varchar32), passWord(varchar64), dbUserName(varchar32)
-            PreparedStatement pstmt = conn.prepareStatement("INSERT INTO User VALUES(?,?,?,?,?,?,?)");
-            // userID
-            pstmt.setInt(1, 99999);
+            PreparedStatement pstmt = conn.prepareStatement("INSERT INTO User(frontName, surName, userLevel, email, passWord, userName) VALUES(?,?,?,?,?,?)");
             // frontName
-            pstmt.setString(2, "Frontnametest");
+            pstmt.setString(1, "Frontnametest");
             // surName
-            pstmt.setString(3, "Surnametest");
+            pstmt.setString(2, "Surnametest");
             // userLevel
-            pstmt.setInt(4, 1);
+            pstmt.setInt(3, 1);
             // email
-            pstmt.setString(5, "test@test.com");
+            pstmt.setString(4, "test@test.com");
             // passWord
-            pstmt.setString(6, "1234");
+            pstmt.setString(5, "1234");
             // dbUserName
-            pstmt.setString(7, "test");
+            pstmt.setString(6, "test");
             //Executing the statement
             pstmt.execute();
+            System.out.println("Record inserted......");
+
+        } catch (Exception ex) {
+            System.err.println("Cannot connect to database server");
+            ex.printStackTrace();
+
+        } finally {
+            if (conn != null) {
+                try {
+                    System.out.println("\n***** Let terminate the Connection *****");
+                    conn.close();
+                    System.out.println("\nDatabase connection terminated...");
+                } catch (Exception ex) {
+                    System.out.println("Error in connection termination!");
+                }
+            }
+        }
+    }
+
+    @Test
+    @Order(2)
+    public void dbUserTest2() {
+        // Variables
+        Connection conn = null;
+
+        try {
+            // Connection statement
+            conn = DriverManager.getConnection(url, dbUserName, dbPassWord);
+            System.out.println("\nDatabase Connection Established...");
+
+            database.saltRegister("test", "1234", "test@test.com", "test@test.com", new Text());
             System.out.println("Record inserted......");
 
         } catch (Exception ex) {
@@ -200,9 +240,10 @@ public class DatabaseTest {
     }
 
     @Test
-    @Order(4)
+    @Disabled
     public void dbFolderTest() {
         // Variables
+        int userid = database.userAndPwExists("test", "1234");
         Connection conn = null;
 
         try {
@@ -211,17 +252,11 @@ public class DatabaseTest {
             System.out.println("\nDatabase Connection Established...");
 
             // Folder statement VALUES(name(varchar32), folderID(int11), editDate(Date), userID(int11)
-            PreparedStatement pstmt = conn.prepareStatement("INSERT INTO Folder VALUES(?,?,?,?)");
+            PreparedStatement pstmt = conn.prepareStatement("INSERT INTO Fotos.Folder(NAME, EDITDATE, USERID) VALUES (?, CURDATE(), ?)");
             // name
             pstmt.setString(1, "root");
-            // folderID
-            pstmt.setInt(2, 99999);
-            // editDate
-            Date date = Calendar.getInstance().getTime();
-            java.sql.Date sqlDate = new java.sql.Date(date.getTime());
-            pstmt.setDate(3, sqlDate);
             // userID
-            pstmt.setInt(4, 99999);
+            pstmt.setInt(2, userid);
             //Executing the statement
             pstmt.execute();
             System.out.println("Record inserted......");
@@ -244,18 +279,52 @@ public class DatabaseTest {
     }
 
     @Test
+    @Order(4)
+    public void dbFolderTest2() {
+        // Variables
+        int userid = database.userAndPwExists("test", "1234");
+        System.out.println("USERID ON FOLDERTEST: " + userid);
+        Connection conn = null;
+
+        try {
+            // Connection statement
+            conn = DriverManager.getConnection(url, dbUserName, dbPassWord);
+            System.out.println("\nDatabase Connection Established...");
+
+            database.uploadNewFolder("root", userid);
+            System.out.println("Record inserted......");
+
+        } catch (Exception ex) {
+            System.err.println("Cannot connect to database server");
+            ex.printStackTrace();
+
+        } finally {
+            if (conn != null) {
+                try {
+                    System.out.println("\n***** Let terminate the Connection *****");
+                    conn.close();
+                    System.out.println("\nDatabase connection terminated...");
+                } catch (Exception ex) {
+                    System.out.println("Error in connection termination!");
+                }
+            }
+        }
+    }
+    @Test
     @Order(5)
     public void uploadNewFolderTest() {
-        database.uploadNewFolder("test1", 99999);
-        database.uploadNewFolder("test2", 99999);
-        database.uploadNewFolder("test3", 99999);
+        int userid = database.userAndPwExists("test", "1234");
+        database.uploadNewFolder("test1", userid);
+        database.uploadNewFolder("test2", userid);
+        database.uploadNewFolder("test3", userid);
     }
 
     @DisplayName("Testataan onko käyttäjän kansioita oikea määrä.")
     @Test
     @Order(6)
     public void folderSizeTest() {
-        HashMap<Integer, String> test = database.getUserFolders(99999);
+        int userid = database.userAndPwExists("test", "1234");
+        HashMap<Integer, String> test = database.getUserFolders(userid);
         assertEquals(3, test.size());
     }
 
