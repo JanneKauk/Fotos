@@ -386,9 +386,9 @@ public class FotosController {
                 FileChooser fileChooser = new FileChooser();
                 fileChooser.setTitle("Valitse kuvatiedosto(t)");
                 fileChooser.getExtensionFilters().addAll(
-                    new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.gif"),
-                    new FileChooser.ExtensionFilter("All Files", "*.*"
-                ));
+                    new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.gif")
+                   // new FileChooser.ExtensionFilter("All Files", "*.*")
+                );
                 List<File> files = fileChooser.showOpenMultipleDialog(mainStage);
                 //Valittiinko tiedostoja?
                 if (files != null){
