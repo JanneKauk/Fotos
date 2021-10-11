@@ -85,241 +85,256 @@ public class DatabaseTest {
     @Test
     @Order(1)
     public void dbConnectionTest() {
-        System.out.println("\n\n***** MySQL JDBC Connection Testing *****");
-        Connection conn = null;
+        assertDoesNotThrow(() -> {
+            System.out.println("\n\n***** MySQL JDBC Connection Testing *****");
+            Connection conn = null;
 
-        try {
-            // Connection statement
-            conn = DriverManager.getConnection(url, dbUserName, dbPassWord);
-            System.out.println("\nDatabase Connection Established...");
+            try {
+                // Connection statement
+                conn = DriverManager.getConnection(url, dbUserName, dbPassWord);
+                System.out.println("\nDatabase Connection Established...");
 
-        } catch (Exception ex) {
-            System.err.println("Cannot connect to database server");
-            ex.printStackTrace();
-
-        } finally {
-            if (conn != null) {
-                try {
-                    System.out.println("\n***** Let terminate the Connection *****");
-                    conn.close();
-                    System.out.println("\nDatabase connection terminated...");
-                } catch (Exception ex) {
-                    System.out.println("Error in connection termination!");
+            } catch (Exception ex) {
+                System.err.println("Cannot connect to database server");
+                ex.printStackTrace();
+                throw ex;
+            } finally {
+                if (conn != null) {
+                    try {
+                        System.out.println("\n***** Let terminate the Connection *****");
+                        conn.close();
+                        System.out.println("\nDatabase connection terminated...");
+                    } catch (Exception ex) {
+                        System.out.println("Error in connection termination!");
+                    }
                 }
             }
-        }
+        });
     }
 
     @Test
     @Disabled
     public void dbUserTest() {
-        // Variables
-        Connection conn = null;
+        assertDoesNotThrow(() -> {
+            // Variables
+            Connection conn = null;
 
-        try {
-            // Connection statement
-            conn = DriverManager.getConnection(url, dbUserName, dbPassWord);
-            System.out.println("\nDatabase Connection Established...");
+            try {
+                // Connection statement
+                conn = DriverManager.getConnection(url, dbUserName, dbPassWord);
+                System.out.println("\nDatabase Connection Established...");
 
-            // USER statement VALUES(userID (int11), frontName (varchar32), surName(varchar32), userLevel(int11)
-            // email(varchar32), passWord(varchar64), dbUserName(varchar32)
-            PreparedStatement pstmt = conn.prepareStatement("INSERT INTO User(frontName, surName, userLevel, email, passWord, userName) VALUES(?,?,?,?,?,?)");
-            // frontName
-            pstmt.setString(1, "Frontnametest");
-            // surName
-            pstmt.setString(2, "Surnametest");
-            // userLevel
-            pstmt.setInt(3, 1);
-            // email
-            pstmt.setString(4, "test@test.com");
-            // passWord
-            pstmt.setString(5, "1234");
-            // dbUserName
-            pstmt.setString(6, "test");
-            //Executing the statement
-            pstmt.execute();
-            System.out.println("Record inserted......");
+                // USER statement VALUES(userID (int11), frontName (varchar32), surName(varchar32), userLevel(int11)
+                // email(varchar32), passWord(varchar64), dbUserName(varchar32)
+                PreparedStatement pstmt = conn.prepareStatement("INSERT INTO User(frontName, surName, userLevel, email, passWord, userName) VALUES(?,?,?,?,?,?)");
+                // frontName
+                pstmt.setString(1, "Frontnametest");
+                // surName
+                pstmt.setString(2, "Surnametest");
+                // userLevel
+                pstmt.setInt(3, 1);
+                // email
+                pstmt.setString(4, "test@test.com");
+                // passWord
+                pstmt.setString(5, "1234");
+                // dbUserName
+                pstmt.setString(6, "test");
+                //Executing the statement
+                pstmt.execute();
+                System.out.println("Record inserted......");
 
-        } catch (Exception ex) {
-            System.err.println("Cannot connect to database server");
-            ex.printStackTrace();
-
-        } finally {
-            if (conn != null) {
-                try {
-                    System.out.println("\n***** Let terminate the Connection *****");
-                    conn.close();
-                    System.out.println("\nDatabase connection terminated...");
-                } catch (Exception ex) {
-                    System.out.println("Error in connection termination!");
+            } catch (Exception ex) {
+                System.err.println("Cannot connect to database server");
+                ex.printStackTrace();
+                throw ex;
+            } finally {
+                if (conn != null) {
+                    try {
+                        System.out.println("\n***** Let terminate the Connection *****");
+                        conn.close();
+                        System.out.println("\nDatabase connection terminated...");
+                    } catch (Exception ex) {
+                        System.out.println("Error in connection termination!");
+                    }
                 }
             }
-        }
+        });
     }
 
     @Test
     @Order(2)
     public void dbUserTest2() {
-        // Variables
-        Connection conn = null;
+        assertDoesNotThrow(() -> {
+            // Variables
+            Connection conn = null;
 
-        try {
-            // Connection statement
-            conn = DriverManager.getConnection(url, dbUserName, dbPassWord);
-            System.out.println("\nDatabase Connection Established...");
+            try {
+                // Connection statement
+                conn = DriverManager.getConnection(url, dbUserName, dbPassWord);
+                System.out.println("\nDatabase Connection Established...");
 
-            database.saltRegister("test", "1234", "test@test.com", "test@test.com", new Text());
-            System.out.println("test user inserted......");
+                database.saltRegister("test", "1234", "test@test.com", "test@test.com", new Text());
+                System.out.println("test user inserted......");
 
 
-        } catch (Exception ex) {
-            System.err.println("Cannot connect to database server");
-            ex.printStackTrace();
-
-        } finally {
-            if (conn != null) {
-                try {
-                    System.out.println("\n***** Let terminate the Connection *****");
-                    conn.close();
-                    System.out.println("\nDatabase connection terminated...");
-                } catch (Exception ex) {
-                    System.out.println("Error in connection termination!");
+            } catch (Exception ex) {
+                System.err.println("Cannot connect to database server");
+                ex.printStackTrace();
+                throw ex;
+            } finally {
+                if (conn != null) {
+                    try {
+                        System.out.println("\n***** Let terminate the Connection *****");
+                        conn.close();
+                        System.out.println("\nDatabase connection terminated...");
+                    } catch (Exception ex) {
+                        System.out.println("Error in connection termination!");
+                    }
                 }
             }
-        }
+        });
     }
 
     @Test
     @Order(3)
     public void dbImageTest() {
-        // Variables
-        Connection conn = null;
-        int userid = database.userAndPwExists("test", "1234");
+        assertDoesNotThrow(() -> {
+            // Variables
+            Connection conn = null;
+            int userid = database.userAndPwExists("test", "1234");
 
-        int rootFolder = database.getParentFolderId(userid);
-        try {
-            // Connection statement
-            conn = DriverManager.getConnection(url, dbUserName, dbPassWord);
-            System.out.println("\nDatabase Connection Established...");
+            int rootFolder = database.getParentFolderId(userid);
+            try {
+                // Connection statement
+                conn = DriverManager.getConnection(url, dbUserName, dbPassWord);
+                System.out.println("\nDatabase Connection Established...");
 
-            // Image statement VALUES(imageID (int11), viewingRights (int11), fileName(varchar64), image(blob), date(date)
-            // userID(int11), folderID(int11)
-            PreparedStatement pstmt = conn.prepareStatement("INSERT INTO Fotos.Image(viewingRights, fileName, image, date, userID, folderID) VALUES(?,?,?,?,?,?)");
+                // Image statement VALUES(imageID (int11), viewingRights (int11), fileName(varchar64), image(blob), date(date)
+                // userID(int11), folderID(int11)
+                PreparedStatement pstmt = conn.prepareStatement("INSERT INTO Fotos.Image(viewingRights, fileName, image, date, userID, folderID) VALUES(?,?,?,?,?,?)");
 
-            // viewingRights
-            pstmt.setInt(1, 0);
-            // fileName
-            pstmt.setString(2, "testing1");
-            // blob
-            InputStream in = new FileInputStream("src/test/resources/image/noimage.jpg");
-            pstmt.setBlob(3, in);
-            // date
-            Date date = Calendar.getInstance().getTime();
-            java.sql.Date sqlDate = new java.sql.Date(date.getTime());
-            pstmt.setDate(4, sqlDate);
-            // userID
-            pstmt.setInt(5, userid);
-            // folderID
-            pstmt.setInt(6, rootFolder);
-            //Executing the statement
-            pstmt.execute();
-            System.out.println("Record inserted......");
+                // viewingRights
+                pstmt.setInt(1, 0);
+                // fileName
+                pstmt.setString(2, "testing1");
+                // blob
+                InputStream in = new FileInputStream("src/test/resources/image/noimage.jpg");
+                pstmt.setBlob(3, in);
+                // date
+                Date date = Calendar.getInstance().getTime();
+                java.sql.Date sqlDate = new java.sql.Date(date.getTime());
+                pstmt.setDate(4, sqlDate);
+                // userID
+                pstmt.setInt(5, userid);
+                // folderID
+                pstmt.setInt(6, rootFolder);
+                //Executing the statement
+                pstmt.execute();
+                System.out.println("Record inserted......");
 
-        } catch (Exception ex) {
-            System.err.println("Cannot connect to database server");
-            ex.printStackTrace();
+            } catch (Exception ex) {
+                System.err.println("Cannot connect to database server");
+                ex.printStackTrace();
+                throw ex;
 
-        } finally {
-            if (conn != null) {
-                try {
-                    System.out.println("\n***** Let terminate the Connection *****");
-                    conn.close();
-                    System.out.println("\nDatabase connection terminated...");
-                } catch (Exception ex) {
-                    System.out.println("Error in connection termination!");
+            } finally {
+                if (conn != null) {
+                    try {
+                        System.out.println("\n***** Let terminate the Connection *****");
+                        conn.close();
+                        System.out.println("\nDatabase connection terminated...");
+                    } catch (Exception ex) {
+                        System.out.println("Error in connection termination!");
+                    }
                 }
             }
-        }
+        });
     }
 
     @Test
     @Disabled
     public void dbFolderTest() {
-        // Variables
-        int userid = database.userAndPwExists("test", "1234");
-        Connection conn = null;
+        assertDoesNotThrow(() -> {
+            // Variables
+            int userid = database.userAndPwExists("test", "1234");
+            Connection conn = null;
 
-        try {
-            // Connection statement
-            conn = DriverManager.getConnection(url, dbUserName, dbPassWord);
-            System.out.println("\nDatabase Connection Established...");
+            try {
+                // Connection statement
+                conn = DriverManager.getConnection(url, dbUserName, dbPassWord);
+                System.out.println("\nDatabase Connection Established...");
 
-            // Folder statement VALUES(name(varchar32), folderID(int11), editDate(Date), userID(int11)
-            PreparedStatement pstmt = conn.prepareStatement("INSERT INTO Fotos.Folder(NAME, EDITDATE, USERID) VALUES (?, CURDATE(), ?)");
-            // name
-            pstmt.setString(1, "root");
-            // userID
-            pstmt.setInt(2, userid);
-            //Executing the statement
-            pstmt.execute();
-            System.out.println("Record inserted......");
+                // Folder statement VALUES(name(varchar32), folderID(int11), editDate(Date), userID(int11)
+                PreparedStatement pstmt = conn.prepareStatement("INSERT INTO Fotos.Folder(NAME, EDITDATE, USERID) VALUES (?, CURDATE(), ?)");
+                // name
+                pstmt.setString(1, "root");
+                // userID
+                pstmt.setInt(2, userid);
+                //Executing the statement
+                pstmt.execute();
+                System.out.println("Record inserted......");
 
-        } catch (Exception ex) {
-            System.err.println("Cannot connect to database server");
-            ex.printStackTrace();
-
-        } finally {
-            if (conn != null) {
-                try {
-                    System.out.println("\n***** Let terminate the Connection *****");
-                    conn.close();
-                    System.out.println("\nDatabase connection terminated...");
-                } catch (Exception ex) {
-                    System.out.println("Error in connection termination!");
+            } catch (Exception ex) {
+                System.err.println("Cannot connect to database server");
+                ex.printStackTrace();
+                throw ex;
+            } finally {
+                if (conn != null) {
+                    try {
+                        System.out.println("\n***** Let terminate the Connection *****");
+                        conn.close();
+                        System.out.println("\nDatabase connection terminated...");
+                    } catch (Exception ex) {
+                        System.out.println("Error in connection termination!");
+                    }
                 }
             }
-        }
+        });
     }
 
     @Test
     @Order(4)
     public void dbFolderTest2() {
-        // Variables
-        int userid = database.userAndPwExists("test", "1234");
-        System.out.println("USERID ON FOLDERTEST: " + userid);
-        Connection conn = null;
+        assertDoesNotThrow(() -> {
+            // Variables
+            int userid = database.userAndPwExists("test", "1234");
+            System.out.println("USERID ON FOLDERTEST: " + userid);
+            Connection conn = null;
 
-        try {
-            // Connection statement
-            conn = DriverManager.getConnection(url, dbUserName, dbPassWord);
-            System.out.println("\nDatabase Connection Established...");
+            try {
+                // Connection statement
+                conn = DriverManager.getConnection(url, dbUserName, dbPassWord);
+                System.out.println("\nDatabase Connection Established...");
 
-            database.uploadNewFolder("root", userid);
-            System.out.println("Record inserted......");
+                database.uploadNewFolder("root", userid);
+                System.out.println("Record inserted......");
 
-        } catch (Exception ex) {
-            System.err.println("Cannot connect to database server");
-            ex.printStackTrace();
-
-        } finally {
-            if (conn != null) {
-                try {
-                    System.out.println("\n***** Let terminate the Connection *****");
-                    conn.close();
-                    System.out.println("\nDatabase connection terminated...");
-                } catch (Exception ex) {
-                    System.out.println("Error in connection termination!");
+            } catch (Exception ex) {
+                System.err.println("Cannot connect to database server");
+                ex.printStackTrace();
+                throw ex;
+            } finally {
+                if (conn != null) {
+                    try {
+                        System.out.println("\n***** Let terminate the Connection *****");
+                        conn.close();
+                        System.out.println("\nDatabase connection terminated...");
+                    } catch (Exception ex) {
+                        System.out.println("Error in connection termination!");
+                    }
                 }
             }
-        }
+        });
     }
     @Test
     @Order(5)
     public void uploadNewFolderTest() {
-        int userid = database.userAndPwExists("test", "1234");
-        database.uploadNewFolder("test1", userid);
-        database.uploadNewFolder("test2", userid);
-        database.uploadNewFolder("test3", userid);
+        assertDoesNotThrow(() -> {
+            int userid = database.userAndPwExists("test", "1234");
+            database.uploadNewFolder("test1", userid);
+            database.uploadNewFolder("test2", userid);
+            database.uploadNewFolder("test3", userid);
+        });
     }
 
     @DisplayName("Testataan onko käyttäjän kansioita oikea määrä.")
