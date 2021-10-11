@@ -20,6 +20,8 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
@@ -63,7 +65,7 @@ public class FotosController {
     @FXML
     VBox loginVbox, emailVbox, newFolderVbox;
     @FXML
-    TextField usernameField, emailField1, emailField2, folderNameField, settingsSurNameTextField, settingsFrontNameTextField, settingsEmailTextField;
+    TextField usernameField, emailField1, emailField2, folderNameField, settingsSurNameTextField, settingsFrontNameTextField, settingsEmailTextField, searchTextField;
     @FXML
     PasswordField passwordField;
     @FXML
@@ -120,6 +122,16 @@ public class FotosController {
         settingsBorderPane.setVisible(false);
         imageViewStackPane.setVisible(false);
         newFolderVbox.setVisible(false);
+        //Hakukentälle kuuntelija
+        searchTextField.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent keyEvent) {
+                if (keyEvent.getCode().equals(KeyCode.ENTER)) {
+                    databaseChanged = true;
+                    adjustImageGrid();
+                }
+            }
+        });
     }
 
     public void setMainStage(Stage stage){
@@ -167,7 +179,12 @@ public class FotosController {
         Map<Integer, Pair<String, Image>> images;
         if (privateUserID > 0) {
             //Käyttäjä on kirjautunut.
-            images = database.downloadImages(selectedFolderID);
+            if (!Objects.equals(searchTextField.getText(), "")) {
+                System.out.println("Searching by: " + searchTextField.getText());
+                images = database.downloadImages(selectedFolderID, searchTextField.getText());
+            } else {
+                images = database.downloadImages(selectedFolderID, null);
+            }
         } else {
             //käyttäjä ei ole kirjautunut.
             //TODO lataa julkiset kuvat

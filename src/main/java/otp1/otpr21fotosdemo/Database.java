@@ -627,7 +627,7 @@ public class Database {
     }
 
     //Palauttaa Hashmapin jossa key on imageID ja Value on PAIR-rakenne. Pair-rakenteessa taas key on tiedostonimi ja value on imagedata
-    public Map<Integer, Pair<String, javafx.scene.image.Image>> downloadImages(int folderId) {
+    public Map<Integer, Pair<String, javafx.scene.image.Image>> downloadImages(int folderId, String searchString) {
         Connection conn = null;
         ResultSet result = null;
         Map<Integer, Pair<String, javafx.scene.image.Image>> images = new HashMap<>();
@@ -641,13 +641,20 @@ public class Database {
             PreparedStatement pstmt = null;
             try {
 
-
-                pstmt = conn.prepareStatement(
+                if (searchString != null) {
+                    pstmt = conn.prepareStatement("SELECT imageID, fileName, image FROM Fotos.Image WHERE userID=? AND folderID=? AND fileName LIKE ?");
+                    pstmt.setInt(1, privateUserId);
+                    pstmt.setInt(2, folderId);
+                    pstmt.setString(3, "%" + searchString + "%");
+                } else {
+                    pstmt = conn.prepareStatement(
                         "SELECT imageID, fileName, image FROM Fotos.Image WHERE userID=? AND folderID=?;"
                 );
+                    pstmt.setInt(1, privateUserId);
+                    pstmt.setInt(2, folderId);
+                }
 
-                pstmt.setInt(1, privateUserId);
-                pstmt.setInt(2, folderId);
+
                 result = pstmt.executeQuery();
 
                 while (result.next()) {

@@ -48,7 +48,7 @@
                                   <RowConstraints maxHeight="31.000001907348633" minHeight="9.0" prefHeight="26.333333333333336" vgrow="SOMETIMES" />
                                 </rowConstraints>
                                  <children>
-                                    <TextField alignment="CENTER" promptText="Hae" GridPane.valignment="BOTTOM" />
+                                    <TextField fx:id="searchTextField" alignment="CENTER" promptText="Hae" GridPane.valignment="BOTTOM" />
                                     <Label onMouseClicked="#onFilterShowHidebuttonClick" text="Tarkennettu haku" GridPane.halignment="CENTER" GridPane.rowIndex="1">
                                        <font>
                                           <Font name="System Bold" size="12.0" />
