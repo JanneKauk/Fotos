@@ -304,13 +304,13 @@
             <VBox fx:id="loginVbox" blendMode="SRC_ATOP" maxHeight="200.0" maxWidth="160.0" prefHeight="200.0" prefWidth="100.0" style="-fx-background-color: white; -fx-border-width: 1; -fx-border-color: black; -fx-border-radius: 15; -fx-background-radius: 15;" StackPane.alignment="TOP_RIGHT">
                <children>
                   <Label text="Käyttäjätunnus" />
-                  <TextField fx:id="usernameField" />
+                  <TextField fx:id="usernameField" onAction="#login" />
                   <Label text="Salasana">
                      <VBox.margin>
                         <Insets top="10.0" />
                      </VBox.margin>
                   </Label>
-                  <PasswordField fx:id="passwordField" />
+                  <PasswordField fx:id="passwordField" onAction="#login" />
                   <VBox fx:id="emailVbox">
                      <children>
                         <Label text="Sähköposti">
