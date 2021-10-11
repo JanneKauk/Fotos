@@ -87,7 +87,7 @@ public class Database {
             String dbUserName = "otpdb";
             String dbPassWord = "Asdfghjkl1234567890";
             String url = "jdbc:mysql://10.114.32.13:3306/Fotos";
-
+            int userId = -1;
             try {
                 // Connection statement
                 conn = DriverManager.getConnection(url, dbUserName, dbPassWord);
@@ -95,7 +95,10 @@ public class Database {
 
                 // USER statement VALUES(userID (int11), frontName (varchar32), surName(varchar32), userLevel(int11)
                 // email(varchar32), passWord(varchar64), dbUserName(varchar32)
-                PreparedStatement pstmt = conn.prepareStatement("INSERT INTO User(frontName, surName, userLevel, email, passWord, userName) VALUES(?,?,?,?,?,?)");
+                PreparedStatement pstmt = conn.prepareStatement(
+                        "INSERT INTO User(frontName, surName, userLevel, email, passWord, userName) VALUES(?,?,?,?,?,?)",
+                        Statement.RETURN_GENERATED_KEYS
+                );
                 // frontName
                 pstmt.setString(1, "empty");
                 // surName
@@ -110,7 +113,11 @@ public class Database {
                 pstmt.setString(6, userName);
                 //Executing the statement
                 pstmt.execute();
+                ResultSet key = pstmt.getGeneratedKeys();
+                key.next();
+                userId = key.getInt(1);
                 System.out.println("Record inserted......");
+
 
             } catch (Exception ex) {
                 System.err.println("Cannot connect to database server");
@@ -126,6 +133,9 @@ public class Database {
                         System.out.println("Error in connection termination!");
                     }
                 }
+            }
+            if (userId > 0){
+                uploadNewFolder("root", userId);
             }
         } else {
             System.out.println("BBBBBBBBBBBBB");
@@ -833,7 +843,7 @@ public class Database {
                 myStatement.setString(1, name);
                 myStatement.setInt(2, userId);
                 myStatement.executeUpdate();
-                System.out.println("Uusi kansio viety tietokantaan.");
+                System.out.println("Uusi kansio viety tietokantaan. " + name + " for userID " + userId);
             } catch (Exception e) {
                 System.err.println("Error in query");
                 e.printStackTrace();
