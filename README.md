@@ -60,3 +60,17 @@ Ylläpitäjä voi luoda ylläpito tilin auttaakseen asiakkaita ongelmien ratkais
 Ylläpitäjä voi resetoida käyttäjän salasanan esim. jos on epäilys, että salasana on vuotanut ulkopuolisille.
 
 Ylläpitäjä voi poistaa käyttäjän tilin jos käyttäjä niin haluaa eikä pysty sitä itse tekemään.
+
+#Tarkoitus
+
+Tarkoituksena on tehdä pilvipalvelusovellus, johon käyttäjät voivat ladata
+kuvia. Palvelussa käyttäjä voi tarkastella omia kuviaan, ladata niitä pilvestä omalle tietokoneelle
+ja lajitella kuvia eri kansioihin joita käyttäjä voi tehdä.
+
+#Kehitysympäristö ja projektin asennusohjeet Intellij Ideaan.
+
+Kehitysympäristönä käytimme Intellij Ideaa. Projektin saa ladattua Intellij Ideaan gitin kautta näin:
+
+1. Laita version control päälle: vcs > enable version control > valitse valikosta git ja paina ok.
+2. Git > manage remotes ja lisää sinne uusi remote jonka url-osoitteeksi https://gitlab.metropolia.fi/jurit/otp-r21-fotos
+3. Lataa projekti: git > pull
