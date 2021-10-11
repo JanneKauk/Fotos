@@ -23,6 +23,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -31,6 +32,8 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.Pair;
 
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.io.*;
 import java.util.*;
 
@@ -54,7 +57,7 @@ public class FotosController {
     @FXML
     Button omatKuvatButton, julkisetKuvatButton, jaetutKuvatButton, loginButton, cycleBack, cycleForward;
     @FXML
-    Label usernameLabel;
+    Label usernameLabel, settingsUserName;
     @FXML
     VBox loginVbox, emailVbox, newFolderVbox;
     @FXML
@@ -311,6 +314,7 @@ public class FotosController {
             omatKuvatButton.setVisible(true);
             jaetutKuvatButton.setVisible(true);
             usernameLabel.setText(usernameField.getText());
+            settingsUserName.setText(usernameField.getText());
             loginVbox.setVisible(false);
             newFolderButton.setVisible(true);
             clearLoginFields();
