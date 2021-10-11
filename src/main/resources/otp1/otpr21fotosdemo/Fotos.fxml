@@ -211,19 +211,19 @@
                                     <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                     <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                     <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                       </rowConstraints>
                                       <children>
-                                            <Label text="Sukunimi" GridPane.rowIndex="3" />
-                                            <TextField fx:id="surName" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="223.0" GridPane.rowIndex="4" />
-                                            <Label text="Etunimi" GridPane.rowIndex="5" />
-                                            <TextField fx:id="firstName" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="223.0" GridPane.rowIndex="6" />
-                                            <Label text="Sähköposti" GridPane.rowIndex="7" />
-                                            <TextField fx:id="email" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="223.0" GridPane.rowIndex="8" />
-                                            <Label fx:id="settingsUserName" prefHeight="25.0" prefWidth="215.0" text="mdmaflmvmvz" textFill="#7c7c7c" GridPane.rowIndex="2">
-                                                <font>
-                                                    <Font size="13.0" />
-                                                </font>
-                                            </Label>
+                                            <Label text="Sukunimi:" GridPane.rowIndex="3" />
+                                            <TextField fx:id="settingsSurNameTextField" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="223.0" GridPane.rowIndex="4" />
+                                            <Label text="Etunimi:" GridPane.rowIndex="5" />
+                                            <TextField fx:id="settingsFrontNameTextField" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="223.0" GridPane.rowIndex="6" />
+                                            <Label text="Sähköposti:" GridPane.rowIndex="7" />
+                                            <TextField fx:id="settingsEmailTextField" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="223.0" GridPane.rowIndex="8" />
+                                    <Text fx:id="settingsUserName" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" GridPane.rowIndex="1">
+                                       <GridPane.margin>
+                                          <Insets left="100.0" />
+                                       </GridPane.margin></Text>
                                             <Label text="Käyttäjätunnus:" textFill="#7c7c7c" GridPane.rowIndex="1">
                                                 <font>
                                                     <Font size="13.0" />
@@ -245,6 +245,12 @@
                                                     <Font size="25.0" />
                                                 </font>
                                             </Label>
+                                    <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#changeUserInfo" text="Hyväksy" GridPane.rowIndex="9" />
+                                    <Text fx:id="settingsUserInfoUpdateResponse" strokeType="OUTSIDE" strokeWidth="0.0" GridPane.rowIndex="9">
+                                       <GridPane.margin>
+                                          <Insets left="70.0" />
+                                       </GridPane.margin>
+                                    </Text>
                                       </children>
                                   </GridPane>
                            </center>
