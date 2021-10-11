@@ -57,11 +57,13 @@ public class FotosController {
     @FXML
     Button omatKuvatButton, julkisetKuvatButton, jaetutKuvatButton, loginButton, cycleBack, cycleForward;
     @FXML
-    Label usernameLabel, settingsUserName;
+    Label usernameLabel;
+    @FXML
+    Text settingsUserName, settingsUserInfoUpdateResponse, settingsSurName, settingsFrontName, settingsEmail;
     @FXML
     VBox loginVbox, emailVbox, newFolderVbox;
     @FXML
-    TextField usernameField, emailField1, emailField2, folderNameField;
+    TextField usernameField, emailField1, emailField2, folderNameField, settingsSurNameTextField, settingsFrontNameTextField, settingsEmailTextField;
     @FXML
     PasswordField passwordField;
     @FXML
@@ -76,12 +78,12 @@ public class FotosController {
     private ImageView testImageView, newFolderButton;
     @FXML
     public Text loginErrorText, newFolderErrorText;
-    @FXML
 
     private Stage mainStage = null;
     private boolean loggedIn = false;
     private Database database = null;
     private Integer privateUserID;
+    private String settingsSurNameString, settingsFrontNameString, settingsEmailString;
     private int selectedFolderID;
     private boolean databaseChanged = true;
 
@@ -299,8 +301,11 @@ public class FotosController {
         adjustImageGrid();
     }
 
-    public void fetchUserID(int methodUserID) {
+    public void fetchUserInfo(int methodUserID, String userSurName, String userFrontName, String userEmail) {
         privateUserID = methodUserID;
+        settingsSurNameString = userSurName;
+        settingsFrontNameString = userFrontName;
+        settingsEmailString = userEmail;
     }
 
     @FXML
@@ -315,6 +320,9 @@ public class FotosController {
             jaetutKuvatButton.setVisible(true);
             usernameLabel.setText(usernameField.getText());
             settingsUserName.setText(usernameField.getText());
+            settingsSurNameTextField.setText(settingsSurNameString);
+            settingsFrontNameTextField.setText(settingsFrontNameString);
+            settingsEmailTextField.setText(settingsEmailString);
             loginVbox.setVisible(false);
             newFolderButton.setVisible(true);
             clearLoginFields();
@@ -598,6 +606,8 @@ public class FotosController {
         folderMenu.setVisible(false);
         folderMenuHideButton.setManaged(false);
         folderMenuHideButton.setVisible(false);
+        settingsUserInfoUpdateResponse.setText("");
+
 
         /*
         Stage stage;
@@ -609,6 +619,20 @@ public class FotosController {
         stage.setScene(scene);
         stage.show();
         */
+    }
+
+    @FXML
+    public void changeUserInfo() {
+        String userSurName = settingsSurNameTextField.getText();
+        String userFrontName = settingsFrontNameTextField.getText();
+        String userEmail = settingsEmailTextField.getText();
+        if (database.changeUserInfoDB(userSurName, userFrontName, userEmail, privateUserID)) {
+            settingsUserInfoUpdateResponse.setStyle("-fx-text-fill: black");
+            settingsUserInfoUpdateResponse.setText("User information updated successfully");
+        } else {
+            settingsUserInfoUpdateResponse.setStyle("-fx-text-fill: red");
+            settingsUserInfoUpdateResponse.setText("User information updating was not successful");
+        }
     }
 
     @FXML

@@ -141,6 +141,9 @@ public class Database {
         passWord = saltLogin(passWord);
 
         int found = 0;
+        String userSurName = null;
+        String userFrontName = null;
+        String userEmail = null;
         Connection conn = null;
         try {
             // Connection statement
@@ -150,7 +153,7 @@ public class Database {
             PreparedStatement pstmt2 = null;
 
             try {
-                pstmt = conn.prepareStatement("SELECT userName,userID FROM Fotos.User WHERE userName=?;");
+                pstmt = conn.prepareStatement("SELECT userName,userID,surName,frontName,email FROM Fotos.User WHERE userName=?;");
                 pstmt.setString(1, user);
                 ResultSet result = pstmt.executeQuery();
 
@@ -164,6 +167,10 @@ public class Database {
                     System.err.println("No such username found");
                 } else if (Objects.equals(result.getString("userName"), user) && result2.getInt(1) > 0) {
                     found = result.getInt("userID");
+                    userSurName = result.getString("surName");
+                    userFrontName = result.getString("frontName");
+                    userEmail = result.getString("email");
+                    System.out.println(userSurName + userFrontName + userEmail);
                     System.out.println("Found " + Objects.equals(result.getString("userName"), user) + " " + user);
                 }
 
@@ -203,9 +210,44 @@ public class Database {
             }
         }
         // Palauttaa userID ja lähettää sen FotosController variableks
-        controller.fetchUserID(found);
+        controller.fetchUserInfo(found, userSurName, userFrontName, userEmail);
         privateUserId = found;
         return found;
+    }
+
+    public boolean changeUserInfoDB(String userSurname, String userFrontName, String userEmail, int userID) {
+        Connection conn = null;
+        try {
+            // Connection statement
+            conn = DriverManager.getConnection(url, dbUserName, dbPassword);
+            System.out.println("\nDatabase Connection Established...");
+
+            PreparedStatement pstmt = conn.prepareStatement("UPDATE Fotos.User SET surName = ?, frontName = ?, email = ? WHERE userID = ?;");
+
+            pstmt.setString(1, userSurname);
+            pstmt.setString(2, userFrontName);
+            pstmt.setString(3, userEmail);
+            pstmt.setInt(4, userID);
+
+            pstmt.executeUpdate();
+
+        } catch (Exception ex) {
+            System.err.println("Cannot connect to database server");
+            ex.printStackTrace();
+            return false;
+        } finally {
+            if (conn != null) {
+                try {
+                    System.out.println("\n***** Let terminate the Connection *****");
+                    conn.close();
+                    System.out.println("\nDatabase connection terminated...");
+                } catch (Exception ex) {
+                    System.out.println("Error in connection termination!");
+                }
+            }
+        }
+        System.out.println("User info changed successfully.");
+        return true;
     }
 
     public boolean userExists(String user) {
