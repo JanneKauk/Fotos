@@ -197,13 +197,9 @@ public class Database {
 
                     } catch (Exception ex) {
                         System.out.println("Error in statement termination!");
-
                     }
                 }
-
             }
-
-
         } catch (Exception ex) {
             System.err.println("Cannot connect to database server");
             ex.printStackTrace();
@@ -223,6 +219,38 @@ public class Database {
         controller.fetchUserInfo(found, userSurName, userFrontName, userEmail);
         privateUserId = found;
         return found;
+    }
+
+    public boolean changeUserPassword(int userID, String newPassword) {
+        Connection conn = null;
+        newPassword = saltLogin(newPassword);
+
+        try {
+            // Connection statement
+            conn = DriverManager.getConnection(url, dbUserName, dbPassword);
+            System.out.println("\nDatabase Connection Established...");
+
+            PreparedStatement pstmt = conn.prepareStatement("UPDATE Fotos.User SET passWord = ? WHERE userID = ?;");
+            pstmt.setString(1, newPassword);
+            pstmt.setInt(2, userID);
+            pstmt.executeUpdate();
+
+        } catch (Exception ex) {
+            System.err.println("Cannot connect to database server");
+            ex.printStackTrace();
+            return false;
+        } finally {
+            if (conn != null) {
+                try {
+                    System.out.println("\n***** Let terminate the Connection *****");
+                    conn.close();
+                    System.out.println("\nDatabase connection terminated...");
+                } catch (Exception ex) {
+                    System.out.println("Error in connection termination!");
+                }
+            }
+        }
+        return true;
     }
 
     public boolean changeUserInfoDB(String userSurname, String userFrontName, String userEmail, int userID) {

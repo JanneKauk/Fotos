@@ -6,6 +6,7 @@ module otp1.otpr21fotosdemo {
     requires org.apache.commons.codec;
 
 
+
     opens otp1.otpr21fotosdemo to javafx.fxml;
     exports otp1.otpr21fotosdemo;
 }
