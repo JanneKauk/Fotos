@@ -75,9 +75,9 @@ public class FotosController {
     @FXML
     private Region imageviewBackgroundRegion;
     @FXML
-    private StackPane imageViewStackPane, blurringStackPane, addImageButton, testStackPane;
+    private StackPane imageViewStackPane, blurringStackPane, addImageButton, uploadingStackPane;
     @FXML
-    private ImageView testImageView, newFolderButton;
+    private ImageView uploadingRotatingImageview, newFolderButton;
     @FXML
     public Text loginErrorText, newFolderErrorText;
 
@@ -113,6 +113,8 @@ public class FotosController {
         pictureInfoArrow.setRotate(180);
         filterMenu.setManaged(false);
         pictureInfo.setManaged(false);
+
+        uploadingStackPane.setVisible(false);
 
         //Uuden kansion -ja Login menu piiloo ja sen sisällä rekisteröitymiseen tarvittavat tekstikentät myös.
         loginVbox.setVisible(false);
@@ -311,6 +313,7 @@ public class FotosController {
         databaseChanged = true;
         omatKuvatButton.setVisible(false);
         jaetutKuvatButton.setVisible(false);
+        addImageButton.setVisible(false);
         usernameLabel.setText("Kirjaudu/Rekisteröidy");
         folderGridPane.getChildren().clear();
         newFolderButton.setVisible(false);
@@ -335,6 +338,7 @@ public class FotosController {
             loggedIn = true;
             omatKuvatButton.setVisible(true);
             jaetutKuvatButton.setVisible(true);
+            addImageButton.setVisible(true);
             usernameLabel.setText(usernameField.getText());
             settingsUserName.setText(usernameField.getText());
             settingsSurNameTextField.setText(settingsSurNameString);
@@ -449,12 +453,20 @@ public class FotosController {
                     Optional<ButtonType> vastaus = alert.showAndWait();
                     if(vastaus.isPresent() && vastaus.get() == ButtonType.OK){
                         //Upload on another thread
+                        uploadingStackPane.setVisible(true);
+                        RotateTransition rotateLoadingImage = new RotateTransition(new Duration(2000), uploadingRotatingImageview);
+                        rotateLoadingImage.setByAngle(360);
+                        rotateLoadingImage.setCycleCount(1000);
+                        rotateLoadingImage.play();
+
                         Runnable uploadTask = () -> {
                             System.out.println ("Upload for userID " + privateUserID);
                             database.uploadImages(privateUserID, selectedFolderID, files);
                             System.out.println("Uploaded.");
                             databaseChanged = true;
                             Platform.runLater(() -> {
+                                rotateLoadingImage.stop();
+                                uploadingStackPane.setVisible(false);
                                 adjustImageGrid();
                                 System.out.println("adjusted?");
                             });
