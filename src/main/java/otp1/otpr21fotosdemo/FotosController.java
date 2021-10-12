@@ -61,13 +61,13 @@ public class FotosController {
     @FXML
     Label usernameLabel;
     @FXML
-    Text settingsUserName, settingsUserInfoUpdateResponse, settingsSurName, settingsFrontName, settingsEmail;
+    Text settingsUserName, settingsUserInfoUpdateResponse, settingsUserPasswordUpdateResponse, settingsSurName, settingsFrontName, settingsEmail;
     @FXML
     VBox loginVbox, emailVbox, newFolderVbox;
     @FXML
     TextField usernameField, emailField1, emailField2, folderNameField, settingsSurNameTextField, settingsFrontNameTextField, settingsEmailTextField, searchTextField;
     @FXML
-    PasswordField passwordField;
+    PasswordField passwordField, settingsOldPassword, settingsNewPassword, settingsNewPasswordAgain;
     @FXML
     ImageView bigPicture;
     @FXML
@@ -85,7 +85,7 @@ public class FotosController {
     private boolean loggedIn = false;
     private Database database = null;
     private Integer privateUserID;
-    private String settingsSurNameString, settingsFrontNameString, settingsEmailString;
+    private String settingsSurNameString, settingsFrontNameString, settingsEmailString, userName;
     private int selectedFolderID;
     private boolean databaseChanged = true;
 
@@ -340,6 +340,7 @@ public class FotosController {
             settingsSurNameTextField.setText(settingsSurNameString);
             settingsFrontNameTextField.setText(settingsFrontNameString);
             settingsEmailTextField.setText(settingsEmailString);
+            userName = usernameField.getText();
             loginVbox.setVisible(false);
             newFolderButton.setVisible(true);
             clearLoginFields();
@@ -624,6 +625,10 @@ public class FotosController {
         folderMenuHideButton.setManaged(false);
         folderMenuHideButton.setVisible(false);
         settingsUserInfoUpdateResponse.setText("");
+        settingsUserPasswordUpdateResponse.setText("");
+        settingsOldPassword.setText("");
+        settingsNewPassword.setText("");
+        settingsNewPasswordAgain.setText("");
 
 
         /*
@@ -644,11 +649,31 @@ public class FotosController {
         String userFrontName = settingsFrontNameTextField.getText();
         String userEmail = settingsEmailTextField.getText();
         if (database.changeUserInfoDB(userSurName, userFrontName, userEmail, privateUserID)) {
+            settingsUserInfoUpdateResponse.setText("Käyttäjän tiedot päivitetty onnistuneesti");
             settingsUserInfoUpdateResponse.setStyle("-fx-text-fill: black");
-            settingsUserInfoUpdateResponse.setText("User information updated successfully");
         } else {
+            settingsUserInfoUpdateResponse.setText("Käyttäjän tietojen päivittäminen epäonnistui");
             settingsUserInfoUpdateResponse.setStyle("-fx-text-fill: red");
-            settingsUserInfoUpdateResponse.setText("User information updating was not successful");
+        }
+    }
+
+    @FXML
+    public void changeUserPassword() {
+        String oldPassword = settingsOldPassword.getText();
+        String newPassword = settingsNewPassword.getText();
+        String newPasswordAgain = settingsNewPasswordAgain.getText();
+
+        if (!Objects.equals(newPassword, newPasswordAgain)) {
+            settingsUserPasswordUpdateResponse.setText("Uuden salasanan pitää olla samanlainen molemmassa kentässä");
+            settingsUserPasswordUpdateResponse.setStyle("-fx-text-fill: red");
+        } else if (database.userAndPwExists(userName, oldPassword) != 0) {
+            if (database.changeUserPassword(privateUserID, newPassword)) {
+                settingsUserPasswordUpdateResponse.setText("Uuden salasanan uusiminen onnistui");
+                settingsUserPasswordUpdateResponse.setStyle("-fx-text-fill: black");
+            }
+        } else {
+            settingsUserPasswordUpdateResponse.setText("Salasanan uusimisessa tapahtui virhe");
+            settingsUserPasswordUpdateResponse.setStyle("-fx-text-fill: red");
         }
     }
 
