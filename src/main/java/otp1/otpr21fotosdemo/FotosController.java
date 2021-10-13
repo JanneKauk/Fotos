@@ -709,6 +709,56 @@ public class FotosController {
     }
 
     @FXML
+    public void deleteUserImages() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Haluatko varmasti poistaa kaikki kuvat");
+        alert.setTitle("Vahvista");
+        alert.setHeaderText(null);
+
+        Optional<ButtonType> vastaus = alert.showAndWait();
+        if (vastaus.isPresent() && vastaus.get() == ButtonType.OK) {
+            if (database.deleteAllUserImages(privateUserID)) {
+                Alert alert2 = new Alert(Alert.AlertType.INFORMATION, "Kaikki kuvat poistettu onnistuneesti");
+                alert2.setTitle("Kuvat poistettu");
+                alert2.setHeaderText(null);
+                alert2.showAndWait();
+            } else {
+                Alert alert3 = new Alert(Alert.AlertType.INFORMATION, "Kuvien poisto epäonnistui, yritä uudestan");
+                alert3.setTitle("Kuvat eivät poistunut");
+                alert3.setHeaderText(null);
+                alert3.showAndWait();
+            }
+        } else {
+            System.out.println("Abort user image deletion");
+        }
+    }
+
+    @FXML
+    public void deleteUser() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Haluatko varmasti poistaa tilin? Huom. myös kaikki tallennetut kuvat poistetaan!");
+        alert.setTitle("Vahvista");
+        alert.setHeaderText(null);
+
+        Optional<ButtonType> vastaus = alert.showAndWait();
+        if (vastaus.isPresent() && vastaus.get() == ButtonType.OK) {
+            if (database.deleteUser(privateUserID)) {
+                Alert alert2 = new Alert(Alert.AlertType.INFORMATION, "Tili poistettu onnistuneesti");
+                alert2.setTitle("Tili poistettu");
+                alert2.setHeaderText(null);
+                alert2.showAndWait();
+
+                logout();
+            } else {
+                Alert alert3 = new Alert(Alert.AlertType.INFORMATION, "Tilin poisto epäonnistui, yritä uudestan");
+                alert3.setTitle("Tili ei poistunut");
+                alert3.setHeaderText(null);
+                alert3.showAndWait();
+            }
+        } else {
+            System.out.println("Abort user deletion");
+        }
+    }
+
+    @FXML
     public void switchToDefaultScene() {
         //Laitetaan etusivun elementit näkyviin ja poistetaan asetusten elementit pois näkyvistä.
         settingsBorderPane.setManaged(false);

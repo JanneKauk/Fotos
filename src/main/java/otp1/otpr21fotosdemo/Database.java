@@ -430,6 +430,74 @@ public class Database {
         return (foundThumb && foundFullres);
     }
 
+    public boolean deleteAllUserImages(int userID) {
+        Connection conn = null;
+        try {
+            // Connection statement
+            conn = DriverManager.getConnection(url, dbUserName, dbPassword);
+            System.out.println("\nDatabase Connection Established...");
+
+            PreparedStatement pstmt = conn.prepareStatement("DELETE FROM Fotos.Image WHERE userID = ?;");
+            pstmt.setInt(1, userID);
+            pstmt.executeUpdate();
+
+        } catch (Exception ex) {
+            System.err.println("Cannot connect to database server");
+            ex.printStackTrace();
+            return false;
+        } finally {
+            if (conn != null) {
+                try {
+                    System.out.println("\n***** Let terminate the Connection *****");
+                    conn.close();
+                    System.out.println("\nDatabase connection terminated...");
+                } catch (Exception ex) {
+                    System.out.println("Error in connection termination!");
+                }
+            }
+        }
+        System.out.println("User images deleted successfully.");
+        return true;
+    }
+
+    public boolean deleteUser(int userID) {
+        Connection conn = null;
+        try {
+            // Connection statement
+            conn = DriverManager.getConnection(url, dbUserName, dbPassword);
+            System.out.println("\nDatabase Connection Established...");
+
+            PreparedStatement pstmt3 = conn.prepareStatement("DELETE FROM Fotos.Image WHERE userID = ?;");
+            pstmt3.setInt(1, userID);
+            pstmt3.executeUpdate();
+
+            PreparedStatement pstmt2 = conn.prepareStatement("DELETE FROM Fotos.Folder WHERE userID = ?;");
+            pstmt2.setInt(1, userID);
+            pstmt2.executeUpdate();
+
+            PreparedStatement pstmt = conn.prepareStatement("DELETE FROM Fotos.User WHERE userID = ?;");
+            pstmt.setInt(1, userID);
+            pstmt.executeUpdate();
+
+        } catch (Exception ex) {
+            System.err.println("Cannot connect to database server");
+            ex.printStackTrace();
+            return false;
+        } finally {
+            if (conn != null) {
+                try {
+                    System.out.println("\n***** Let terminate the Connection *****");
+                    conn.close();
+                    System.out.println("\nDatabase connection terminated...");
+                } catch (Exception ex) {
+                    System.out.println("Error in connection termination!");
+                }
+            }
+        }
+        System.out.println("User deleted successfully.");
+        return true;
+    }
+
     public boolean deleteImage(int imageID){
         boolean deleted = false;
         //boolean deletedFullRes = false;
