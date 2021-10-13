@@ -9,10 +9,8 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
-import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -25,7 +23,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -34,8 +31,6 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.Pair;
 
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.io.*;
 import java.util.*;
 
@@ -77,7 +72,7 @@ public class FotosController {
     @FXML
     private StackPane imageViewStackPane, blurringStackPane, addImageButton, uploadingStackPane;
     @FXML
-    private ImageView uploadingRotatingImageview, newFolderButton;
+    private ImageView uploadingRotatingImageview, newFolderButton, addImageButtonImageView;
     @FXML
     public Text loginErrorText, newFolderErrorText;
 
@@ -95,6 +90,8 @@ public class FotosController {
     RowConstraints rc = new RowConstraints();
     ColumnConstraints cc = new ColumnConstraints();
     Number currentImageID = null;
+    int currentImageIndex = 0;
+    ArrayList<Integer> imageIdList;
 
     @FXML
     private void deleteTest(){
@@ -179,6 +176,7 @@ public class FotosController {
         if(columnFitCount == currentColumnCount && !databaseChanged) return;//Continue only if column count OR database changed
 
         Map<Integer, Pair<String, Image>> images;
+        imageIdList = new ArrayList<>();
         if (privateUserID > 0) {
             //Käyttäjä on kirjautunut.
             if (!Objects.equals(searchTextField.getText(), "")) {
@@ -232,16 +230,16 @@ public class FotosController {
             //For each column
             for (int j = 0; j < currentColumnCount; j++) {
                 if (!it.hasNext()) break;//Stop when all pictures have been added
+                imageIdList.add(it.next());//Add the next ImageID to a list
                 //New elements
                 Pane p = new Pane();
                 ImageView iv = new ImageView();
                 p.getChildren().add(iv);
                 p.prefWidthProperty().bind(Bindings.min(fotosGridPane.widthProperty().divide(currentColumnCount), fotosGridPane.heightProperty().divide(rows)));
                 p.prefHeightProperty().bind(Bindings.min(fotosGridPane.widthProperty().divide(currentColumnCount), fotosGridPane.heightProperty().divide(rows)));
+
                 //ImageView settings
-                int imageID = it.next();
-                Pair<String, Image> filenameAndImage = images.get(imageID);
-                iv.setImage(filenameAndImage.getValue());
+                iv.setImage(images.get(imageIdList.get(t)).getValue());//Gets the ImageID from the list
                 //System.out.println("Displaying: " + filenameAndImage.getKey());
                 iv.setSmooth(true);
                 iv.setPreserveRatio(false);
@@ -256,18 +254,19 @@ public class FotosController {
                 iv.setViewport(viewportRect);
                 iv.fitWidthProperty().bind(p.widthProperty());
                 iv.fitHeightProperty().bind(p.heightProperty());
+
                 int finalT = t;
                 iv.setOnMouseClicked(event -> {
-                    Image fullImage = database.downloadFullImage(imageID);
+                    currentImageID = imageIdList.get(finalT);//What picture we are looking at
+                    System.out.println("ID:"+currentImageID);
+                    currentImageIndex = finalT;//What index the picture is in
+                    System.out.println("Index:"+ currentImageIndex);
+                    Image fullImage = database.downloadFullImage(currentImageID.intValue());//Find the original version of the clicked picture
                     if (fullImage != null){
                         bigPicture.setImage(fullImage);
                     } else {
                         bigPicture.setImage(iv.getImage());
                     }
-                    currentImageID = imageID;
-                    System.out.println("ID:"+currentImageID);
-                    int index = finalT;
-                    System.out.println("Index:"+index);
                     openImageview();
                 });
                 //Add the created element p to the grid in pos (j,i)
@@ -285,13 +284,33 @@ public class FotosController {
         System.out.println("Grid done");
     }
 
-    @FXML
+    @FXML//Cycle pictures back when viewing them
     private void cycleImageBack(){
-
+        if(currentImageIndex < 1) {
+            System.out.println("Start reached.");
+            return;
+        }
+        try{
+            currentImageIndex = currentImageIndex-1;
+            currentImageID = imageIdList.get(currentImageIndex);
+            bigPicture.setImage(database.downloadFullImage(currentImageID.intValue()));
+        }catch(Error e){
+            System.out.println("Full picture not found!:" + e);
+        }
     }
-    @FXML
+    @FXML//Cycle pictures forward when viewing them
     private void cycleImageForward(){
-        fotosGridPane.getChildren().get(5+1);
+        if(currentImageIndex == imageIdList.size()-1) {
+            System.out.println("End reached.");
+            return;
+        }
+        try{
+            currentImageIndex = currentImageIndex+1;
+            currentImageID = imageIdList.get(currentImageIndex);
+            bigPicture.setImage(database.downloadFullImage(currentImageID.intValue()));
+        }catch(Error e){
+            System.out.println("Full picture not found!:" + e);
+        }
     }
 
     private void clearLoginFields(){
@@ -455,6 +474,7 @@ public class FotosController {
                     if(vastaus.isPresent() && vastaus.get() == ButtonType.OK){
                         //Upload on another thread
                         uploadingStackPane.setVisible(true);
+                        addImageButtonImageView.setVisible(false);
                         RotateTransition rotateLoadingImage = new RotateTransition(new Duration(2000), uploadingRotatingImageview);
                         rotateLoadingImage.setByAngle(360);
                         rotateLoadingImage.setCycleCount(1000);
@@ -468,6 +488,7 @@ public class FotosController {
                             Platform.runLater(() -> {
                                 rotateLoadingImage.stop();
                                 uploadingStackPane.setVisible(false);
+                                addImageButtonImageView.setVisible(true);
                                 adjustImageGrid();
                                 System.out.println("adjusted?");
                             });
@@ -686,6 +707,56 @@ public class FotosController {
         } else {
             settingsUserPasswordUpdateResponse.setText("Salasanan uusimisessa tapahtui virhe");
             settingsUserPasswordUpdateResponse.setStyle("-fx-text-fill: red");
+        }
+    }
+
+    @FXML
+    public void deleteUserImages() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Haluatko varmasti poistaa kaikki kuvat");
+        alert.setTitle("Vahvista");
+        alert.setHeaderText(null);
+
+        Optional<ButtonType> vastaus = alert.showAndWait();
+        if (vastaus.isPresent() && vastaus.get() == ButtonType.OK) {
+            if (database.deleteAllUserImages(privateUserID)) {
+                Alert alert2 = new Alert(Alert.AlertType.INFORMATION, "Kaikki kuvat poistettu onnistuneesti");
+                alert2.setTitle("Kuvat poistettu");
+                alert2.setHeaderText(null);
+                alert2.showAndWait();
+            } else {
+                Alert alert3 = new Alert(Alert.AlertType.INFORMATION, "Kuvien poisto epäonnistui, yritä uudestan");
+                alert3.setTitle("Kuvat eivät poistunut");
+                alert3.setHeaderText(null);
+                alert3.showAndWait();
+            }
+        } else {
+            System.out.println("Abort user image deletion");
+        }
+    }
+
+    @FXML
+    public void deleteUser() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Haluatko varmasti poistaa tilin? Huom. myös kaikki tallennetut kuvat poistetaan!");
+        alert.setTitle("Vahvista");
+        alert.setHeaderText(null);
+
+        Optional<ButtonType> vastaus = alert.showAndWait();
+        if (vastaus.isPresent() && vastaus.get() == ButtonType.OK) {
+            if (database.deleteUser(privateUserID)) {
+                Alert alert2 = new Alert(Alert.AlertType.INFORMATION, "Tili poistettu onnistuneesti");
+                alert2.setTitle("Tili poistettu");
+                alert2.setHeaderText(null);
+                alert2.showAndWait();
+
+                logout();
+            } else {
+                Alert alert3 = new Alert(Alert.AlertType.INFORMATION, "Tilin poisto epäonnistui, yritä uudestan");
+                alert3.setTitle("Tili ei poistunut");
+                alert3.setHeaderText(null);
+                alert3.showAndWait();
+            }
+        } else {
+            System.out.println("Abort user deletion");
         }
     }
 

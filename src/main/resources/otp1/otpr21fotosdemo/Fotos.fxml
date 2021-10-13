@@ -296,8 +296,8 @@
                                           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                       </rowConstraints>
                                       <children>
-                                          <Button fx:id="deleteAllPhotosButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="31.0" prefWidth="160.0" text="Poista kaikki kuvat" GridPane.halignment="CENTER" />
-                                          <Button fx:id="deleteAccountButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="31.0" prefWidth="160.0" text="Poista tili" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
+                                          <Button fx:id="deleteAllPhotosButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#deleteUserImages" prefHeight="31.0" prefWidth="160.0" text="Poista kaikki kuvat" GridPane.halignment="CENTER" />
+                                          <Button fx:id="deleteAccountButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#deleteUser" prefHeight="31.0" prefWidth="160.0" text="Poista tili" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
                                       </children>
                                   </GridPane>
                            </bottom>
@@ -389,7 +389,7 @@
              </VBox>
              <StackPane fx:id="addImageButton" maxHeight="60.0" maxWidth="60.0" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="2" GridPane.valignment="BOTTOM" StackPane.alignment="BOTTOM_RIGHT">
                  <children>
-                  <ImageView fitHeight="124.0" fitWidth="127.0" onMouseClicked="#onAddImgButtonClick" pickOnBounds="true" preserveRatio="true" StackPane.alignment="CENTER">
+                  <ImageView fx:id="addImageButtonImageView" fitHeight="124.0" fitWidth="127.0" onMouseClicked="#onAddImgButtonClick" pickOnBounds="true" preserveRatio="true" StackPane.alignment="CENTER">
                      <StackPane.margin>
                         <Insets />
                      </StackPane.margin>
