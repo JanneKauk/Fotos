@@ -72,7 +72,7 @@ public class FotosController {
     @FXML
     private StackPane imageViewStackPane, blurringStackPane, addImageButton, uploadingStackPane;
     @FXML
-    private ImageView uploadingRotatingImageview, newFolderButton;
+    private ImageView uploadingRotatingImageview, newFolderButton, addImageButtonImageView;
     @FXML
     public Text loginErrorText, newFolderErrorText;
 
@@ -474,6 +474,7 @@ public class FotosController {
                     if(vastaus.isPresent() && vastaus.get() == ButtonType.OK){
                         //Upload on another thread
                         uploadingStackPane.setVisible(true);
+                        addImageButtonImageView.setVisible(false);
                         RotateTransition rotateLoadingImage = new RotateTransition(new Duration(2000), uploadingRotatingImageview);
                         rotateLoadingImage.setByAngle(360);
                         rotateLoadingImage.setCycleCount(1000);
@@ -487,6 +488,7 @@ public class FotosController {
                             Platform.runLater(() -> {
                                 rotateLoadingImage.stop();
                                 uploadingStackPane.setVisible(false);
+                                addImageButtonImageView.setVisible(true);
                                 adjustImageGrid();
                                 System.out.println("adjusted?");
                             });
