@@ -21,8 +21,8 @@ public class Database {
     private String dbUserName = "otpdb";
     private String dbPassword = "Asdfghjkl1234567890";
     private String url = "jdbc:mysql://10.114.32.13:3306/";
-    private final int MAX_THUMB_HEIGHT = 200;
-    private final int MAX_THUMB_WIDTH = 200;
+    private final int MAX_THUMB_HEIGHT = 400;
+    private final int MAX_THUMB_WIDTH = 400;
     private HashMap<Integer, javafx.scene.image.Image> fullImageCache = new HashMap<>();
     private int privateUserId;
     private FotosController controller;
