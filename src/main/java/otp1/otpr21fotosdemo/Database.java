@@ -977,11 +977,15 @@ public class Database {
             conn = DriverManager.getConnection(url, dbUserName, dbPassword);
             System.out.println("\nDatabase Connection Established...");
 
-            PreparedStatement myStatement = null;
+            PreparedStatement myStatement1 = null;
+            PreparedStatement myStatement2 = null;
             try {
-                myStatement = conn.prepareStatement("DELETE FROM Fotos.Folder WHERE folderID=?");
-                myStatement.setInt(1, folderid);
-                myStatement.executeUpdate();
+                myStatement2 = conn.prepareStatement("DELETE FROM Fotos.Image WHERE folderID=?");
+                myStatement2.setInt(1, folderid);
+                myStatement2.executeUpdate();
+                myStatement1 = conn.prepareStatement("DELETE FROM Fotos.Folder WHERE folderID=?");
+                myStatement1.setInt(1, folderid);
+                myStatement1.executeUpdate();
                 System.out.println("Kansio poistettu tietokannasta.");
             } catch (Exception e) {
                 System.err.println("Error in query");

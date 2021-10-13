@@ -884,6 +884,7 @@ public class FotosController {
         database.deleteFolder(folderid);
         folderGridPane.getChildren().clear();
         loadUserFolders(privateUserID);
+        loadUserRootFolder();
     }
 
     @FXML
