@@ -11,17 +11,18 @@ import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
+import javafx.geometry.Side;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
@@ -31,8 +32,10 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.Pair;
 
+import java.awt.*;
 import java.io.*;
 import java.util.*;
+import java.util.List;
 
 import static java.lang.Double.valueOf;
 
@@ -92,7 +95,12 @@ public class FotosController {
     Number currentImageID = null;
     int currentImageIndex = 0;
     ArrayList<Integer> imageIdList;
+    private ImageSelector imageSelector;
 
+    @FXML
+    private void onFotosGridPaneClick(){
+        imageSelector.clearSelection();
+    }
     @FXML
     private void deleteTest(){
         database.deleteImage(118);
@@ -129,6 +137,16 @@ public class FotosController {
                     databaseChanged = true;
                     adjustImageGrid();
                 }
+            }
+        });
+        imageSelector = new ImageSelector();
+        //Tämä tarvitaan jotta kuvien valinta saadaan clearattua kun klikataan muualle.
+        rootborderpane.setOnMouseClicked(event -> {
+            if (event.isControlDown() || event.getPickResult().getIntersectedNode().getTypeSelector().equals("ImageView")) {
+                //Klikattiin imageviewiin tai CTRL pohjas
+                return;
+            }else if (imageSelector.countSelected() > 0) {
+                imageSelector.clearSelection();
             }
         });
     }
@@ -201,7 +219,6 @@ public class FotosController {
         //System.out.println("columns in Igrid: "+columns); DEBUG
         rows = (int)Math.ceil((double)imageTableCount / currentColumnCount);
         //System.out.println("rows in Igrid: "+rows); DEBUG
-
         Iterator<Integer> it = images.keySet().iterator();
         /*
         //Palauttaa Hashmapin jossa key on imageID ja Value on PAIR-rakenne. Pair-rakenteessa taas key on tiedostonimi ja value on imagedata
@@ -222,7 +239,7 @@ public class FotosController {
             }
         }
         */
-
+        imageSelector.clearAll();
         int t = 0;
         System.out.println("Creating imagegrid");
         //For each row
@@ -230,9 +247,14 @@ public class FotosController {
             //For each column
             for (int j = 0; j < currentColumnCount; j++) {
                 if (!it.hasNext()) break;//Stop when all pictures have been added
-                imageIdList.add(it.next());//Add the next ImageID to a list
+                int imageDatabaseId = it.next();
+                imageIdList.add(imageDatabaseId);//Add the next ImageID to a list
                 //New elements
                 Pane p = new Pane();
+                /*
+                p.setStyle("-fx-border-color: red;");
+                p.setStyle("-fx-border-width: 10;");
+                */
                 ImageView iv = new ImageView();
                 p.getChildren().add(iv);
                 p.prefWidthProperty().bind(Bindings.min(fotosGridPane.widthProperty().divide(currentColumnCount), fotosGridPane.heightProperty().divide(rows)));
@@ -257,18 +279,53 @@ public class FotosController {
 
                 int finalT = t;
                 iv.setOnMouseClicked(event -> {
-                    currentImageID = imageIdList.get(finalT);//What picture we are looking at
-                    System.out.println("ID:"+currentImageID);
-                    currentImageIndex = finalT;//What index the picture is in
-                    System.out.println("Index:"+ currentImageIndex);
-                    Image fullImage = database.downloadFullImage(currentImageID.intValue());//Find the original version of the clicked picture
-                    if (fullImage != null){
-                        bigPicture.setImage(fullImage);
-                    } else {
-                        bigPicture.setImage(iv.getImage());
+
+                    if (event.getButton() == MouseButton.PRIMARY) {
+                        //Left click
+                        if (event.isControlDown()){
+                            //CTRL painettuna
+                            if (imageSelector.isSelected(imageDatabaseId))
+                                imageSelector.removeFromSelection(imageDatabaseId);
+                            else
+                                imageSelector.addToSelection(imageDatabaseId);
+
+                        } else {
+                            //EI CTRL painettuna
+
+                            //Jos kuvia valittana niin vain clearataan valinta.
+                            if (imageSelector.countSelected() > 0){
+                                imageSelector.clearSelection();
+                                return;
+                            }
+                            currentImageID = imageIdList.get(finalT);//What picture we are looking at
+                            System.out.println("ID:" + currentImageID);
+                            currentImageIndex = finalT;//What index the picture is in
+                            System.out.println("Index:" + currentImageIndex);
+                            Image fullImage = database.downloadFullImage(currentImageID.intValue());//Find the original version of the clicked picture
+                            if (fullImage != null) {
+                                bigPicture.setImage(fullImage);
+                            } else {
+                                bigPicture.setImage(iv.getImage());
+                            }
+                            openImageview();
+                        }
+                    } else if (event.getButton() == MouseButton.SECONDARY){
+                        //Right click
+                        ContextMenu menu = new ContextMenu();
+                        MenuItem menuitem1 = new MenuItem("Poista");
+                        menu.getItems().addAll(menuitem1);
+                        menuitem1.setOnAction(new EventHandler<ActionEvent>() {
+                            @Override
+                            public void handle(ActionEvent event) {
+                                deleteSelectedImages(imageDatabaseId);
+                            }
+                        });
+                        menu.show(iv, Side.LEFT, event.getX(), event.getY());
+
+
                     }
-                    openImageview();
                 });
+                imageSelector.addToAll(imageDatabaseId, iv);
                 //Add the created element p to the grid in pos (j,i)
                 fotosGridPane.add(p, j, i);
                 t++;
@@ -282,6 +339,38 @@ public class FotosController {
 //        fotosGridPane.setGridLinesVisible(true); //For debug
         databaseChanged = false;
         System.out.println("Grid done");
+    }
+
+    //Poistaa valitut kuvat tai jos ei mitään valittuna niin sen mistä klikattiin juuri oikealla hiirellä.
+    private void deleteSelectedImages(int clickedImageDatabaseId){
+        ArrayList<Integer> selectedImageIds = imageSelector.getSelectedIds();
+
+        //Jos mitään ei ollut valittuna niin lisätään poistettavien listaan se kuva josta klikattiin juuri oikealla.
+        if (selectedImageIds.size() == 0){
+            selectedImageIds.add(clickedImageDatabaseId);
+        }
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Haluatko varmasti poistaa valitut " + selectedImageIds.size() + " kuvaa?");
+        alert.setTitle("Vahvista");
+        alert.setHeaderText(null);
+
+        Optional<ButtonType> vastaus = alert.showAndWait();
+        if(vastaus.isPresent() && vastaus.get() == ButtonType.OK){
+
+            for(Integer i:selectedImageIds){
+                database.deleteImage(i);
+            }
+            imageSelector.clearSelection();
+            databaseChanged = true;
+            adjustImageGrid();
+            StringBuilder b = new StringBuilder();
+            for (Integer i : selectedImageIds){
+                b.append(i + " ");
+            }
+            System.out.println("Deleted images with ids: " + b);
+        } else {
+            System.out.println("Nothing deleted");
+        }
+
     }
 
     @FXML//Cycle pictures back when viewing them
