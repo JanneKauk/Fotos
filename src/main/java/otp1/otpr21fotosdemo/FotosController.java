@@ -107,18 +107,28 @@ public class FotosController {
     }
     @FXML
     private void initialize() {
+        imageSelector = new ImageSelector();
         database = new Database();
         database.setController(this);
         logout();
         //Filtermenu piiloon alussa
         filterMenu.setTranslateX(-200);
         pictureInfo.setTranslateX(-200);
-
         filterButtonStackPane.setRotate(180);
         pictureInfoArrow.setRotate(180);
         filterMenu.setManaged(false);
         pictureInfo.setManaged(false);
 
+        /* Ei toimi vielä.....
+        //Foldermenu piiloo alussa
+        System.out.println("Foldermenu getheight... : " + folderMenu.getHeight() );
+        folderMenu.setViewOrder(1);
+        folderMenu.setTranslateY(-160);
+        System.out.println("Foldermenu translatey... : " + folderMenu.getTranslateY() );
+        folderButtonStackPane.setRotate(180);
+        folderMenu.setManaged(false);
+        BorderPane.setMargin(filterMenuHbox, new Insets(folderMenu.getHeight(), 0, 0, 0));
+*/
         uploadingStackPane.setVisible(false);
 
         //Uuden kansion -ja Login menu piiloo ja sen sisällä rekisteröitymiseen tarvittavat tekstikentät myös.
@@ -139,7 +149,6 @@ public class FotosController {
                 }
             }
         });
-        imageSelector = new ImageSelector();
         //Tämä tarvitaan jotta kuvien valinta saadaan clearattua kun klikataan muualle.
         rootborderpane.setOnMouseClicked(event -> {
             if (event.isControlDown() || event.getPickResult().getIntersectedNode().getTypeSelector().equals("ImageView")) {
@@ -205,9 +214,15 @@ public class FotosController {
             }
         } else {
             //käyttäjä ei ole kirjautunut.
-            //TODO lataa julkiset kuvat
-            images = new HashMap<Integer, Pair<String, javafx.scene.image.Image>>();
+            images = database.downloadPublicImages();
         }
+        StringBuilder b = new StringBuilder();
+        b.append("Grids imageID:s: ");
+        images.entrySet()
+                .stream()
+                .sorted(Map.Entry.<Integer, Pair<String, Image>>comparingByKey())
+                .forEach(integerPairEntry -> {b.append(integerPairEntry.getKey() + " ");});
+        System.out.println(b);
         //Reset and recreate the grid
         setGridConstraints();
         imageTableCount = images.size();
@@ -220,6 +235,7 @@ public class FotosController {
         rows = (int)Math.ceil((double)imageTableCount / currentColumnCount);
         //System.out.println("rows in Igrid: "+rows); DEBUG
         Iterator<Integer> it = images.keySet().iterator();
+
         /*
         //Palauttaa Hashmapin jossa key on imageID ja Value on PAIR-rakenne. Pair-rakenteessa taas key on tiedostonimi ja value on imagedata
         //Esimerkiksi:  luetellaan tiedostonimet konsolii.
@@ -292,7 +308,7 @@ public class FotosController {
                         } else {
                             //EI CTRL painettuna
 
-                            //Jos kuvia valittana niin vain clearataan valinta.
+                            //Jos kuvia valittuna niin vain clearataan valinta.
                             if (imageSelector.countSelected() > 0){
                                 imageSelector.clearSelection();
                                 return;
@@ -312,16 +328,54 @@ public class FotosController {
                     } else if (event.getButton() == MouseButton.SECONDARY){
                         //Right click
                         ContextMenu menu = new ContextMenu();
-                        MenuItem menuitem1 = new MenuItem("Poista");
-                        menu.getItems().addAll(menuitem1);
-                        menuitem1.setOnAction(new EventHandler<ActionEvent>() {
-                            @Override
-                            public void handle(ActionEvent event) {
-                                deleteSelectedImages(imageDatabaseId);
-                            }
-                        });
-                        menu.show(iv, Side.LEFT, event.getX(), event.getY());
+                        if(loggedIn) {
+                            MenuItem menuitem1 = new MenuItem("Aseta kaikki julkiseksi");
+                            MenuItem menuitem2 = new MenuItem("Aseta kaikki yksityiseksi");
+                            menuitem1.setOnAction(new EventHandler<ActionEvent>() {
+                                @Override
+                                public void handle(ActionEvent event) {
+                                    setSelectedImagesPublicity(imageDatabaseId, true);
+                                }
+                            });
+                            menuitem2.setOnAction(new EventHandler<ActionEvent>() {
+                                @Override
+                                public void handle(ActionEvent event) {
+                                    setSelectedImagesPublicity(imageDatabaseId, false);
+                                }
+                            });
+                            if (imageSelector.countSelected() > 1) {
+                                menu.getItems().addAll(menuitem1);
+                                menu.getItems().addAll(menuitem2);
+                            } else {
+                                //Kuvia on valittuna vain yksi tai right klikattiin yhtä kuvaa valitsematta useampaa.
+                                menuitem1.setText("Aseta julkiseksi");
+                                menuitem2.setText("Aseta yksityiseksi");
+                                //Selvitetään kuvan julkisuus
+                                boolean publc;
+                                if (imageSelector.countSelected() == 0) {
+                                    publc = database.getImagePublicity(imageDatabaseId);
+                                } else {
+                                    //selected == 1
+                                    publc = database.getImagePublicity(imageSelector.getSelectedIds().get(0));
+                                }
 
+                                if (publc) {
+                                    menu.getItems().addAll(menuitem2);
+                                } else {
+                                    menu.getItems().addAll(menuitem1);
+                                }
+                            }
+
+                            MenuItem menuitem3 = new MenuItem("Poista");
+                            menu.getItems().addAll(menuitem3);
+                            menuitem3.setOnAction(new EventHandler<ActionEvent>() {
+                                @Override
+                                public void handle(ActionEvent event) {
+                                    deleteSelectedImages(imageDatabaseId);
+                                }
+                            });
+                        }
+                        menu.show(iv, Side.LEFT, event.getX(), event.getY());
 
                     }
                 });
@@ -390,6 +444,28 @@ public class FotosController {
             System.out.println("Nothing deleted");
         }
 
+    }
+
+    private void setSelectedImagesPublicity(int clickedImageId, boolean publc){
+        boolean success = true;
+        int count = 0;
+        if (imageSelector.countSelected() == 0){
+            success = success && database.setImagePublicity(clickedImageId, publc);
+            count++;
+        } else {
+            ArrayList<Integer> selected = imageSelector.getSelectedIds();
+            for (Integer i : selected){
+                success = success && database.setImagePublicity(i,publc);
+                count++;
+            }
+        }
+
+
+        if (success){
+            System.out.println("Set " + count + " images " + (publc ? "public" : "private"));
+        } else {
+            System.out.println("Error in setting some images publicity");
+        }
     }
 
     @FXML//Cycle pictures back when viewing them
@@ -727,6 +803,7 @@ public class FotosController {
     private void onFolderShowHidebuttonClick(){
         TranslateTransition transitionMenu = new TranslateTransition(new Duration(500), folderMenu);
         RotateTransition rotateButton = new RotateTransition(new Duration(500), folderButtonStackPane);
+        System.out.println("Folder translateY: " + folderMenu.getTranslateY());
         if (folderMenu.getTranslateY() != 0){
             //Avataan kiinni oleva foldermenu
             System.out.println("Folderit auki!");

@@ -500,14 +500,12 @@ public class Database {
 
     public boolean deleteImage(int imageID){
         boolean deleted = false;
-        //boolean deletedFullRes = false;
         Connection conn = null;
         try {
             // Connection statement
             conn = DriverManager.getConnection(url, dbUserName, dbPassword);
             System.out.println("Database Connection Established...");
             PreparedStatement pstmt = null;
-            //PreparedStatement pstmt2 = null;
             try {
                 pstmt = conn.prepareStatement("DELETE FROM Fotos.Image WHERE  imageID=?;");
                 pstmt.setInt(1, imageID);
@@ -516,19 +514,6 @@ public class Database {
                 if (pstmt.getUpdateCount() > 0) {
                     deleted = true;
                 }
-
-                /*
-                Full_Image taulusta ei tarvitse poistaa erikseen, koska
-                tietokanta poistaa tuon entryn, kun se poistetaan Image-taulusta...
-
-                pstmt2 = conn.prepareStatement("DELETE FROM Fotos.Full_Image WHERE  imageID=?;");
-                pstmt2.setInt(1, imageID);
-                pstmt2.execute();
-                System.out.println("Poistettiin " + pstmt2.getUpdateCount() + " riviä taulusta Fotos.Full_Image");
-                if (pstmt2.getUpdateCount() > 0) {
-                    deletedFullRes = true;
-                }
-                */
 
             } catch (Exception e) {
                 System.err.println("Error in query");
@@ -544,16 +529,6 @@ public class Database {
 
                     }
                 }
-                /*
-                if (pstmt2 != null) {
-                    try {
-                        pstmt2.close();
-
-                    } catch (Exception ex) {
-                        System.out.println("Error in statement 2 termination!");
-
-                    }
-                }*/
 
             }
 
@@ -578,7 +553,117 @@ public class Database {
         return deleted;
     }
 
-    //TODO Joku "progress bar" -tyyppinen näkymä mistä näkee miten kuvien uploadaus edistyy
+    public boolean setImagePublicity(int imageID, boolean publc){
+        boolean success = false;
+        int viewingRights = publc ? 1 : 0;
+        Connection conn = null;
+        try {
+            // Connection statement
+            conn = DriverManager.getConnection(url, dbUserName, dbPassword);
+            System.out.println("Database Connection Established...");
+            PreparedStatement pstmt = null;
+            try {
+                pstmt = conn.prepareStatement("UPDATE Fotos.Image SET viewingRights = ? WHERE imageID = ?;");
+                pstmt.setInt(1, viewingRights);
+                pstmt.setInt(2, imageID);
+                pstmt.execute();
+                if (publc)
+                    System.out.println("Asetettiin " + pstmt.getUpdateCount() + " kuvaa julkiseksi.");
+                else
+                    System.out.println("Asetettiin " + pstmt.getUpdateCount() + " kuvaa yksityiseksi.");
+                if (pstmt.getUpdateCount() > 0) {
+                    success = true;
+                }
+
+
+            } catch (Exception e) {
+                System.err.println("Error in query");
+                e.printStackTrace();
+
+            } finally {
+                if (pstmt != null) {
+                    try {
+                        pstmt.close();
+
+                    } catch (Exception ex) {
+                        System.out.println("Error in statement 1 termination!");
+
+                    }
+                }
+            }
+
+
+        } catch (Exception ex) {
+            System.err.println("Cannot connect to database server");
+            ex.printStackTrace();
+        } finally {
+            if (conn != null) {
+                try {
+                    System.out.println("***** Let terminate the Connection *****");
+                    conn.close();
+                    System.out.println("Database connection terminated...");
+
+                } catch (Exception ex) {
+                    System.out.println("Error in connection termination!");
+
+                }
+            }
+
+        }
+        return success;
+    }
+
+    public boolean getImagePublicity(int imageID){
+        Connection conn = null;
+        ResultSet result = null;
+        int viewingRights = -1;
+        try {
+            // Connection statement
+            conn = DriverManager.getConnection(url, dbUserName, dbPassword);
+            System.out.println("Database Connection Established...");
+            PreparedStatement pstmt = null;
+            try {
+                pstmt = conn.prepareStatement(
+                        "SELECT viewingRights  FROM Fotos.Image WHERE imageID=?;"
+                );
+                pstmt.setInt(1, imageID);
+                result = pstmt.executeQuery();
+                if (result.next()) {
+                    viewingRights = result.getInt("viewingRights");
+                }
+            } catch (Exception e) {
+                System.err.println("Error in query");
+                e.printStackTrace();
+            } finally {
+                if (pstmt != null) {
+                    try {
+                        pstmt.close();
+                    } catch (Exception ex) {
+                        System.out.println("Error in statement 1 termination!");
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            System.err.println("Cannot connect to database server");
+            ex.printStackTrace();
+        } finally {
+            if (conn != null) {
+                try {
+                    System.out.println("***** Let terminate the Connection *****");
+                    conn.close();
+                    System.out.println("Database connection terminated...");
+                } catch (Exception ex) {
+                    System.out.println("Error in connection termination!");
+
+                }
+            }
+        }
+        if (viewingRights > 0){
+            return true;
+        } else {
+            return false;
+        }
+    }
     public List<Integer> uploadImages(int userId, int folderId, List<File> files) {
 
         System.out.println("UploadTask starting.");
@@ -796,7 +881,64 @@ public class Database {
         }
         return images;
     }
+    public Map<Integer, Pair<String, javafx.scene.image.Image>> downloadPublicImages() {
+        Connection conn = null;
+        ResultSet result = null;
+        Map<Integer, Pair<String, javafx.scene.image.Image>> images = new HashMap<>();
 
+
+        try {
+            // Connection statement
+            conn = DriverManager.getConnection(url, dbUserName, dbPassword);
+            System.out.println("\nDatabase Connection Established...");
+
+            PreparedStatement pstmt = null;
+            try {
+                pstmt = conn.prepareStatement(
+                        "SELECT imageID, fileName, image FROM Fotos.Image WHERE viewingRights=1;"
+                );
+                result = pstmt.executeQuery();
+
+                while (result.next()) {
+                    int id = result.getInt("imageID");
+                    String filename = result.getString("filename");
+                    javafx.scene.image.Image image = new javafx.scene.image.Image(result.getBinaryStream("image"));
+                    images.put(id, new Pair<>(filename, image));
+                }
+            } catch (Exception e) {
+                System.err.println("Error in query");
+                e.printStackTrace();
+            } finally {
+                if (pstmt != null) {
+                    try {
+                        pstmt.close();
+
+                    } catch (Exception ex) {
+                        System.out.println("Error in statement termination!");
+
+                    }
+                }
+            }
+
+        } catch (Exception ex) {
+            System.err.println("Cannot connect to database server");
+            ex.printStackTrace();
+        } finally {
+            if (conn != null) {
+                try {
+                    System.out.println("\n***** Let terminate the Connection *****");
+                    conn.close();
+                    System.out.println("\nDatabase connection terminated...");
+
+                } catch (Exception ex) {
+                    System.out.println("Error in connection termination!");
+
+                }
+            }
+
+        }
+        return images;
+    }
     public javafx.scene.image.Image downloadFullImage(int imageID) {
         if (fullImageCache.containsKey(imageID)) {
             System.out.println("Full image found in cache. Showing that instead.");
