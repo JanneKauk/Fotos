@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-public class ImageSelector {
+public class ImageSelector{
     private final double OPACITY_NOT_SELECTED = 0.3;
     private Map<Integer, ImageView> allImageViews;
     private ArrayList<Integer> selectedIds;
@@ -55,7 +55,10 @@ public class ImageSelector {
         System.out.println("Selected id:s : "+ b.toString());
     }
 
-    public void addToAll(int id, ImageView iv){
+    public void addToAll(int id, ImageView iv) throws Exception{
+        if (allImageViews.containsKey(id)){
+            throw new Exception("ID " + id + " exists already in allImageViews!");
+        }
         allImageViews.put(id,iv);
     }
 
@@ -69,7 +72,7 @@ public class ImageSelector {
         } else {
             allImageViews.get(id).setOpacity(OPACITY_NOT_SELECTED);
         }
-        ;
+
         selectedIds.remove(Integer.valueOf(id));
 
         StringBuilder b = new StringBuilder();
@@ -88,5 +91,10 @@ public class ImageSelector {
 
     public ArrayList<Integer> getSelectedIds() {
         return new ArrayList<Integer>(selectedIds);
+    }
+
+    //For testing
+    public int countAll(){
+        return allImageViews.size();
     }
 }

@@ -112,6 +112,7 @@ public class DatabaseTest {
         });
     }
 
+    /*
     @Test
     @Disabled
     public void dbUserTest() {
@@ -160,7 +161,7 @@ public class DatabaseTest {
             }
         });
     }
-
+    */
     @Test
     @Order(2)
     public void dbUserTest2() {
@@ -250,7 +251,7 @@ public class DatabaseTest {
             }
         });
     }
-
+    /*
     @Test
     @Disabled
     public void dbFolderTest() {
@@ -291,7 +292,7 @@ public class DatabaseTest {
             }
         });
     }
-
+    */
     @Test
     @Order(4)
     public void dbFolderTest2() {
@@ -361,17 +362,30 @@ public class DatabaseTest {
     @Order(8)
     public void uploadImagesTest(){
         Database base = new Database();
-        File file = new File("src/main/resources/otp1/otpr21fotosdemo/image/addition-icon.png");
+        File file1 = new File("src/main/resources/otp1/otpr21fotosdemo/image/testImage1.jpg");
+        File file2 = new File("src/main/resources/otp1/otpr21fotosdemo/image/testImage2.jpg");
+        File file3 = new File("src/main/resources/otp1/otpr21fotosdemo/image/testImage3WithVeryLongFileName1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901.jpg");
+
         List<File> fileList = new ArrayList<File>();
-        fileList.add(file);
+        fileList.add(file1);
+        fileList.add(file2);
+        fileList.add(file3);
 
         assertAll(() -> {
             List<Integer> imageIDt = base.uploadImages(1,1,fileList);
             if(imageIDt.size() > 0){
                 //Testataan löytyykö lisätty kuva
-                assertTrue( base.imageExists(imageIDt.get(0)), "Lisättyä kuvaa ei löytynyt!");
+                assertTrue( base.imageExists(imageIDt.get(0)), "Lisättyä kuvaa 1 ei löytynyt!");
                 //Poistetaan lisätty kuva
-                assertTrue(base.deleteImage(imageIDt.get(0)), "Kuvan poisto ei onnistunut!");
+                assertTrue(base.deleteImage(imageIDt.get(0)), "Kuvan 1 poisto ei onnistunut!");
+                //Testataan löytyykö lisätty kuva
+                assertTrue( base.imageExists(imageIDt.get(1)), "Lisättyä kuvaa 2 ei löytynyt!");
+                //Poistetaan lisätty kuva
+                assertTrue(base.deleteImage(imageIDt.get(1)), "Kuvan 2 poisto ei onnistunut!");
+                //Testataan löytyykö lisätty kuva
+                assertTrue( base.imageExists(imageIDt.get(2)), "Lisättyä kuvaa 3 ei löytynyt!");
+                //Poistetaan lisätty kuva
+                assertTrue(base.deleteImage(imageIDt.get(2)), "Kuvan 3 poisto ei onnistunut!");
             }
         });
     }

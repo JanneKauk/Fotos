@@ -325,7 +325,11 @@ public class FotosController {
 
                     }
                 });
-                imageSelector.addToAll(imageDatabaseId, iv);
+                try {
+                    imageSelector.addToAll(imageDatabaseId, iv);
+                } catch (Exception e){
+                    System.err.println(e.getMessage() + e);
+                }
                 //Add the created element p to the grid in pos (j,i)
                 fotosGridPane.add(p, j, i);
                 t++;
@@ -354,10 +358,12 @@ public class FotosController {
         alert.setHeaderText(null);
 
         Optional<ButtonType> vastaus = alert.showAndWait();
+        boolean success = true;
         if(vastaus.isPresent() && vastaus.get() == ButtonType.OK){
 
             for(Integer i:selectedImageIds){
-                database.deleteImage(i);
+                //success jää falseksi jos yksikin kuvanpoisto epäonnistuu.
+                success = success && database.deleteImage(i);
             }
             imageSelector.clearSelection();
             databaseChanged = true;
@@ -366,7 +372,20 @@ public class FotosController {
             for (Integer i : selectedImageIds){
                 b.append(i + " ");
             }
+
             System.out.println("Deleted images with ids: " + b);
+            if (success) {
+                Alert info = new Alert(Alert.AlertType.INFORMATION, "Poistettiin valitut " + selectedImageIds.size() + " kuvaa.");
+                info.setTitle("Poistettu");
+                info.setHeaderText(null);
+                info.showAndWait();
+            } else {
+                Alert info = new Alert(Alert.AlertType.ERROR, "Kuvan poistossa tapahtui virhe");
+                info.setTitle("Virhe");
+                info.setHeaderText(null);
+                info.showAndWait();
+            }
+
         } else {
             System.out.println("Nothing deleted");
         }
