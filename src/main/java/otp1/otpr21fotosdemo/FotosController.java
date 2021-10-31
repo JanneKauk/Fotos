@@ -49,7 +49,7 @@ public class FotosController {
     @FXML
     private StackPane folderButtonStackPane;
     @FXML
-    private GridPane fotosGridPane, folderGridPane;
+    private GridPane fotosGridPane, folderGridPane, breadCrumbGridPane;
     @FXML
     private HBox filterMenuHbox;
     @FXML
@@ -86,6 +86,7 @@ public class FotosController {
     private String settingsSurNameString, settingsFrontNameString, settingsEmailString, userName;
     private int selectedFolderID;
     private boolean databaseChanged = true;
+    private ArrayList<String> breadCrumbArrayList = new ArrayList<>();
 
     //Image Grid settings
     private int currentColumnCount, rows, maxCols = 8;
@@ -425,6 +426,7 @@ public class FotosController {
         usernameLabel.setText("Kirjaudu/Rekisteröidy");
         folderGridPane.getChildren().clear();
         newFolderButton.setVisible(false);
+        resetBreadCrumbs();
         switchToDefaultScene();
         adjustImageGrid();
     }
@@ -862,6 +864,7 @@ public class FotosController {
         folderMenuHideButton.setManaged(true);
         folderMenuHideButton.setVisible(true);
         loadUserRootFolder();
+        resetBreadCrumbs();
         /*
         //Laitetaan etusivun elementit takaisin näkyviin.
         folderMenu.setVisible(true);
@@ -928,7 +931,7 @@ public class FotosController {
                         });
                         menu.show(vbox, mouseEvent.getScreenX(), mouseEvent.getScreenY());
                     } else if (mouseEvent.getButton() == MouseButton.PRIMARY) {
-                        onFolderClick(folder);
+                        onFolderClick(folder, folderinfo.get(folder));
                     }
                 }
             });
@@ -978,9 +981,10 @@ public class FotosController {
 
     @FXML
     //Kun kansiota klikataan
-    public void onFolderClick(Integer folderid) {
+    public void onFolderClick(Integer folderid, String foldername) {
         selectedFolderID = folderid;
         System.out.println("Näytetään folderid: " + selectedFolderID);
+        updateBreadCrumbs(folderid, foldername);
         databaseChanged = true;
         adjustImageGrid();
     }
@@ -991,5 +995,53 @@ public class FotosController {
         selectedFolderID = database.getParentFolderId(privateUserID);
         databaseChanged = true;
         adjustImageGrid();
+    }
+
+    //Breadcrumbssien päivitykseen
+    public void updateBreadCrumbs(Integer folderid, String foldername) {
+
+        breadCrumbArrayList.add(foldername);
+        breadCrumbGridPane.getChildren().clear();
+
+        int j = 0;
+        for (int i = 0; i < breadCrumbArrayList.size(); i++) {
+            Label label1 = new Label(breadCrumbArrayList.get(i));
+            Label label2 = new Label(">");
+            label1.setFont(new Font(14));
+            label1.setAlignment(Pos.CENTER_LEFT);
+            breadCrumbGridPane.add(label2, j, 0, 1, 1);
+            breadCrumbGridPane.add(label1, j + 1, 0, 1, 1);
+
+            int finalI = i;
+            label1.setOnMouseEntered(mouseEvent1 -> {
+                    label1.setUnderline(true);
+
+                    label1.setOnMouseClicked(mouseEvent2 -> onBreadCrumbClick(folderid, finalI, foldername));
+
+                    label1.setOnMouseExited(mouseEvent3 -> label1.setUnderline(false));
+            });
+
+            j += 2;
+
+        }
+    }
+
+    //Breadcrumbssien resetointiin
+    public void resetBreadCrumbs() {
+        breadCrumbArrayList.clear();
+        breadCrumbGridPane.getChildren().clear();
+    }
+
+    //Kun jotain breadcrumbia klikataan, poistetaan edellä olevat breadcrumbit
+    public void onBreadCrumbClick(Integer folderid, int arrayindex, String foldername) {
+        System.out.println("BREADCRUMB SIZE: " + breadCrumbArrayList.size());
+        System.out.println("CLICKED BREADCRUMB FOLDERID: " + folderid);
+        for (int i = breadCrumbArrayList.size() - 1; i >= 0; i--) {
+            if (i > arrayindex) {
+                System.out.println("REMOVED INDEX: " + i);
+                breadCrumbArrayList.remove(i);
+            }
+        }
+        onFolderClick(folderid, foldername);
     }
 }
