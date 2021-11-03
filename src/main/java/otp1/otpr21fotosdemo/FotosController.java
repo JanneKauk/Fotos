@@ -4,6 +4,7 @@ import javafx.animation.RotateTransition;
 import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -12,6 +13,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.geometry.Side;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
@@ -86,7 +88,8 @@ public class FotosController {
     private String settingsSurNameString, settingsFrontNameString, settingsEmailString, userName;
     private int selectedFolderID;
     private boolean databaseChanged = true;
-    private ArrayList<String> breadCrumbArrayList = new ArrayList<>();
+    //private ArrayList<String> breadCrumbArrayList = new ArrayList<>();
+    private int breadCrumbGridPaneCounter;
 
     //Image Grid settings
     private int currentColumnCount, rows, maxCols = 8;
@@ -99,13 +102,15 @@ public class FotosController {
     private ImageSelector imageSelector;
 
     @FXML
-    private void onFotosGridPaneClick(){
+    private void onFotosGridPaneClick() {
         imageSelector.clearSelection();
     }
+
     @FXML
-    private void deleteTest(){
+    private void deleteTest() {
         database.deleteImage(118);
     }
+
     @FXML
     private void initialize() {
         imageSelector = new ImageSelector();
@@ -155,13 +160,13 @@ public class FotosController {
             if (event.isControlDown() || event.getPickResult().getIntersectedNode().getTypeSelector().equals("ImageView")) {
                 //Klikattiin imageviewiin tai CTRL pohjas
                 return;
-            }else if (imageSelector.countSelected() > 0) {
+            } else if (imageSelector.countSelected() > 0) {
                 imageSelector.clearSelection();
             }
         });
     }
 
-    public void setMainStage(Stage stage){
+    public void setMainStage(Stage stage) {
         mainStage = stage;
         setGridConstraints();
         //Adjusts the Igrid when the window size changes
@@ -174,18 +179,19 @@ public class FotosController {
         stage.setMaximized(true);
     }
 
-    private void openImageview(){
+    private void openImageview() {
         blurringStackPane.setEffect(new GaussianBlur());
         imageViewStackPane.setVisible(true);
     }
+
     @FXML
-    private void closeImageview(){
+    private void closeImageview() {
         imageViewStackPane.setVisible(false);
         blurringStackPane.setEffect(null);
         currentImageID = null;
     }
 
-    private void setGridConstraints(){
+    private void setGridConstraints() {
         fotosGridPane.getChildren().clear();
         fotosGridPane.getRowConstraints().clear();
         fotosGridPane.getColumnConstraints().clear();
@@ -195,13 +201,14 @@ public class FotosController {
         rc.setMinHeight(150);
     }
 
-    private void adjustImageGrid(){
+    private void adjustImageGrid() {
         //Calc how many columns fit into the parent stackpane
         double parentWidth = centerStackp.getWidth();
-        double parentHeight =  centerStackp.getHeight();
+        double parentHeight = centerStackp.getHeight();
         fotosGridPane.setMinHeight(parentHeight);
-        int columnFitCount = Math.max(3 , Math.min(8 , (int)Math.floor(parentWidth/(cc.getMinWidth()+fotosGridPane.getHgap()))));
-        if(columnFitCount == currentColumnCount && !databaseChanged) return;//Continue only if column count OR database changed
+        int columnFitCount = Math.max(3, Math.min(8, (int) Math.floor(parentWidth / (cc.getMinWidth() + fotosGridPane.getHgap()))));
+        if (columnFitCount == currentColumnCount && !databaseChanged)
+            return;//Continue only if column count OR database changed
 
         Map<Integer, Pair<String, Image>> images;
         imageIdList = new ArrayList<>();
@@ -222,18 +229,20 @@ public class FotosController {
         images.entrySet()
                 .stream()
                 .sorted(Map.Entry.<Integer, Pair<String, Image>>comparingByKey())
-                .forEach(integerPairEntry -> {b.append(integerPairEntry.getKey() + " ");});
+                .forEach(integerPairEntry -> {
+                    b.append(integerPairEntry.getKey() + " ");
+                });
         System.out.println(b);
         //Reset and recreate the grid
         setGridConstraints();
         imageTableCount = images.size();
         System.out.println("IMAGE TABLE COUNT: " + imageTableCount);
-        if(imageTableCount < 1) return; //Return if there are no pictures in this location
+        if (imageTableCount < 1) return; //Return if there are no pictures in this location
 
         //Set rows and columns
         currentColumnCount = columnFitCount;
         //System.out.println("columns in Igrid: "+columns); DEBUG
-        rows = (int)Math.ceil((double)imageTableCount / currentColumnCount);
+        rows = (int) Math.ceil((double) imageTableCount / currentColumnCount);
         //System.out.println("rows in Igrid: "+rows); DEBUG
         Iterator<Integer> it = images.keySet().iterator();
 
@@ -285,11 +294,11 @@ public class FotosController {
                 //Viewport settings
                 double w = iv.getImage().getWidth();
                 double h = iv.getImage().getHeight();
-                if(w<h) h=w;
-                else w=h;
+                if (w < h) h = w;
+                else w = h;
                 double x = 0;
-                if(w < iv.getImage().getWidth()) x = (iv.getImage().getWidth()/2)-(w/2);
-                Rectangle2D viewportRect = new Rectangle2D(x , 0, w, h);
+                if (w < iv.getImage().getWidth()) x = (iv.getImage().getWidth() / 2) - (w / 2);
+                Rectangle2D viewportRect = new Rectangle2D(x, 0, w, h);
                 iv.setViewport(viewportRect);
                 iv.fitWidthProperty().bind(p.widthProperty());
                 iv.fitHeightProperty().bind(p.heightProperty());
@@ -299,7 +308,7 @@ public class FotosController {
 
                     if (event.getButton() == MouseButton.PRIMARY) {
                         //Left click
-                        if (event.isControlDown()){
+                        if (event.isControlDown()) {
                             //CTRL painettuna
                             if (imageSelector.isSelected(imageDatabaseId))
                                 imageSelector.removeFromSelection(imageDatabaseId);
@@ -310,7 +319,7 @@ public class FotosController {
                             //EI CTRL painettuna
 
                             //Jos kuvia valittuna niin vain clearataan valinta.
-                            if (imageSelector.countSelected() > 0){
+                            if (imageSelector.countSelected() > 0) {
                                 imageSelector.clearSelection();
                                 return;
                             }
@@ -326,10 +335,10 @@ public class FotosController {
                             }
                             openImageview();
                         }
-                    } else if (event.getButton() == MouseButton.SECONDARY){
+                    } else if (event.getButton() == MouseButton.SECONDARY) {
                         //Right click
                         ContextMenu menu = new ContextMenu();
-                        if(loggedIn) {
+                        if (loggedIn) {
                             MenuItem menuitem1 = new MenuItem("Aseta kaikki julkiseksi");
                             MenuItem menuitem2 = new MenuItem("Aseta kaikki yksityiseksi");
                             menuitem1.setOnAction(new EventHandler<ActionEvent>() {
@@ -382,14 +391,14 @@ public class FotosController {
                 });
                 try {
                     imageSelector.addToAll(imageDatabaseId, iv);
-                } catch (Exception e){
+                } catch (Exception e) {
                     System.err.println(e.getMessage() + e);
                 }
                 //Add the created element p to the grid in pos (j,i)
                 fotosGridPane.add(p, j, i);
                 t++;
                 //Add column constraints
-                if(i < 1) fotosGridPane.getColumnConstraints().add(cc);
+                if (i < 1) fotosGridPane.getColumnConstraints().add(cc);
             }
             //Add row constraints
             fotosGridPane.getRowConstraints().add(rc);
@@ -401,11 +410,11 @@ public class FotosController {
     }
 
     //Poistaa valitut kuvat tai jos ei mitään valittuna niin sen mistä klikattiin juuri oikealla hiirellä.
-    private void deleteSelectedImages(int clickedImageDatabaseId){
+    private void deleteSelectedImages(int clickedImageDatabaseId) {
         ArrayList<Integer> selectedImageIds = imageSelector.getSelectedIds();
 
         //Jos mitään ei ollut valittuna niin lisätään poistettavien listaan se kuva josta klikattiin juuri oikealla.
-        if (selectedImageIds.size() == 0){
+        if (selectedImageIds.size() == 0) {
             selectedImageIds.add(clickedImageDatabaseId);
         }
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Haluatko varmasti poistaa valitut " + selectedImageIds.size() + " kuvaa?");
@@ -414,9 +423,9 @@ public class FotosController {
 
         Optional<ButtonType> vastaus = alert.showAndWait();
         boolean success = true;
-        if(vastaus.isPresent() && vastaus.get() == ButtonType.OK){
+        if (vastaus.isPresent() && vastaus.get() == ButtonType.OK) {
 
-            for(Integer i:selectedImageIds){
+            for (Integer i : selectedImageIds) {
                 //success jää falseksi jos yksikin kuvanpoisto epäonnistuu.
                 success = success && database.deleteImage(i);
             }
@@ -424,7 +433,7 @@ public class FotosController {
             databaseChanged = true;
             adjustImageGrid();
             StringBuilder b = new StringBuilder();
-            for (Integer i : selectedImageIds){
+            for (Integer i : selectedImageIds) {
                 b.append(i + " ");
             }
 
@@ -447,22 +456,22 @@ public class FotosController {
 
     }
 
-    private void setSelectedImagesPublicity(int clickedImageId, boolean publc){
+    private void setSelectedImagesPublicity(int clickedImageId, boolean publc) {
         boolean success = true;
         int count = 0;
-        if (imageSelector.countSelected() == 0){
+        if (imageSelector.countSelected() == 0) {
             success = success && database.setImagePublicity(clickedImageId, publc);
             count++;
         } else {
             ArrayList<Integer> selected = imageSelector.getSelectedIds();
-            for (Integer i : selected){
-                success = success && database.setImagePublicity(i,publc);
+            for (Integer i : selected) {
+                success = success && database.setImagePublicity(i, publc);
                 count++;
             }
         }
 
 
-        if (success){
+        if (success) {
             System.out.println("Set " + count + " images " + (publc ? "public" : "private"));
         } else {
             System.out.println("Error in setting some images publicity");
@@ -470,35 +479,36 @@ public class FotosController {
     }
 
     @FXML//Cycle pictures back when viewing them
-    private void cycleImageBack(){
-        if(currentImageIndex < 1) {
+    private void cycleImageBack() {
+        if (currentImageIndex < 1) {
             System.out.println("Start reached.");
             return;
         }
-        try{
-            currentImageIndex = currentImageIndex-1;
+        try {
+            currentImageIndex = currentImageIndex - 1;
             currentImageID = imageIdList.get(currentImageIndex);
             bigPicture.setImage(database.downloadFullImage(currentImageID.intValue()));
-        }catch(Error e){
-            System.out.println("Full picture not found!:" + e);
-        }
-    }
-    @FXML//Cycle pictures forward when viewing them
-    private void cycleImageForward(){
-        if(currentImageIndex == imageIdList.size()-1) {
-            System.out.println("End reached.");
-            return;
-        }
-        try{
-            currentImageIndex = currentImageIndex+1;
-            currentImageID = imageIdList.get(currentImageIndex);
-            bigPicture.setImage(database.downloadFullImage(currentImageID.intValue()));
-        }catch(Error e){
+        } catch (Error e) {
             System.out.println("Full picture not found!:" + e);
         }
     }
 
-    private void clearLoginFields(){
+    @FXML//Cycle pictures forward when viewing them
+    private void cycleImageForward() {
+        if (currentImageIndex == imageIdList.size() - 1) {
+            System.out.println("End reached.");
+            return;
+        }
+        try {
+            currentImageIndex = currentImageIndex + 1;
+            currentImageID = imageIdList.get(currentImageIndex);
+            bigPicture.setImage(database.downloadFullImage(currentImageID.intValue()));
+        } catch (Error e) {
+            System.out.println("Full picture not found!:" + e);
+        }
+    }
+
+    private void clearLoginFields() {
         usernameField.setText("");
         passwordField.setText("");
         emailField1.setText("");
@@ -510,7 +520,7 @@ public class FotosController {
         newFolderErrorText.setText("");
     }
 
-    private void logout(){
+    private void logout() {
         loggedIn = false;
         privateUserID = -1;
         database.setPrivateUserId(-1);
@@ -591,7 +601,7 @@ public class FotosController {
     }
 
     @FXML
-    private void onMainBorderPaneClick(Event event){
+    private void onMainBorderPaneClick(Event event) {
        /* System.out.println("onMainBorderPaneClick: 1 " + loginVbox.isVisible());
         System.out.println("event1: " + event.getSource());
         System.out.println("event2: " + event.getTarget());
@@ -614,27 +624,28 @@ public class FotosController {
             clearNewFolderMenuFields();
         }
     }
+
     @FXML
     protected void onAddImgButtonClick() {
-        if (loggedIn){
+        if (loggedIn) {
             //Tähän tullaa ku painetaan sinistä pluspallo-kuvaketta kuvan lisäämiseks.
-            System.out.println ("Add image");
+            System.out.println("Add image");
             //Varmistetaan että controller on saanut start-metodilta mainStagen
             if (mainStage != null) {
                 //Tiedostonvalintaikkuna
                 FileChooser fileChooser = new FileChooser();
                 fileChooser.setTitle("Valitse kuvatiedosto(t)");
                 fileChooser.getExtensionFilters().addAll(
-                    new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.gif")
-                   // new FileChooser.ExtensionFilter("All Files", "*.*")
+                        new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.gif")
+                        // new FileChooser.ExtensionFilter("All Files", "*.*")
                 );
                 List<File> files = fileChooser.showOpenMultipleDialog(mainStage);
                 //Valittiinko tiedostoja?
-                if (files != null){
+                if (files != null) {
                     //Rakennetaan varmistuskysymys
                     Stage dialog = new Stage();
                     StringBuilder kysymys = new StringBuilder();
-                    if (files.size() == 1){
+                    if (files.size() == 1) {
                         kysymys.append("Haluatko varmasti ladata palveluun seuraavan kuvan?\n");
                     } else {
                         kysymys.append("Haluatko varmasti ladata palveluun seuraavat " + files.size() + " kuvaa?\n");
@@ -645,7 +656,7 @@ public class FotosController {
                         files.forEach(file -> kysymys.append(file.getName() + '\n'));
                     } else {
                         Iterator<File> it = files.iterator();
-                        for(int i = 0; i < rows_in_confirmation; i++){
+                        for (int i = 0; i < rows_in_confirmation; i++) {
                             kysymys.append(it.next().getName() + '\n');
                         }
                         kysymys.append("...\n");
@@ -657,7 +668,7 @@ public class FotosController {
                     alert.setHeaderText(null);
 
                     Optional<ButtonType> vastaus = alert.showAndWait();
-                    if(vastaus.isPresent() && vastaus.get() == ButtonType.OK){
+                    if (vastaus.isPresent() && vastaus.get() == ButtonType.OK) {
                         //Upload on another thread
                         uploadingStackPane.setVisible(true);
                         addImageButtonImageView.setVisible(false);
@@ -667,7 +678,7 @@ public class FotosController {
                         rotateLoadingImage.play();
 
                         Runnable uploadTask = () -> {
-                            System.out.println ("Upload for userID " + privateUserID);
+                            System.out.println("Upload for userID " + privateUserID);
                             database.uploadImages(privateUserID, selectedFolderID, files);
                             System.out.println("Uploaded.");
                             databaseChanged = true;
@@ -686,9 +697,8 @@ public class FotosController {
 
                     } else {
                         //No upload
-                        System.out.println ("No upload");
+                        System.out.println("No upload");
                     }
-
 
 
                 }
@@ -697,10 +707,8 @@ public class FotosController {
     }
 
 
-
-
     @FXML
-    protected void onProfileClick(){
+    protected void onProfileClick() {
         if (loggedIn) {
             //Kun hiiri viedään proffilikuvan päälle
             System.out.println("Cursor on profile picture.");
@@ -743,11 +751,12 @@ public class FotosController {
     private Pane filterMenu, pictureInfo;
     @FXML
     private StackPane filterButtonStackPane, pictureInfoArrow;
+
     @FXML
-    private void onFilterShowHidebuttonClick(){
+    private void onFilterShowHidebuttonClick() {
         TranslateTransition transitionMenu = new TranslateTransition(new Duration(500), filterMenu);
         RotateTransition rotateButton = new RotateTransition(new Duration(500), filterButtonStackPane);
-        if (filterMenu.getTranslateX() != 0){
+        if (filterMenu.getTranslateX() != 0) {
             //Avataan kiinni oleva filtermenu
             System.out.println("Filterit auki!");
             transitionMenu.setToX(0);
@@ -772,11 +781,12 @@ public class FotosController {
 
         }
     }
+
     @FXML
-    private void onPictureInfoShowHideButtonClick(){
+    private void onPictureInfoShowHideButtonClick() {
         TranslateTransition transitionMenu = new TranslateTransition(new Duration(500), pictureInfo);
         RotateTransition rotateButton = new RotateTransition(new Duration(500), pictureInfoArrow);
-        if (pictureInfo.getTranslateX() != 0){
+        if (pictureInfo.getTranslateX() != 0) {
             //Avataan kiinni oleva menu
             System.out.println("Kuva infot auki!");
             transitionMenu.setToX(0);
@@ -802,11 +812,11 @@ public class FotosController {
     }
 
     @FXML
-    private void onFolderShowHidebuttonClick(){
+    private void onFolderShowHidebuttonClick() {
         TranslateTransition transitionMenu = new TranslateTransition(new Duration(500), folderMenu);
         RotateTransition rotateButton = new RotateTransition(new Duration(500), folderButtonStackPane);
         System.out.println("Folder translateY: " + folderMenu.getTranslateY());
-        if (folderMenu.getTranslateY() != 0){
+        if (folderMenu.getTranslateY() != 0) {
             //Avataan kiinni oleva foldermenu
             System.out.println("Folderit auki!");
             transitionMenu.setToY(0);
@@ -820,7 +830,7 @@ public class FotosController {
             //Suljetaan auki oleva foldermenu
             System.out.println("Folderit kiinni!");
             folderMenu.setViewOrder(1);
-            transitionMenu.setToY(-(folderMenu.getHeight()*2));
+            transitionMenu.setToY(-(folderMenu.getHeight() * 2));
             transitionMenu.play();
             rotateButton.setByAngle(180);
             rotateButton.play();
@@ -832,6 +842,7 @@ public class FotosController {
 
         }
     }
+
     @FXML
     public void switchToSettingsScene() throws IOException {
         //Laitetaan asetusten elementit näkyviin ja poistetaan etusivun elementit pois näkyvistä.
@@ -975,7 +986,7 @@ public class FotosController {
     }
 
     @FXML
-    public void testDownload(){
+    public void testDownload() {
         /*System.out.println("TestDownload");
         List<javafx.scene.image.Image> images = database.downloadImages(1);
         System.out.println("Number of images: " + images.size());
@@ -992,11 +1003,11 @@ public class FotosController {
     public void loadUserFolders(int userId) {
         //Haetaan tietokannasta
         System.out.println("Ladataan kansioita...");
-        HashMap <Integer, String> folderinfo;
+        HashMap<Integer, String> folderinfo;
         folderinfo = database.getUserFolders(userId);
         int i = 0;
         //Asetetaan kansiot käyttöliittymään
-        for (Integer folder: folderinfo.keySet()) {
+        for (Integer folder : folderinfo.keySet()) {
             Image img = new Image("file:src/main/resources/otp1/otpr21fotosdemo/image/folder-1484.png");
             ImageView imgview = new ImageView(img);
             imgview.setFitWidth(54);
@@ -1096,48 +1107,74 @@ public class FotosController {
     //Breadcrumbssien päivitykseen
     public void updateBreadCrumbs(Integer folderid, String foldername) {
 
-        breadCrumbArrayList.add(foldername);
-        breadCrumbGridPane.getChildren().clear();
+        //breadCrumbArrayList.add(foldername);
+        System.out.println("Added folderid: " + folderid + " and name: " + foldername);
+        //breadCrumbGridPane.getChildren().clear();
 
-        int j = 0;
+        Label label1 = new Label(foldername);
+        Label label2 = new Label(">");
+        label1.setFont(new Font(14));
+        label1.setAlignment(Pos.CENTER_LEFT);
+        label1.setId(String.valueOf(folderid));
+        breadCrumbGridPane.add(label2, breadCrumbGridPaneCounter, 0, 1, 1);
+        breadCrumbGridPane.add(label1, breadCrumbGridPaneCounter + 1, 0, 1, 1);
+        breadCrumbGridPaneCounter += 2;
+
+       /* int j = 0;
         for (int i = 0; i < breadCrumbArrayList.size(); i++) {
             Label label1 = new Label(breadCrumbArrayList.get(i));
             Label label2 = new Label(">");
             label1.setFont(new Font(14));
             label1.setAlignment(Pos.CENTER_LEFT);
+            label1.setId(String.valueOf(folderid));
             breadCrumbGridPane.add(label2, j, 0, 1, 1);
             breadCrumbGridPane.add(label1, j + 1, 0, 1, 1);
 
-            int finalI = i;
-            label1.setOnMouseEntered(mouseEvent1 -> {
-                    label1.setUnderline(true);
+            int finalI = i;*/
+        System.out.println("Label id: " + label1.getId());
+        label1.setOnMouseEntered(mouseEvent1 -> {
+            label1.setUnderline(true);
 
-                    label1.setOnMouseClicked(mouseEvent2 -> onBreadCrumbClick(folderid, finalI, foldername));
+            label1.setOnMouseExited(mouseEvent3 -> label1.setUnderline(false));
+        });
+        label1.setOnMouseClicked(mouseEvent2 -> onBreadCrumbClick(folderid, label1, foldername));
 
-                    label1.setOnMouseExited(mouseEvent3 -> label1.setUnderline(false));
-            });
 
-            j += 2;
+        //j += 2;
 
-        }
     }
+
+//}
 
     //Breadcrumbssien resetointiin
     public void resetBreadCrumbs() {
-        breadCrumbArrayList.clear();
+        //breadCrumbArrayList.clear();
         breadCrumbGridPane.getChildren().clear();
+        breadCrumbGridPaneCounter = 0;
     }
 
     //Kun jotain breadcrumbia klikataan, poistetaan edellä olevat breadcrumbit
-    public void onBreadCrumbClick(Integer folderid, int arrayindex, String foldername) {
-        System.out.println("BREADCRUMB SIZE: " + breadCrumbArrayList.size());
-        System.out.println("CLICKED BREADCRUMB FOLDERID: " + folderid);
-        for (int i = breadCrumbArrayList.size() - 1; i >= 0; i--) {
-            if (i > arrayindex) {
+    public void onBreadCrumbClick(Integer folderid, Node node, String foldername) {
+
+        //System.out.println("BREADCRUMB SIZE: " + breadCrumbArrayList.size());
+        System.out.println("CLICKED BREADCRUMB FOLDERID: " + folderid + " AND NAME :" + foldername);
+        int clickedBreadCrumbIndex = GridPane.getColumnIndex(node);
+        for (int i = breadCrumbGridPane.getChildren().size() - 1; i >= 0 ; i--) {
+            if (i >= clickedBreadCrumbIndex - 1) {
+                Node node2 = breadCrumbGridPane.getChildren().get(i);
+                breadCrumbGridPane.getChildren().remove(node2);
+                breadCrumbGridPaneCounter--;
+            }
+        }
+
+        /*for (int i = breadCrumbArrayList.size() - 1; i >= 0; i--) {
+            if (i >= arrayindex) {
                 System.out.println("REMOVED INDEX: " + i);
                 breadCrumbArrayList.remove(i);
             }
-        }
+        }*/
+        //onFolderClick(folderid, foldername);
+
         onFolderClick(folderid, foldername);
     }
 }
