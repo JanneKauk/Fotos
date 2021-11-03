@@ -351,6 +351,7 @@ public class Database {
     }
 
     public boolean imageExists(int imageID){
+        System.out.println("Database.imageExists");
         boolean foundThumb = false;
         boolean foundFullres = false;
         Connection conn = null;
@@ -554,6 +555,7 @@ public class Database {
     }
 
     public boolean setImagePublicity(int imageID, boolean publc){
+        System.out.println("Database.setImagePublicity");
         boolean success = false;
         int viewingRights = publc ? 1 : 0;
         Connection conn = null;
@@ -613,7 +615,8 @@ public class Database {
         return success;
     }
 
-    public boolean getImagePublicity(int imageID){
+    public boolean imageIsPublic(int imageID){
+        System.out.println("Database.imageIsPublic");
         Connection conn = null;
         ResultSet result = null;
         int viewingRights = -1;
@@ -809,10 +812,11 @@ public class Database {
 
     //Palauttaa Hashmapin jossa key on imageID ja Value on PAIR-rakenne. Pair-rakenteessa taas key on tiedostonimi ja value on imagedata
     public Map<Integer, Pair<String, javafx.scene.image.Image>> downloadImages(int folderId, String searchString) {
+        System.out.println("Database.downloadImages");
         Connection conn = null;
         ResultSet result = null;
         Map<Integer, Pair<String, javafx.scene.image.Image>> images = new HashMap<>();
-
+        ArrayList<Integer> publicImageIDs = new ArrayList<>();
 
         try {
             // Connection statement
@@ -823,13 +827,13 @@ public class Database {
             try {
 
                 if (searchString != null) {
-                    pstmt = conn.prepareStatement("SELECT imageID, fileName, image FROM Fotos.Image WHERE userID=? AND folderID=? AND fileName LIKE ?");
+                    pstmt = conn.prepareStatement("SELECT imageID, fileName, image, viewingRights FROM Fotos.Image WHERE userID=? AND folderID=? AND fileName LIKE ?");
                     pstmt.setInt(1, privateUserId);
                     pstmt.setInt(2, folderId);
                     pstmt.setString(3, "%" + searchString + "%");
                 } else {
                     pstmt = conn.prepareStatement(
-                        "SELECT imageID, fileName, image FROM Fotos.Image WHERE userID=? AND folderID=?;"
+                        "SELECT imageID, fileName, image, viewingRights FROM Fotos.Image WHERE userID=? AND folderID=?;"
                 );
                     pstmt.setInt(1, privateUserId);
                     pstmt.setInt(2, folderId);
@@ -843,8 +847,11 @@ public class Database {
                     String filename = result.getString("filename");
                     javafx.scene.image.Image image = new javafx.scene.image.Image(result.getBinaryStream("image"));
                     images.put(id, new Pair<>(filename, image));
-
+                    if (result.getInt("viewingRights") > 0){
+                        publicImageIDs.add(id);
+                    }
                 }
+                controller.setPublicImagesInView(publicImageIDs);
 
             } catch (Exception e) {
                 System.err.println("Error in query");
@@ -881,7 +888,8 @@ public class Database {
         }
         return images;
     }
-    public Map<Integer, Pair<String, javafx.scene.image.Image>> downloadPublicImages() {
+    public Map<Integer, Pair<String, javafx.scene.image.Image>> downloadPublicImages(String searchString) {
+        System.out.println("Database.downloadPublicImages");
         Connection conn = null;
         ResultSet result = null;
         Map<Integer, Pair<String, javafx.scene.image.Image>> images = new HashMap<>();
@@ -894,9 +902,14 @@ public class Database {
 
             PreparedStatement pstmt = null;
             try {
-                pstmt = conn.prepareStatement(
-                        "SELECT imageID, fileName, image FROM Fotos.Image WHERE viewingRights=1;"
-                );
+                if (searchString != null) {
+                    pstmt = conn.prepareStatement("SELECT imageID, fileName, image FROM Fotos.Image WHERE viewingRights=1 AND fileName LIKE ?");
+                    pstmt.setString(1, "%" + searchString + "%");
+                } else {
+                    pstmt = conn.prepareStatement(
+                            "SELECT imageID, fileName, image FROM Fotos.Image WHERE viewingRights=1;"
+                    );
+                }
                 result = pstmt.executeQuery();
 
                 while (result.next()) {
@@ -940,6 +953,7 @@ public class Database {
         return images;
     }
     public javafx.scene.image.Image downloadFullImage(int imageID) {
+        System.out.println("Database.downloadFullImage");
         if (fullImageCache.containsKey(imageID)) {
             System.out.println("Full image found in cache. Showing that instead.");
             return fullImageCache.get(imageID);
@@ -1006,6 +1020,7 @@ public class Database {
     }
 
     public HashMap <Integer, String> getUserFolders(int userId) {
+        System.out.println("Database.getUserFolders");
         Connection conn = null;
         ResultSet result = null;
         //ArrayList<String> folderlist = new ArrayList<String>();
@@ -1069,6 +1084,7 @@ public class Database {
     }
 
     public void uploadNewFolder(String name, int userId) {
+        System.out.println("Database.uploadNewFolder");
         Connection conn = null;
 
         try {
@@ -1112,6 +1128,7 @@ public class Database {
     }
 
     public void deleteFolder(int folderid) {
+        System.out.println("Database.deleteFolder");
         Connection conn = null;
 
         try {
@@ -1152,6 +1169,7 @@ public class Database {
     }
 
     public int getParentFolderId(int userId) {
+        System.out.println("Database.getParentFolderId");
         Connection conn = null;
         ResultSet result = null;
         int parentfolderid = 0;

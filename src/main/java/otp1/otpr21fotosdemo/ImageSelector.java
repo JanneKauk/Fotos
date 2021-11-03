@@ -36,6 +36,8 @@ public class ImageSelector{
     }
 
     public void addToSelection(int id) {
+        if (isSelected(id))
+            return;
         if (selectedIds.size() == 0) {
             Iterator<Integer> it = allImageViews.keySet().iterator();
             while (it.hasNext()) {
@@ -63,6 +65,8 @@ public class ImageSelector{
     }
 
     public void removeFromSelection(int id){
+        if (!isSelected(id))
+            return;
         if (selectedIds.size() == 1) {
             Iterator<Integer> it = allImageViews.keySet().iterator();
             while (it.hasNext()) {
