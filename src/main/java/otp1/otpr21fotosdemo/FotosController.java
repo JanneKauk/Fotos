@@ -26,6 +26,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -34,7 +35,6 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.Pair;
 
-import java.awt.*;
 import java.io.*;
 import java.util.*;
 import java.util.List;
@@ -81,6 +81,12 @@ public class FotosController {
     @FXML
     public Text loginErrorText, newFolderErrorText;
 
+    private enum DisplayImages {
+        OWN, PUBLIC, SHARED
+    }
+
+    private DisplayImages displayImages;
+
     private Stage mainStage = null;
     private boolean loggedIn = false;
     private Database database = null;
@@ -100,6 +106,7 @@ public class FotosController {
     int currentImageIndex = 0;
     ArrayList<Integer> imageIdList;
     private ImageSelector imageSelector;
+    private ArrayList<Integer> publicImagesInView;
 
     @FXML
     private void onFotosGridPaneClick() {
@@ -113,6 +120,8 @@ public class FotosController {
 
     @FXML
     private void initialize() {
+        displayImages = DisplayImages.PUBLIC;
+        publicImagesInView = new ArrayList<>();
         imageSelector = new ImageSelector();
         database = new Database();
         database.setController(this);
@@ -201,6 +210,12 @@ public class FotosController {
         rc.setMinHeight(150);
     }
 
+    private void refreshImageGrid() {
+        //Convenience-method for forcing new imagegrid
+        databaseChanged = true;
+        adjustImageGrid();
+    }
+
     private void adjustImageGrid() {
         //Calc how many columns fit into the parent stackpane
         double parentWidth = centerStackp.getWidth();
@@ -209,33 +224,50 @@ public class FotosController {
         int columnFitCount = Math.max(3, Math.min(8, (int) Math.floor(parentWidth / (cc.getMinWidth() + fotosGridPane.getHgap()))));
         if (columnFitCount == currentColumnCount && !databaseChanged)
             return;//Continue only if column count OR database changed
-
+        publicImagesInView.clear();
         Map<Integer, Pair<String, Image>> images;
         imageIdList = new ArrayList<>();
         if (privateUserID > 0) {
             //Käyttäjä on kirjautunut.
-            if (!Objects.equals(searchTextField.getText(), "")) {
-                System.out.println("Searching by: " + searchTextField.getText());
-                images = database.downloadImages(selectedFolderID, searchTextField.getText());
+            if (displayImages == DisplayImages.PUBLIC) {
+                //Valittuna "Julkiset kuvat"
+                if (!Objects.equals(searchTextField.getText(), "")) {
+                    System.out.println("Searching by: " + searchTextField.getText());
+                    images = database.downloadPublicImages(searchTextField.getText());
+                } else {
+                    images = database.downloadPublicImages(null);
+                }
+
+            } else if (displayImages == DisplayImages.OWN) {
+                //Valittuna "Omat kuvat"
+                if (!Objects.equals(searchTextField.getText(), "")) {
+                    System.out.println("Searching by: " + searchTextField.getText());
+                    images = database.downloadImages(selectedFolderID, searchTextField.getText());
+                } else {
+                    images = database.downloadImages(selectedFolderID, null);
+                }
             } else {
-                images = database.downloadImages(selectedFolderID, null);
+                //Valittuna "Jaetut kuvat"
+                //TODO Jaetut kuvat toteutus
+                //Annetaan toistaiseksi vain tyhjä hashmap
+                images = new HashMap<Integer, Pair<String, javafx.scene.image.Image>>();
             }
         } else {
             //käyttäjä ei ole kirjautunut.
-            images = database.downloadPublicImages();
+            images = database.downloadPublicImages(null);
         }
         StringBuilder b = new StringBuilder();
         b.append("Grids imageID:s: ");
-        images.entrySet()
-                .stream()
-                .sorted(Map.Entry.<Integer, Pair<String, Image>>comparingByKey())
-                .forEach(integerPairEntry -> {
-                    b.append(integerPairEntry.getKey() + " ");
-                });
+        //Järjestetään lista imageID:n mukaan
+        TreeMap<Integer, Pair<String, Image>> sortedImages = new TreeMap<>(images);
+        sortedImages.entrySet().stream().forEach(entry -> {
+            b.append(entry.getKey() + " ");
+        });
+
         System.out.println(b);
         //Reset and recreate the grid
         setGridConstraints();
-        imageTableCount = images.size();
+        imageTableCount = sortedImages.size();
         System.out.println("IMAGE TABLE COUNT: " + imageTableCount);
         if (imageTableCount < 1) return; //Return if there are no pictures in this location
 
@@ -244,18 +276,18 @@ public class FotosController {
         //System.out.println("columns in Igrid: "+columns); DEBUG
         rows = (int) Math.ceil((double) imageTableCount / currentColumnCount);
         //System.out.println("rows in Igrid: "+rows); DEBUG
-        Iterator<Integer> it = images.keySet().iterator();
+        Iterator<Integer> it = sortedImages.keySet().iterator();
 
         /*
         //Palauttaa Hashmapin jossa key on imageID ja Value on PAIR-rakenne. Pair-rakenteessa taas key on tiedostonimi ja value on imagedata
         //Esimerkiksi:  luetellaan tiedostonimet konsolii.
         {
             //iteraattori imageID:iden läpikäymiseen
-            Iterator<Integer> it = images.keySet().iterator();
+            Iterator<Integer> it = sortedImages.keySet().iterator();
             int count = 1;
             while (it.hasNext()) {
                 int imageID = it.next();
-                Pair<String, Image> filenameAndImage = images.get(imageID);
+                Pair<String, Image> filenameAndImage = sortedImages.get(imageID);
                 //Tällä saa tiedostonimen
                 String filename = filenameAndImage.getKey();
                 //Tällä saa imagedatan Image-muodossa (javafx.scene...)
@@ -287,7 +319,7 @@ public class FotosController {
                 p.prefHeightProperty().bind(Bindings.min(fotosGridPane.widthProperty().divide(currentColumnCount), fotosGridPane.heightProperty().divide(rows)));
 
                 //ImageView settings
-                iv.setImage(images.get(imageIdList.get(t)).getValue());//Gets the ImageID from the list
+                iv.setImage(sortedImages.get(imageIdList.get(t)).getValue());//Gets the ImageID from the list
                 //System.out.println("Displaying: " + filenameAndImage.getKey());
                 iv.setSmooth(true);
                 iv.setPreserveRatio(false);
@@ -315,8 +347,29 @@ public class FotosController {
                             else
                                 imageSelector.addToSelection(imageDatabaseId);
 
+                        } else if (event.isShiftDown()) {
+                            //SHIFT painettuna
+                            if (imageSelector.countSelected() == 0) {
+                                imageSelector.addToSelection(imageDatabaseId);
+                            } else {
+                                ArrayList<Integer> lista = imageSelector.getSelectedIds();
+                                //Edellinen valittu
+                                int lastId = lista.get(lista.size() - 1);
+                                int eka, toka;
+                                eka = Math.min(lastId, imageDatabaseId);
+                                toka = Math.max(lastId, imageDatabaseId);
+                                Iterator<Integer> ite = sortedImages.keySet().iterator();
+                                while (ite.hasNext()) {
+                                    int id = ite.next();
+                                    if (id >= eka && id <= toka) {
+                                        imageSelector.addToSelection(id);
+                                    }
+
+                                }
+
+                            }
                         } else {
-                            //EI CTRL painettuna
+                            //EI CTRL EIKÄ SHIFT painettuna
 
                             //Jos kuvia valittuna niin vain clearataan valinta.
                             if (imageSelector.countSelected() > 0) {
@@ -344,13 +397,60 @@ public class FotosController {
                             menuitem1.setOnAction(new EventHandler<ActionEvent>() {
                                 @Override
                                 public void handle(ActionEvent event) {
-                                    setSelectedImagesPublicity(imageDatabaseId, true);
+                                    //Julkiseksi
+                                    int count = imageSelector.countSelected();
+                                    count = count == 0 ? 1 : count; //Jos valittuna ei ole yhtään kuvaa niin asetetaan count=1, koska tällöin toiminto kohdistuu klikattuun kuvaan.
+                                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Haluatko varmasti asettaa valitut " + count + " kuvaa julkiseksi?");
+                                    alert.setTitle("Vahvista");
+                                    alert.setHeaderText(null);
+
+                                    Optional<ButtonType> vastaus = alert.showAndWait();
+
+                                    if (vastaus.isPresent() && vastaus.get() == ButtonType.OK) {
+                                        boolean success = setSelectedImagesPublicity(imageDatabaseId, true);
+                                        refreshImageGrid();
+                                        if (success) {
+                                            Alert info = new Alert(Alert.AlertType.INFORMATION, "Asetettiin valitut " + count + " kuvaa julkiseksi.");
+                                            info.setTitle("Julkistettu");
+                                            info.setHeaderText(null);
+                                            info.showAndWait();
+                                        } else {
+                                            Alert info = new Alert(Alert.AlertType.ERROR, "Kuvien julkistuksessa tapahtui virhe");
+                                            info.setTitle("Virhe");
+                                            info.setHeaderText(null);
+                                            info.showAndWait();
+                                        }
+                                    }
+
                                 }
                             });
                             menuitem2.setOnAction(new EventHandler<ActionEvent>() {
                                 @Override
                                 public void handle(ActionEvent event) {
-                                    setSelectedImagesPublicity(imageDatabaseId, false);
+                                    //Yksityiseksi
+                                    int count = imageSelector.countSelected();
+                                    count = count == 0 ? 1 : count; //Jos valittuna ei ole yhtään kuvaa niin asetetaan count=1, koska tällöin toiminto kohdistuu klikattuun kuvaan.
+                                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Haluatko varmasti asettaa valitut " + count + " kuvaa yksityiseksi?");
+                                    alert.setTitle("Vahvista");
+                                    alert.setHeaderText(null);
+
+                                    Optional<ButtonType> vastaus = alert.showAndWait();
+
+                                    if (vastaus.isPresent() && vastaus.get() == ButtonType.OK) {
+                                        boolean success = setSelectedImagesPublicity(imageDatabaseId, false);
+                                        refreshImageGrid();
+                                        if (success) {
+                                            Alert info = new Alert(Alert.AlertType.INFORMATION, "Asetettiin valitut " + count + " kuvaa yksityiseksi.");
+                                            info.setTitle("Asetettu yksityiseksi");
+                                            info.setHeaderText(null);
+                                            info.showAndWait();
+                                        } else {
+                                            Alert info = new Alert(Alert.AlertType.ERROR, "Kuvien asettamisessa yksityiseksi tapahtui virhe");
+                                            info.setTitle("Virhe");
+                                            info.setHeaderText(null);
+                                            info.showAndWait();
+                                        }
+                                    }
                                 }
                             });
                             if (imageSelector.countSelected() > 1) {
@@ -363,15 +463,17 @@ public class FotosController {
                                 //Selvitetään kuvan julkisuus
                                 boolean publc;
                                 if (imageSelector.countSelected() == 0) {
-                                    publc = database.getImagePublicity(imageDatabaseId);
+                                    publc = database.imageIsPublic(imageDatabaseId);
                                 } else {
                                     //selected == 1
-                                    publc = database.getImagePublicity(imageSelector.getSelectedIds().get(0));
+                                    publc = database.imageIsPublic(imageSelector.getSelectedIds().get(0));
                                 }
 
                                 if (publc) {
+                                    //Yksityiseksi
                                     menu.getItems().addAll(menuitem2);
                                 } else {
+                                    //Julkiseksi
                                     menu.getItems().addAll(menuitem1);
                                 }
                             }
@@ -395,7 +497,18 @@ public class FotosController {
                     System.err.println(e.getMessage() + e);
                 }
                 //Add the created element p to the grid in pos (j,i)
-                fotosGridPane.add(p, j, i);
+                StackPane pStack = new StackPane();
+                pStack.getChildren().add(p);
+                if (loggedIn && publicImagesInView.contains(imageDatabaseId)) {
+                    //Jos kirjauduttu ja kuva on julkinen niin lisätään "Julkinen"-label kuvan oikeaan yläreunaan.
+                    Label publicLabel = new Label("Julkinen");
+                    publicLabel.setTextFill(Color.WHITE);
+                    publicLabel.setPadding(new Insets(2.0));
+                    publicLabel.setBackground(new Background(new BackgroundFill(Color.web("#5aaaf6", 0.85), new CornerRadii(2.0), Insets.EMPTY)));
+                    pStack.setAlignment(Pos.TOP_RIGHT);
+                    pStack.getChildren().add(publicLabel);
+                }
+                fotosGridPane.add(pStack, j, i);
                 t++;
                 //Add column constraints
                 if (i < 1) fotosGridPane.getColumnConstraints().add(cc);
@@ -456,7 +569,7 @@ public class FotosController {
 
     }
 
-    private void setSelectedImagesPublicity(int clickedImageId, boolean publc) {
+    private boolean setSelectedImagesPublicity(int clickedImageId, boolean publc) {
         boolean success = true;
         int count = 0;
         if (imageSelector.countSelected() == 0) {
@@ -476,6 +589,7 @@ public class FotosController {
         } else {
             System.out.println("Error in setting some images publicity");
         }
+        return success;
     }
 
     @FXML//Cycle pictures back when viewing them
@@ -565,7 +679,9 @@ public class FotosController {
             clearLoginFields();
             loginErrorText.setText("");
             databaseChanged = true;
-            adjustImageGrid();
+            omatKuvatButton.requestFocus();
+            displayImages = DisplayImages.OWN;
+            //adjustImageGrid(); Tää kutsutaan loadUserRootFolder() lopussa
             loadUserRootFolder();
         } else {
             loginErrorText.setText("Käyttäjänimi tai salasana väärin");
@@ -744,6 +860,7 @@ public class FotosController {
         } else {
             //loginmenu auki
             loginVbox.setVisible(true);
+            usernameField.requestFocus();
         }
     }
 
@@ -1159,7 +1276,7 @@ public class FotosController {
         //System.out.println("BREADCRUMB SIZE: " + breadCrumbArrayList.size());
         System.out.println("CLICKED BREADCRUMB FOLDERID: " + folderid + " AND NAME :" + foldername);
         int clickedBreadCrumbIndex = GridPane.getColumnIndex(node);
-        for (int i = breadCrumbGridPane.getChildren().size() - 1; i >= 0 ; i--) {
+        for (int i = breadCrumbGridPane.getChildren().size() - 1; i >= 0; i--) {
             if (i >= clickedBreadCrumbIndex - 1) {
                 Node node2 = breadCrumbGridPane.getChildren().get(i);
                 breadCrumbGridPane.getChildren().remove(node2);
@@ -1176,5 +1293,24 @@ public class FotosController {
         //onFolderClick(folderid, foldername);
 
         onFolderClick(folderid, foldername);
+    }
+
+    public void onOwnImagesButtonClick() {
+        displayImages = DisplayImages.OWN;
+        refreshImageGrid();
+    }
+
+    public void onPublicImagesButtonClick() {
+        displayImages = DisplayImages.PUBLIC;
+        refreshImageGrid();
+    }
+
+    public void onSharedImagesButtonClick() {
+        //displayImages = DisplayImages.SHARED;
+    }
+
+    public void setPublicImagesInView(ArrayList<Integer> list) {
+        publicImagesInView = list;
+
     }
 }
