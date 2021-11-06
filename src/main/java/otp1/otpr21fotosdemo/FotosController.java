@@ -645,8 +645,8 @@ public class FotosController {
         usernameLabel.setText("Kirjaudu/Rekisteröidy");
         folderGridPane.getChildren().clear();
         newFolderButton.setVisible(false);
-        resetBreadCrumbs();
         switchToDefaultScene();
+        resetBreadCrumbs();
         adjustImageGrid();
     }
 
@@ -963,6 +963,7 @@ public class FotosController {
     @FXML
     public void switchToSettingsScene() throws IOException {
         //Laitetaan asetusten elementit näkyviin ja poistetaan etusivun elementit pois näkyvistä.
+        resetBreadCrumbs();
         settingsBorderPane.setManaged(true);
         settingsBorderPane.setVisible(true);
         scrollp.setManaged(false);
@@ -1087,8 +1088,11 @@ public class FotosController {
         folderMenu.setVisible(true);
         folderMenuHideButton.setManaged(true);
         folderMenuHideButton.setVisible(true);
+        newFolderButton.setVisible(true);
+        loadUserFolders(privateUserID);
         loadUserRootFolder();
         resetBreadCrumbs();
+        updateBreadCrumbs(selectedFolderID, "root");
         /*
         //Laitetaan etusivun elementit takaisin näkyviin.
         folderMenu.setVisible(true);
@@ -1200,6 +1204,7 @@ public class FotosController {
         database.deleteFolder(folderid);
         folderGridPane.getChildren().clear();
         loadUserFolders(privateUserID);
+        resetBreadCrumbs();
         loadUserRootFolder();
     }
 
@@ -1219,6 +1224,7 @@ public class FotosController {
         selectedFolderID = database.getParentFolderId(privateUserID);
         databaseChanged = true;
         adjustImageGrid();
+        updateBreadCrumbs(selectedFolderID, "root");
     }
 
     //Breadcrumbssien päivitykseen
@@ -1302,6 +1308,9 @@ public class FotosController {
 
     public void onPublicImagesButtonClick() {
         displayImages = DisplayImages.PUBLIC;
+        folderGridPane.getChildren().clear();
+        newFolderButton.setVisible(false);
+        resetBreadCrumbs();
         refreshImageGrid();
     }
 
