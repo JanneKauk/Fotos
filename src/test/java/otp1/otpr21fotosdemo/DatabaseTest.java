@@ -417,16 +417,16 @@ public class DatabaseTest {
         fileList.add(file3);
 
         assertAll(() -> {
-            Map<Integer, Pair<String, Image>> images = base.downloadImages(1, null);
+            Map<Integer, Pair<String, Image>> images = base.downloadImages(1, null, null);
             int imagesBefore = images.size();
             List<Integer> imageIDt = base.uploadImages(1,1,fileList);
             testImageIDs.addAll(imageIDt);
             assertEquals(3, imageIDt.size(), "Virhe uploadattaessa testikuvia");
 
-            images = base.downloadImages(1, null);
+            images = base.downloadImages(1, null, null);
             assertEquals(3, images.size() - imagesBefore, "Väärä määrä ladattuja kuvia");
 
-            Map<Integer, Pair<String, Image>> imagesWithSearch = base.downloadImages(1, "WithVeryLongFileName12345678901234567");
+            Map<Integer, Pair<String, Image>> imagesWithSearch = base.downloadImages(1, "WithVeryLongFileName12345678901234567", null);
             assertEquals(1, imagesWithSearch.size(), "Väärä määrä tekstihaulla ladattuja kuvia");
             assertDoesNotThrow(()-> {
                 Image img = base.downloadFullImage(imageIDt.get(0));
@@ -490,7 +490,7 @@ public class DatabaseTest {
             assertTrue(base.setImagePublicity(imageIDt.get(0), true), "Virhe asetettaessa kuvaa julkiseksi.");
             assertTrue(base.imageIsPublic(imageIDt.get(0)), "Juuri julkiseksi asetettu kuva ei ollutkaan julkinen.");
 
-            Map<Integer, Pair<String, Image>> images = base.downloadPublicImages(null);
+            Map<Integer, Pair<String, Image>> images = base.downloadPublicImages(null, null);
             assertTrue(images.size() > 0, "Julkisia kuvia latautui 0!");
             assertTrue(images.containsKey(imageIDt.get(0)), "Julkisista kuvista ei löytynyt juuri ladattua ja julkistettua kuvaa!");
 

@@ -80,6 +80,8 @@ public class FotosController {
     private ImageView uploadingRotatingImageview, newFolderButton, addImageButtonImageView;
     @FXML
     public Text loginErrorText, newFolderErrorText;
+    @FXML
+    private DatePicker dateFilter;
 
     private enum DisplayImages {
         OWN, PUBLIC, SHARED
@@ -234,18 +236,18 @@ public class FotosController {
                 //Valittuna "Julkiset kuvat"
                 if (!Objects.equals(searchTextField.getText(), "")) {
                     System.out.println("Searching by: " + searchTextField.getText());
-                    images = database.downloadPublicImages(searchTextField.getText());
+                    images = database.downloadPublicImages(searchTextField.getText(), dateFilter.getValue());
                 } else {
-                    images = database.downloadPublicImages(null);
+                    images = database.downloadPublicImages(null, dateFilter.getValue());
                 }
 
             } else if (displayImages == DisplayImages.OWN) {
                 //Valittuna "Omat kuvat"
                 if (!Objects.equals(searchTextField.getText(), "")) {
                     System.out.println("Searching by: " + searchTextField.getText());
-                    images = database.downloadImages(selectedFolderID, searchTextField.getText());
+                    images = database.downloadImages(selectedFolderID, searchTextField.getText(), dateFilter.getValue());
                 } else {
-                    images = database.downloadImages(selectedFolderID, null);
+                    images = database.downloadImages(selectedFolderID, null,  dateFilter.getValue());
                 }
             } else {
                 //Valittuna "Jaetut kuvat"
@@ -255,7 +257,7 @@ public class FotosController {
             }
         } else {
             //käyttäjä ei ole kirjautunut.
-            images = database.downloadPublicImages(null);
+            images = database.downloadPublicImages(null, dateFilter.getValue());
         }
         StringBuilder b = new StringBuilder();
         b.append("Grids imageID:s: ");
@@ -648,6 +650,7 @@ public class FotosController {
         newFolderButton.setVisible(false);
         switchToDefaultScene();
         resetBreadCrumbs();
+        resetFilters();
         adjustImageGrid();
     }
 
@@ -682,6 +685,7 @@ public class FotosController {
             databaseChanged = true;
             omatKuvatButton.requestFocus();
             displayImages = DisplayImages.OWN;
+            resetFilters();
             //adjustImageGrid(); Tää kutsutaan loadUserRootFolder() lopussa
             loadUserRootFolder();
         } else {
@@ -1321,5 +1325,15 @@ public class FotosController {
     public void setPublicImagesInView(ArrayList<Integer> list) {
         publicImagesInView = list;
 
+    }
+
+    public void onDatepickerClick() {
+        refreshImageGrid();
+    }
+
+    public void resetFilters() {
+        searchTextField.setText("");
+        dateFilter.setValue(null);
+        refreshImageGrid();
     }
 }

@@ -14,6 +14,8 @@ import java.io.*;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.sql.*;
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.*;
 
@@ -847,7 +849,7 @@ public class Database {
     }
 
     //Palauttaa Hashmapin jossa key on imageID ja Value on PAIR-rakenne. Pair-rakenteessa taas key on tiedostonimi ja value on imagedata
-    public Map<Integer, Pair<String, javafx.scene.image.Image>> downloadImages(int folderId, String searchString) {
+    public Map<Integer, Pair<String, javafx.scene.image.Image>> downloadImages(int folderId, String searchString, LocalDate uploadDate) {
         System.out.println("Database.downloadImages");
         Connection conn = null;
         ResultSet result = null;
@@ -863,16 +865,33 @@ public class Database {
             try {
 
                 if (searchString != null) {
-                    pstmt = conn.prepareStatement("SELECT imageID, fileName, image, viewingRights FROM Fotos.Image WHERE userID=? AND folderID=? AND fileName LIKE ?");
-                    pstmt.setInt(1, privateUserId);
-                    pstmt.setInt(2, folderId);
-                    pstmt.setString(3, "%" + searchString + "%");
+                    if (uploadDate == null) {
+                        pstmt = conn.prepareStatement("SELECT imageID, fileName, image, viewingRights FROM Fotos.Image WHERE userID=? AND folderID=? AND fileName LIKE ?");
+                        pstmt.setInt(1, privateUserId);
+                        pstmt.setInt(2, folderId);
+                        pstmt.setString(3, "%" + searchString + "%");
+                    } else {
+                        pstmt = conn.prepareStatement("SELECT imageID, fileName, image, viewingRights FROM Fotos.Image WHERE userID=? AND folderID=? AND date=? AND fileName LIKE ?");
+                        pstmt.setInt(1, privateUserId);
+                        pstmt.setInt(2, folderId);
+                        pstmt.setDate(3, Date.valueOf(uploadDate));
+                        pstmt.setString(4, "%" + searchString + "%");
+                    }
                 } else {
-                    pstmt = conn.prepareStatement(
-                        "SELECT imageID, fileName, image, viewingRights FROM Fotos.Image WHERE userID=? AND folderID=?;"
-                );
-                    pstmt.setInt(1, privateUserId);
-                    pstmt.setInt(2, folderId);
+                    if (uploadDate == null) {
+                        pstmt = conn.prepareStatement(
+                                "SELECT imageID, fileName, image, viewingRights FROM Fotos.Image WHERE userID=? AND folderID=?;"
+                        );
+                        pstmt.setInt(1, privateUserId);
+                        pstmt.setInt(2, folderId);
+                    } else {
+                        pstmt = conn.prepareStatement(
+                                "SELECT imageID, fileName, image, viewingRights FROM Fotos.Image WHERE userID=? AND folderID=? AND date=?;"
+                        );
+                        pstmt.setInt(1, privateUserId);
+                        pstmt.setInt(2, folderId);
+                        pstmt.setDate(3, Date.valueOf(uploadDate));
+                    }
                 }
 
 
@@ -924,7 +943,7 @@ public class Database {
         }
         return images;
     }
-    public Map<Integer, Pair<String, javafx.scene.image.Image>> downloadPublicImages(String searchString) {
+    public Map<Integer, Pair<String, javafx.scene.image.Image>> downloadPublicImages(String searchString, LocalDate uploadDate) {
         System.out.println("Database.downloadPublicImages");
         Connection conn = null;
         ResultSet result = null;
@@ -939,12 +958,21 @@ public class Database {
             PreparedStatement pstmt = null;
             try {
                 if (searchString != null) {
-                    pstmt = conn.prepareStatement("SELECT imageID, fileName, image FROM Fotos.Image WHERE viewingRights=1 AND fileName LIKE ?");
-                    pstmt.setString(1, "%" + searchString + "%");
+                    if (uploadDate == null) {
+                        pstmt = conn.prepareStatement("SELECT imageID, fileName, image FROM Fotos.Image WHERE viewingRights=1 AND fileName LIKE ?");
+                        pstmt.setString(1, "%" + searchString + "%");
+                    } else {
+                        pstmt = conn.prepareStatement("SELECT imageID, fileName, image FROM Fotos.Image WHERE viewingRights=1 AND date=? AND fileName LIKE ?");
+                        pstmt.setDate(1, Date.valueOf(uploadDate));
+                        pstmt.setString(2, "%" + searchString + "%");
+                    }
                 } else {
-                    pstmt = conn.prepareStatement(
-                            "SELECT imageID, fileName, image FROM Fotos.Image WHERE viewingRights=1;"
-                    );
+                    if (uploadDate == null) {
+                        pstmt = conn.prepareStatement("SELECT imageID, fileName, image FROM Fotos.Image WHERE viewingRights=1;");
+                    } else {
+                        pstmt = conn.prepareStatement("SELECT imageID, fileName, image FROM Fotos.Image WHERE viewingRights=1 AND date=?;");
+                        pstmt.setDate(1, Date.valueOf(uploadDate));
+                    }
                 }
                 result = pstmt.executeQuery();
 
