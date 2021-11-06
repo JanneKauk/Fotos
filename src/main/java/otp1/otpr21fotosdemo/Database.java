@@ -682,21 +682,57 @@ public class Database {
             while (it.hasNext()) {
                 File originalFile = it.next();
 
-                //Rajataan tiedostonimeä jos se on pidempi kuin tietokannan raja
+                //Rajataan tiedostonimeä jos se on pidempi kuin tietokannan raja (- 5 merkkiä tiedostonimen perään lisättävää numerointia varten)
                 String filename = originalFile.getName();
-                if (filename.length() > 64) {
+                if (filename.length() > 59) {
+                    String end = filename.substring(filename.lastIndexOf("."));
+                    String shortenedFilename = filename.substring(0, (59 - end.length() - 3));
+
+                    PreparedStatement statement = conn.prepareStatement("SELECT COUNT(*) FROM Fotos.Image WHERE userID=? AND filename LIKE ?");
+                    statement.setInt(1, privateUserId);
+                    statement.setString(2, shortenedFilename + "%");
+                    ResultSet res = statement.executeQuery();
+                    res.next();
+                    int countDuplicateFilenames = res.getInt(1);
+
+                    System.out.println("DuplicateFilenames: " + countDuplicateFilenames);
                     System.out.println("Filename length1: " + filename.length());
                     System.out.println("Filename: " + filename);
 
                     StringBuilder builder = new StringBuilder();
-                    String end = filename.substring(filename.lastIndexOf("."));
-                    builder.append(filename.substring(0, (63 - end.length() - 3)));
-                    builder.append("---" + end);
+                    builder.append(shortenedFilename);
+                    builder.append("---");
+                    if (countDuplicateFilenames > 0){
+                        builder.append("(");
+                        builder.append(countDuplicateFilenames);
+                        builder.append(")");
+                    }
+                    builder.append(end);
                     filename = builder.toString();
 
                     System.out.println("Filename length2: " + filename.length());
-                    System.out.println("Filename: " + filename);
+
+                } else {
+                    String end = filename.substring(filename.lastIndexOf("."));
+                    String filenameNoEnd = filename.substring(0, (filename.length() - end.length()));
+                    PreparedStatement statement = conn.prepareStatement("SELECT COUNT(*) FROM Fotos.Image WHERE userID=? AND filename LIKE ?");
+                    statement.setInt(1, privateUserId);
+                    statement.setString(2, filenameNoEnd + "%");
+                    ResultSet res = statement.executeQuery();
+                    res.next();
+                    int countDuplicateFilenames = res.getInt(1);
+                    if (countDuplicateFilenames > 0){
+                        StringBuilder builder = new StringBuilder();
+                        builder.append(filenameNoEnd);
+                        builder.append("(");
+                        builder.append(countDuplicateFilenames);
+                        builder.append(")");
+                        builder.append(end);
+                        filename = builder.toString();
+                    }
+
                 }
+                System.out.println("Filename: " + filename);
 
                 //Muodostetaan thumbnail InputStream kuvalle
                 System.out.println("Thumbthumb... Thumbnailing");
