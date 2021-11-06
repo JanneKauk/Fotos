@@ -1,8 +1,10 @@
 package otp1.otpr21fotosdemo;
 
+
 import javafx.scene.image.ImageView;
 
-import java.awt.*;
+
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -44,6 +46,7 @@ public class ImageSelector{
                 int i = it.next();
                 if (i != id)
                     allImageViews.get(i).setOpacity(OPACITY_NOT_SELECTED);
+
             }
 
         } else {

@@ -1,6 +1,8 @@
 package otp1.otpr21fotosdemo;
 
+import javafx.scene.image.Image;
 import javafx.scene.text.Text;
+import javafx.util.Pair;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -28,6 +30,7 @@ public class DatabaseTest {
     String dbPassWord = "Asdfghjkl1234567890";
     String url = "jdbc:mysql://10.114.32.13:3306/Fotos";
     private Database database = new Database();
+    private ArrayList<Integer> testImageIDs = new ArrayList<>();
 
     @BeforeAll
     public void setDatabaseController() {
@@ -38,6 +41,9 @@ public class DatabaseTest {
     @Test
     @AfterAll
     public void resetDbChanges() {
+        for (Integer i : testImageIDs){
+            database.deleteImage(i);
+        }
         System.out.println("Removing test data from DB");
         Connection conn = null;
         int userid = database.userAndPwExists("test", "1234");
@@ -358,7 +364,7 @@ public class DatabaseTest {
     }
 
     @Test
-    @DisplayName("Testataan yhden kuvan uploadaus, etsiminen(imageExists) ja poisto.")
+    @DisplayName("Testataan kolmen kuvan uploadaus, etsiminen(imageExists) ja poisto.")
     @Order(8)
     public void uploadImagesTest(){
         Database base = new Database();
@@ -366,27 +372,133 @@ public class DatabaseTest {
         File file2 = new File("src/main/resources/otp1/otpr21fotosdemo/image/testImage2.jpg");
         File file3 = new File("src/main/resources/otp1/otpr21fotosdemo/image/testImage3WithVeryLongFileName1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901.jpg");
 
-        List<File> fileList = new ArrayList<File>();
+        List<File> fileList = new ArrayList<>();
         fileList.add(file1);
         fileList.add(file2);
         fileList.add(file3);
 
         assertAll(() -> {
             List<Integer> imageIDt = base.uploadImages(1,1,fileList);
+            testImageIDs.addAll(imageIDt);
             if(imageIDt.size() > 0){
                 //Testataan löytyykö lisätty kuva
                 assertTrue( base.imageExists(imageIDt.get(0)), "Lisättyä kuvaa 1 ei löytynyt!");
                 //Poistetaan lisätty kuva
                 assertTrue(base.deleteImage(imageIDt.get(0)), "Kuvan 1 poisto ei onnistunut!");
+                testImageIDs.remove(imageIDt.get(0));
                 //Testataan löytyykö lisätty kuva
                 assertTrue( base.imageExists(imageIDt.get(1)), "Lisättyä kuvaa 2 ei löytynyt!");
                 //Poistetaan lisätty kuva
                 assertTrue(base.deleteImage(imageIDt.get(1)), "Kuvan 2 poisto ei onnistunut!");
+                testImageIDs.remove(imageIDt.get(1));
                 //Testataan löytyykö lisätty kuva
                 assertTrue( base.imageExists(imageIDt.get(2)), "Lisättyä kuvaa 3 ei löytynyt!");
                 //Poistetaan lisätty kuva
                 assertTrue(base.deleteImage(imageIDt.get(2)), "Kuvan 3 poisto ei onnistunut!");
+                testImageIDs.remove(imageIDt.get(2));
             }
         });
+    }
+
+    @Test
+    @DisplayName("Testataan kolmen kuvan lataaminen ja yhden kuvan fullres version lataaminen")
+    @Order(9)
+    public void downloadImagesTest(){
+        Database base = new Database();
+        base.setController(new FotosController());
+        base.setPrivateUserId(1);
+        File file1 = new File("src/main/resources/otp1/otpr21fotosdemo/image/testImage1.jpg");
+        File file2 = new File("src/main/resources/otp1/otpr21fotosdemo/image/testImage2.jpg");
+        File file3 = new File("src/main/resources/otp1/otpr21fotosdemo/image/testImage3WithVeryLongFileName1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901.jpg");
+
+        List<File> fileList = new ArrayList<>();
+        fileList.add(file1);
+        fileList.add(file2);
+        fileList.add(file3);
+
+        assertAll(() -> {
+            Map<Integer, Pair<String, Image>> images = base.downloadImages(1, null);
+            int imagesBefore = images.size();
+            List<Integer> imageIDt = base.uploadImages(1,1,fileList);
+            testImageIDs.addAll(imageIDt);
+            assertEquals(3, imageIDt.size(), "Virhe uploadattaessa testikuvia");
+
+            images = base.downloadImages(1, null);
+            assertEquals(3, images.size() - imagesBefore, "Väärä määrä ladattuja kuvia");
+
+            Map<Integer, Pair<String, Image>> imagesWithSearch = base.downloadImages(1, "WithVeryLongFileName12345678901234567");
+            assertEquals(1, imagesWithSearch.size(), "Väärä määrä tekstihaulla ladattuja kuvia");
+            assertDoesNotThrow(()-> {
+                Image img = base.downloadFullImage(imageIDt.get(0));
+                assertNotNull(img, "Ladattu täyden resoluution kuva oli null!");
+            });
+
+            //Poistetaan lisätyt kuvat
+            assertTrue(base.deleteImage(imageIDt.get(0)), "Kuvan 1 poisto ei onnistunut!");
+            testImageIDs.remove(imageIDt.get(0));
+            assertTrue(base.deleteImage(imageIDt.get(1)), "Kuvan 2 poisto ei onnistunut!");
+            testImageIDs.remove(imageIDt.get(1));
+            assertTrue(base.deleteImage(imageIDt.get(2)), "Kuvan 3 poisto ei onnistunut!");
+            testImageIDs.remove(imageIDt.get(2));
+
+        });
+    }
+    @Test
+    @DisplayName("Testataan kuvan asettaminen julkiseksi ja yksityiseksi")
+    @Order(10)
+    public void setImagePublicityTest(){
+        Database base = new Database();
+        base.setController(new FotosController());
+        File file1 = new File("src/main/resources/otp1/otpr21fotosdemo/image/testImage1.jpg");
+
+        List<File> fileList = new ArrayList<>();
+        fileList.add(file1);
+
+
+        assertAll(() -> {
+            List<Integer> imageIDt = base.uploadImages(1,1,fileList);
+            testImageIDs.addAll(imageIDt);
+            assertEquals(1, imageIDt.size(), "Virhe uploadattaessa testikuvia");
+
+            assertTrue(base.setImagePublicity(imageIDt.get(0), true), "Virhe asetettaessa kuvaa julkiseksi.");
+            assertTrue(base.imageIsPublic(imageIDt.get(0)), "Juuri julkiseksi asetettu kuva ei ollutkaan julkinen.");
+            assertTrue(base.setImagePublicity(imageIDt.get(0), false), "Virhe asetettaessa kuvaa yksityiseksi.");
+            assertFalse(base.imageIsPublic(imageIDt.get(0)), "Juuri yksityiseksi asetettu kuva ei ollutkaan yksityinen.");
+
+            //Poistetaan lisätyt kuvat
+            assertTrue(base.deleteImage(imageIDt.get(0)), "Kuvan 1 poisto ei onnistunut!");
+            testImageIDs.remove(imageIDt.get(0));
+
+        });
+    }
+    @Test
+    @DisplayName("Testataan julkisten kuvien lataaminen")
+    @Order(11)
+    public void downloadPublicImagesTest(){
+        Database base = new Database();
+        base.setController(new FotosController());
+        File file1 = new File("src/main/resources/otp1/otpr21fotosdemo/image/testImage1.jpg");
+
+        List<File> fileList = new ArrayList<>();
+        fileList.add(file1);
+
+        assertAll(() -> {
+            List<Integer> imageIDt = base.uploadImages(1,1,fileList);
+            testImageIDs.addAll(imageIDt);
+            assertEquals(1, imageIDt.size(), "Virhe uploadattaessa testikuvia");
+
+            assertTrue(base.setImagePublicity(imageIDt.get(0), true), "Virhe asetettaessa kuvaa julkiseksi.");
+            assertTrue(base.imageIsPublic(imageIDt.get(0)), "Juuri julkiseksi asetettu kuva ei ollutkaan julkinen.");
+
+            Map<Integer, Pair<String, Image>> images = base.downloadPublicImages(null);
+            assertTrue(images.size() > 0, "Julkisia kuvia latautui 0!");
+            assertTrue(images.containsKey(imageIDt.get(0)), "Julkisista kuvista ei löytynyt juuri ladattua ja julkistettua kuvaa!");
+
+            //Poistetaan lisätyt kuvat
+            assertTrue(base.deleteImage(imageIDt.get(0)), "Kuvan 1 poisto ei onnistunut!");
+            testImageIDs.remove(imageIDt.get(0));
+        });
+
+
     }
 }

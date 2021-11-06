@@ -166,8 +166,8 @@ public class FotosController {
         });
         //Tämä tarvitaan jotta kuvien valinta saadaan clearattua kun klikataan muualle.
         rootborderpane.setOnMouseClicked(event -> {
-            if (event.isControlDown() || event.getPickResult().getIntersectedNode().getTypeSelector().equals("ImageView")) {
-                //Klikattiin imageviewiin tai CTRL pohjas
+            if (event.isControlDown() ||event.isShiftDown() || event.getPickResult().getIntersectedNode().getTypeSelector().equals("ImageView")) {
+                //Klikattiin imageviewiin tai CTRL tai SHIFT pohjas
                 return;
             } else if (imageSelector.countSelected() > 0) {
                 imageSelector.clearSelection();
