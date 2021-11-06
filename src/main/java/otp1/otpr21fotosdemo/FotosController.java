@@ -154,6 +154,7 @@ public class FotosController {
         settingsBorderPane.setVisible(false);
         imageViewStackPane.setVisible(false);
         newFolderVbox.setVisible(false);
+        newFolderButton.setVisible(false);
         //Hakukentälle kuuntelija
         searchTextField.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
@@ -663,7 +664,7 @@ public class FotosController {
             loginErrorText.setText("Syötä käyttäjätunnus");
         } else if (database.userAndPwExists(usernameField.getText(), passwordField.getText()) != 0) {
             int userid = database.userAndPwExists(usernameField.getText(), passwordField.getText());
-            loadUserFolders(userid);
+            loadUserFolders(userid, 0);
             loggedIn = true;
             omatKuvatButton.setVisible(true);
             jaetutKuvatButton.setVisible(true);
@@ -697,7 +698,6 @@ public class FotosController {
                 database.saltRegister(usernameField.getText(), passwordField.getText(), emailField1.getText(), emailField2.getText(), loginErrorText);
                 //Tehdään root-kansio uudelle käyttäjälle
                 int userid = database.userAndPwExists(usernameField.getText(), passwordField.getText());
-                database.uploadNewFolder("root", userid);
             } else {
                 loginErrorText.setText("Tämä käyttäjä on jo olemassa");
             }
@@ -1088,8 +1088,7 @@ public class FotosController {
         folderMenu.setVisible(true);
         folderMenuHideButton.setManaged(true);
         folderMenuHideButton.setVisible(true);
-        newFolderButton.setVisible(true);
-        loadUserFolders(privateUserID);
+        loadUserFolders(privateUserID, 0);
         loadUserRootFolder();
         resetBreadCrumbs();
         updateBreadCrumbs(selectedFolderID, "root");
@@ -1121,11 +1120,12 @@ public class FotosController {
 
     @FXML
     //Käyttäjän kansioiden lataamiseen
-    public void loadUserFolders(int userId) {
+    public void loadUserFolders(int userId, int parentfolder) {
         //Haetaan tietokannasta
         System.out.println("Ladataan kansioita...");
         HashMap<Integer, String> folderinfo;
-        folderinfo = database.getUserFolders(userId);
+        folderinfo = database.getUserFolders(userId, parentfolder);
+
         int i = 0;
         //Asetetaan kansiot käyttöliittymään
         for (Integer folder : folderinfo.keySet()) {
@@ -1190,11 +1190,11 @@ public class FotosController {
             newFolderErrorText.setManaged(true);
         } else {
             newfoldername = folderNameField.getText();
-            database.uploadNewFolder(newfoldername, privateUserID);
+            database.uploadNewFolder(newfoldername, privateUserID, selectedFolderID);
             newFolderVbox.setVisible(false);
             clearNewFolderMenuFields();
             folderGridPane.getChildren().clear();
-            loadUserFolders(privateUserID);
+            loadUserFolders(privateUserID, selectedFolderID);
         }
     }
 
@@ -1203,9 +1203,7 @@ public class FotosController {
     public void onDeleteFolderButtonClick(Integer folderid) {
         database.deleteFolder(folderid);
         folderGridPane.getChildren().clear();
-        loadUserFolders(privateUserID);
-        resetBreadCrumbs();
-        loadUserRootFolder();
+        loadUserFolders(privateUserID, selectedFolderID);
     }
 
     @FXML
@@ -1214,6 +1212,8 @@ public class FotosController {
         selectedFolderID = folderid;
         System.out.println("Näytetään folderid: " + selectedFolderID);
         updateBreadCrumbs(folderid, foldername);
+        folderGridPane.getChildren().clear();
+        loadUserFolders(privateUserID, folderid);
         databaseChanged = true;
         adjustImageGrid();
     }
@@ -1221,7 +1221,7 @@ public class FotosController {
     @FXML
     //käyttäjän root-kansion näyttämiseen
     public void loadUserRootFolder() {
-        selectedFolderID = database.getParentFolderId(privateUserID);
+        selectedFolderID = database.getRootFolderId(privateUserID);
         databaseChanged = true;
         adjustImageGrid();
         updateBreadCrumbs(selectedFolderID, "root");

@@ -210,7 +210,7 @@ public class DatabaseTest {
             Connection conn = null;
             int userid = database.userAndPwExists("test", "1234");
 
-            int rootFolder = database.getParentFolderId(userid);
+            int rootFolder = database.getRootFolderId(userid);
             try {
                 // Connection statement
                 conn = DriverManager.getConnection(url, dbUserName, dbPassWord);
@@ -313,7 +313,7 @@ public class DatabaseTest {
                 conn = DriverManager.getConnection(url, dbUserName, dbPassWord);
                 System.out.println("\nDatabase Connection Established...");
 
-                database.uploadNewFolder("root", userid);
+                database.uploadNewFolder("root", userid, 0);
                 System.out.println("Record inserted......");
 
             } catch (Exception ex) {
@@ -338,9 +338,9 @@ public class DatabaseTest {
     public void uploadNewFolderTest() {
         assertDoesNotThrow(() -> {
             int userid = database.userAndPwExists("test", "1234");
-            database.uploadNewFolder("test1", userid);
-            database.uploadNewFolder("test2", userid);
-            database.uploadNewFolder("test3", userid);
+            database.uploadNewFolder("test1", userid, 0);
+            database.uploadNewFolder("test2", userid, 0);
+            database.uploadNewFolder("test3", userid, 0);
         });
     }
 
@@ -349,7 +349,7 @@ public class DatabaseTest {
     @Order(6)
     public void folderSizeTest() {
         int userid = database.userAndPwExists("test", "1234");
-        HashMap<Integer, String> test = database.getUserFolders(userid);
+        HashMap<Integer, String> test = database.getUserFolders(userid, 0);
         assertEquals(3, test.size());
     }
 

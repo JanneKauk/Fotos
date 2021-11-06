@@ -135,7 +135,7 @@ public class Database {
                 }
             }
             if (userId > 0){
-                uploadNewFolder("root", userId);
+                uploadNewFolder("root", userId, 0);
             }
         } else {
             System.out.println("BBBBBBBBBBBBB");
@@ -1055,11 +1055,10 @@ public class Database {
         return image;
     }
 
-    public HashMap <Integer, String> getUserFolders(int userId) {
+    public HashMap <Integer, String> getUserFolders(int userId, int parentfolderid) {
         System.out.println("Database.getUserFolders");
         Connection conn = null;
         ResultSet result = null;
-        //ArrayList<String> folderlist = new ArrayList<String>();
         HashMap <Integer, String> folders = new HashMap <Integer, String>();
 
         try {
@@ -1070,17 +1069,28 @@ public class Database {
             PreparedStatement myStatement = null;
 
             try {
-                myStatement = conn.prepareStatement(
-                        "SELECT * FROM Fotos.Folder WHERE userID=?;"
-                );
-                myStatement.setInt(1, userId);
-                result = myStatement.executeQuery();
+                //Jos parentfolderid parametriksi on asetettu 0, ladataan root-kansion sisällä olevat kansiot.
+                //Muuten ladataan annetun kansion sisällä olevat kansiot
+                if (parentfolderid == 0) {
+                    myStatement = conn.prepareStatement(
+                            "SELECT * FROM Fotos.Folder WHERE userID=? AND parentFolderID=?;"
+                    );
+                    myStatement.setInt(1, userId);
+                    myStatement.setInt(2, getRootFolderId(userId));
+                    result = myStatement.executeQuery();
+                    //
+                } else {
+                    myStatement = conn.prepareStatement(
+                            "SELECT * FROM Fotos.Folder WHERE userID=? AND parentFolderID=?;"
+                    );
+                    myStatement.setInt(1, userId);
+                    myStatement.setInt(2, parentfolderid);
+                    result = myStatement.executeQuery();
+                }
                 while (result.next()) {
                     String foldername = result.getString("name");
                     int folderid = result.getInt("folderID");
                     if (result.getInt("parentFolderID") != 0) {
-                        //if (result.getInt("parentFolderID".equals(null)))
-                        //folderlist.add(foldername);
                         folders.put(folderid, foldername);
                     }
                 }
@@ -1119,7 +1129,7 @@ public class Database {
         return folders;
     }
 
-    public void uploadNewFolder(String name, int userId) {
+    public void uploadNewFolder(String name, int userId, int parentfolderid) {
         System.out.println("Database.uploadNewFolder");
         Connection conn = null;
 
@@ -1135,7 +1145,13 @@ public class Database {
                     myStatement = conn.prepareStatement("INSERT INTO Fotos.Folder(NAME, EDITDATE, USERID) VALUES (?, CURDATE(), ?)");
                 } else {
                     myStatement = conn.prepareStatement("INSERT INTO Fotos.Folder(NAME, EDITDATE, USERID, PARENTFOLDERID) VALUES (?, CURDATE(), ?, ?)");
-                    myStatement.setInt(3, getParentFolderId(userId));
+                    //Jos parametri parenfolderid on 0, laitetaan uuden kansion parentfolderiksi käyttäjän root-kansio.
+                    //Muuten laitetaan parentfolderiksi annettu parentfolderid.
+                        if (parentfolderid == 0) {
+                            myStatement.setInt(3, getRootFolderId(userId));
+                        } else {
+                            myStatement.setInt(3, parentfolderid);
+                        }
                 }
                 myStatement.setString(1, name);
                 myStatement.setInt(2, userId);
@@ -1204,7 +1220,7 @@ public class Database {
         }
     }
 
-    public int getParentFolderId(int userId) {
+    public int getRootFolderId(int userId) {
         System.out.println("Database.getParentFolderId");
         Connection conn = null;
         ResultSet result = null;
