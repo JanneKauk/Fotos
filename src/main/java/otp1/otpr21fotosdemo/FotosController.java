@@ -47,11 +47,11 @@ public class FotosController {
     @FXML
     private Circle profile;
     @FXML
-    private StackPane folderMenuHideButton, folderMenu;
+    private StackPane folderMenuHideButton, folderMenu, rootStackPane;
     @FXML
     private StackPane folderButtonStackPane;
     @FXML
-    private GridPane fotosGridPane, folderGridPane, breadCrumbGridPane;
+    private GridPane fotosGridPane, folderGridPane, breadCrumbGridPane, topBarGridPane;
     @FXML
     private HBox filterMenuHbox;
     @FXML
@@ -82,6 +82,12 @@ public class FotosController {
     public Text loginErrorText, newFolderErrorText;
     @FXML
     private DatePicker dateFilter;
+    @FXML
+    private Label adminSettingsLabel;
+    @FXML
+    private Button applyForAdminButton;
+    @FXML
+    private BorderPane adminBorderPane;
 
     private enum DisplayImages {
         OWN, PUBLIC, SHARED
@@ -93,6 +99,7 @@ public class FotosController {
     private boolean loggedIn = false;
     private Database database = null;
     private Integer privateUserID;
+    private int privateUserLevel;
     private String settingsSurNameString, settingsFrontNameString, settingsEmailString, userName;
     private int selectedFolderID;
     private boolean databaseChanged = true;
@@ -122,6 +129,7 @@ public class FotosController {
 
     @FXML
     private void initialize() {
+        adminBorderPane.setVisible(false);
         displayImages = DisplayImages.PUBLIC;
         publicImagesInView = new ArrayList<>();
         imageSelector = new ImageSelector();
@@ -638,6 +646,7 @@ public class FotosController {
     }
 
     private void logout() {
+        adminBorderPane.setVisible(false);
         loggedIn = false;
         privateUserID = -1;
         database.setPrivateUserId(-1);
@@ -654,11 +663,13 @@ public class FotosController {
         adjustImageGrid();
     }
 
-    public void fetchUserInfo(int methodUserID, String userSurName, String userFrontName, String userEmail) {
+    public void fetchUserInfo(int methodUserID, int methodUserLevel, String userSurName, String userFrontName, String userEmail) {
         privateUserID = methodUserID;
+        privateUserLevel = methodUserLevel;
         settingsSurNameString = userSurName;
         settingsFrontNameString = userFrontName;
         settingsEmailString = userEmail;
+
     }
 
     @FXML
@@ -667,6 +678,14 @@ public class FotosController {
             loginErrorText.setText("Syötä käyttäjätunnus");
         } else if (database.userAndPwExists(usernameField.getText(), passwordField.getText()) != 0) {
             int userid = database.userAndPwExists(usernameField.getText(), passwordField.getText());
+            if (privateUserLevel == 1000){
+                //Käyttäjä on admin
+                rootStackPane.setMargin(adminBorderPane, new Insets(topBarGridPane.getHeight(),0,0,0));
+                adminBorderPane.setVisible(true);
+
+                addImageButton.setVisible(false);
+
+            }
             loadUserFolders(userid, 0);
             loggedIn = true;
             omatKuvatButton.setVisible(true);
@@ -967,6 +986,20 @@ public class FotosController {
     @FXML
     public void switchToSettingsScene() throws IOException {
         //Laitetaan asetusten elementit näkyviin ja poistetaan etusivun elementit pois näkyvistä.
+        if (privateUserLevel < 500){
+            adminSettingsLabel.setVisible(false);
+            applyForAdminButton.setVisible(true);
+        } else if (privateUserLevel < 1000) {
+            //Adminoikeuksia pyydetty. Ei vielä vastattu.
+            adminSettingsLabel.setVisible(true);
+            adminSettingsLabel.setText("Ylläpito-oikeuksia pyydetty");
+            applyForAdminButton.setVisible(false);
+        } else {
+            //Adminoikeudet
+            adminSettingsLabel.setVisible(true);
+            adminSettingsLabel.setText("Ylläpitäjä");
+            applyForAdminButton.setVisible(false);
+        }
         resetBreadCrumbs();
         settingsBorderPane.setManaged(true);
         settingsBorderPane.setVisible(true);
@@ -1336,4 +1369,32 @@ public class FotosController {
         dateFilter.setValue(null);
         refreshImageGrid();
     }
+
+    public void onApplyForAdminButtonClick(){
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
+                "Haluatko varmasti pyytää ylläpito-oikeuksia? \n" +
+                        "Jos sinut hyväksytään ylläpitäjäksi, samassa yhteydessä \n" +
+                        "kaikki kuvasi poistetaan!\n\n " +
+                        "(Ylläpitotilillä ei voi olla kuvia)");
+        alert.setTitle("Vahvista");
+        alert.setHeaderText(null);
+
+        Optional<ButtonType> vastaus = alert.showAndWait();
+        if (vastaus.isPresent() && vastaus.get() == ButtonType.OK) {
+            adminSettingsLabel.setVisible(true);
+            adminSettingsLabel.setText("Ylläpito-oikeuksia pyydetty");
+            applyForAdminButton.setVisible(false);
+            applyForAdmin();
+        }
+    }
+
+    public void applyForAdmin(){
+        if (privateUserLevel < 500){
+            // Jos privateUserLevel >= 500, niin on jo pyydetty adminoikeuksia tai kyseessä on admin. -> ei tehä mitää
+            privateUserLevel += 500;
+            database.changeUserLevel(privateUserID, privateUserLevel);
+        }
+    }
+
+
 }

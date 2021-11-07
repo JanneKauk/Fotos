@@ -153,6 +153,7 @@ public class Database {
         passWord = saltLogin(passWord);
 
         int found = 0;
+        int userLevel = 0;
         String userSurName = null;
         String userFrontName = null;
         String userEmail = null;
@@ -165,7 +166,7 @@ public class Database {
             PreparedStatement pstmt2 = null;
 
             try {
-                pstmt = conn.prepareStatement("SELECT userName,userID,surName,frontName,email FROM Fotos.User WHERE userName=?;");
+                pstmt = conn.prepareStatement("SELECT userName,userID,userLevel,surName,frontName,email FROM Fotos.User WHERE userName=?;");
                 pstmt.setString(1, user);
                 ResultSet result = pstmt.executeQuery();
 
@@ -179,6 +180,7 @@ public class Database {
                     System.out.println("No such username found");
                 } else if (Objects.equals(result.getString("userName"), user) && result2.getInt(1) > 0) {
                     found = result.getInt("userID");
+                    userLevel = result.getInt("userLevel");
                     userSurName = result.getString("surName");
                     userFrontName = result.getString("frontName");
                     userEmail = result.getString("email");
@@ -218,7 +220,7 @@ public class Database {
             }
         }
         // Palauttaa userID ja lähettää sen FotosController variableks
-        controller.fetchUserInfo(found, userSurName, userFrontName, userEmail);
+        controller.fetchUserInfo(found,userLevel, userSurName, userFrontName, userEmail);
         privateUserId = found;
         return found;
     }
@@ -1302,6 +1304,41 @@ public class Database {
 
         }
         return parentfolderid;
+    }
+
+    public void changeUserLevel(int userId, int newUserLevel){
+        Connection conn = null;
+        try {
+            // Connection statement
+            conn = DriverManager.getConnection(url, dbUserName, dbPassword);
+            System.out.println("Database Connection Established...");
+
+            PreparedStatement pstmt = conn.prepareStatement("UPDATE Fotos.User SET userLevel = ? WHERE userID = ?;");
+            pstmt.setInt(1, newUserLevel);
+            pstmt.setInt(2, userId);
+            pstmt.executeUpdate();
+
+        } catch (Exception ex) {
+            System.err.println("Cannot connect to database server");
+            ex.printStackTrace();
+        } finally {
+            if (conn != null) {
+                try {
+                    System.out.println("***** Let terminate the Connection *****");
+                    conn.close();
+                    System.out.println("Database connection terminated...");
+                } catch (Exception ex) {
+                    System.out.println("Error in connection termination!");
+                }
+            }
+        }
+    }
+
+    public void setAdmin(int userId){
+        changeUserLevel(userId, 1000);
+        deleteAllUserImages(userId);
+        //TODO delete all folders also
+
     }
 
 }

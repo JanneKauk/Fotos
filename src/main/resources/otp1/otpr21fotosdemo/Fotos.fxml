@@ -1,13 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.shape.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.SplitMenuButton?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.shape.Polygon?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
 
-<StackPane onMouseClicked="#onMainBorderPaneClick" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="otp1.otpr21fotosdemo.FotosController">
+<StackPane fx:id="rootStackPane" onMouseClicked="#onMainBorderPaneClick" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="otp1.otpr21fotosdemo.FotosController">
    <children>
       <StackPane fx:id="blurringStackPane">
          <children>
@@ -15,7 +34,7 @@
                <top>
                   <VBox BorderPane.alignment="CENTER">
                      <children>
-                        <GridPane style="-fx-background-color: #ebebeb;">
+                        <GridPane fx:id="topBarGridPane" style="-fx-background-color: #ebebeb;">
                            <columnConstraints>
                               <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="40.0" />
                               <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="20.0" />
@@ -285,7 +304,7 @@
                                                 </font>
                                             </Label>
                                     <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#changeUserInfo" text="Hyväksy" GridPane.rowIndex="9" />
-                                    <Button fx:id="applyForAdminButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" text="Pyydä ylläpito oikeuksia" textFill="#949494" GridPane.rowIndex="10">
+                                    <Button fx:id="applyForAdminButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#onApplyForAdminButtonClick" text="Pyydä ylläpito oikeuksia" textFill="#949494" GridPane.rowIndex="10">
                                        <GridPane.margin>
                                           <Insets top="20.0" />
                                        </GridPane.margin>
@@ -327,7 +346,7 @@
                                   </GridPane>
                            </bottom>
                         </BorderPane>
-                         <ScrollPane fx:id="scrollp" fitToWidth="true" style="-fx-border-width: 0; -fx-border-style: none" visible="false">
+                         <ScrollPane fx:id="scrollp" fitToWidth="true" style="-fx-border-width: 0; -fx-border-style: none">
                              <content>
                                  <GridPane fx:id="fotosGridPane" alignment="TOP_CENTER" gridLinesVisible="true" hgap="10.0" vgap="10.0">
 
@@ -535,5 +554,92 @@
             </BorderPane>
          </children>
       </StackPane>
+      <BorderPane fx:id="adminBorderPane" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #ebebeb; -fx-border-image-width: 2; -fx-border-color: #cccccc;">
+         <center>
+            <GridPane alignment="CENTER" prefHeight="489.0" prefWidth="1042.0" BorderPane.alignment="CENTER">
+               <columnConstraints>
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="300.0" minWidth="200.0" prefWidth="300.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="300.0" minWidth="225.0" prefWidth="300.0" />
+               </columnConstraints>
+               <rowConstraints>
+                  <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+               </rowConstraints>
+               <children>
+                  <Label text="Käyttäjät" textFill="#7c7c7c">
+                     <font>
+                        <Font name="System Bold" size="30.0" />
+                     </font>
+                  </Label>
+                  <Label text="Hae käyttäjätunnuksella:" textFill="#7c7c7c" GridPane.rowIndex="1">
+                     <font>
+                        <Font size="13.0" />
+                     </font>
+                  </Label>
+                  <TextField maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="223.0" GridPane.rowIndex="2" />
+                  <Label text="Ylläpitäjät" textFill="#7c7c7c" GridPane.columnIndex="1">
+                     <font>
+                        <Font name="System Bold" size="30.0" />
+                     </font>
+                  </Label>
+                  <Label text="Hyväksy ylläpitäjäksi" textFill="#7c7c7c" GridPane.columnIndex="1" GridPane.rowIndex="12">
+                     <font>
+                        <Font name="System Bold" size="30.0" />
+                     </font>
+                  </Label>
+                  <VBox fx:id="adminViewUsersVBox" prefHeight="200.0" prefWidth="100.0" GridPane.rowIndex="3" />
+                  <VBox fx:id="adminViewAdminsVBox" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <VBox fx:id="adminViewPendingAdminsVBox" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1" GridPane.rowIndex="13" />
+               </children>
+            </GridPane>
+         </center>
+         <top>
+            <Label alignment="CENTER" text="Ylläpito" textAlignment="CENTER" BorderPane.alignment="CENTER">
+               <font>
+                  <Font name="System Bold" size="43.0" />
+               </font>
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+               <padding>
+                  <Insets bottom="40.0" />
+               </padding>
+            </Label>
+         </top>
+         <bottom>
+            <GridPane alignment="CENTER" prefHeight="81.0" prefWidth="381.0" BorderPane.alignment="CENTER">
+               <columnConstraints>
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="416.33336385091144" minWidth="10.0" prefWidth="249.33333333333331" />
+               </columnConstraints>
+               <rowConstraints>
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+               </rowConstraints>
+               <children>
+                  <Button fx:id="deleteAccountButton1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#deleteUser" prefHeight="31.0" prefWidth="160.0" text="Poista tili" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
+               </children>
+            </GridPane>
+         </bottom>
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+         <StackPane.margin>
+            <Insets />
+         </StackPane.margin>
+      </BorderPane>
    </children>
 </StackPane>
