@@ -26,7 +26,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<StackPane onMouseClicked="#onMainBorderPaneClick" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="otp1.otpr21fotosdemo.FotosController">
+<StackPane onMouseClicked="#onMainBorderPaneClick" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="otp1.otpr21fotosdemo.FotosController">
    <children>
       <StackPane fx:id="blurringStackPane">
          <children>
@@ -263,6 +263,7 @@
                                     <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                     <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                     <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints maxHeight="50.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                       </rowConstraints>
                                       <children>
                                             <Label text="Sukunimi:" GridPane.rowIndex="3" />
@@ -279,6 +280,11 @@
                                                 <font>
                                                     <Font size="13.0" />
                                                 </font>
+                                    </Label>
+                                    <Label fx:id="adminSettingsLabel" text="Ylläpitäjä" textFill="#ef5353" GridPane.rowIndex="2">
+                                       <font>
+                                          <Font size="13.0" />
+                                       </font>
                                     </Label>
                                             <Label text="Omat tiedot" textFill="#7c7c7c">
                                                 <font>
@@ -297,6 +303,11 @@
                                                 </font>
                                             </Label>
                                     <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#changeUserInfo" text="Hyväksy" GridPane.rowIndex="9" />
+                                    <Button fx:id="applyForAdminButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" text="Pyydä ylläpito oikeuksia" textFill="#949494" GridPane.rowIndex="10">
+                                       <GridPane.margin>
+                                          <Insets top="20.0" />
+                                       </GridPane.margin>
+                                    </Button>
                                     <Text fx:id="settingsUserInfoUpdateResponse" strokeType="OUTSIDE" strokeWidth="0.0" GridPane.rowIndex="9">
                                        <GridPane.margin>
                                           <Insets left="70.0" />
@@ -334,7 +345,7 @@
                                   </GridPane>
                            </bottom>
                         </BorderPane>
-                         <ScrollPane fx:id="scrollp" fitToWidth="true" style="-fx-border-width: 0; -fx-border-style: none">
+                         <ScrollPane fx:id="scrollp" fitToWidth="true" style="-fx-border-width: 0; -fx-border-style: none" visible="false">
                              <content>
                                  <GridPane fx:id="fotosGridPane" alignment="TOP_CENTER" gridLinesVisible="true" hgap="10.0" vgap="10.0">
 
