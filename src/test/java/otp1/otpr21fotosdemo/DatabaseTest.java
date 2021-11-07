@@ -210,7 +210,7 @@ public class DatabaseTest {
             Connection conn = null;
             int userid = database.userAndPwExists("test", "1234");
 
-            int rootFolder = database.getParentFolderId(userid);
+            int rootFolder = database.getRootFolderId(userid);
             try {
                 // Connection statement
                 conn = DriverManager.getConnection(url, dbUserName, dbPassWord);
@@ -313,7 +313,7 @@ public class DatabaseTest {
                 conn = DriverManager.getConnection(url, dbUserName, dbPassWord);
                 System.out.println("\nDatabase Connection Established...");
 
-                database.uploadNewFolder("root", userid);
+                database.uploadNewFolder("root", userid, 0);
                 System.out.println("Record inserted......");
 
             } catch (Exception ex) {
@@ -338,9 +338,9 @@ public class DatabaseTest {
     public void uploadNewFolderTest() {
         assertDoesNotThrow(() -> {
             int userid = database.userAndPwExists("test", "1234");
-            database.uploadNewFolder("test1", userid);
-            database.uploadNewFolder("test2", userid);
-            database.uploadNewFolder("test3", userid);
+            database.uploadNewFolder("test1", userid, 0);
+            database.uploadNewFolder("test2", userid, 0);
+            database.uploadNewFolder("test3", userid, 0);
         });
     }
 
@@ -349,7 +349,7 @@ public class DatabaseTest {
     @Order(6)
     public void folderSizeTest() {
         int userid = database.userAndPwExists("test", "1234");
-        HashMap<Integer, String> test = database.getUserFolders(userid);
+        HashMap<Integer, String> test = database.getUserFolders(userid, 0);
         assertEquals(3, test.size());
     }
 
@@ -417,16 +417,16 @@ public class DatabaseTest {
         fileList.add(file3);
 
         assertAll(() -> {
-            Map<Integer, Pair<String, Image>> images = base.downloadImages(1, null);
+            Map<Integer, Pair<String, Image>> images = base.downloadImages(1, null, null);
             int imagesBefore = images.size();
             List<Integer> imageIDt = base.uploadImages(1,1,fileList);
             testImageIDs.addAll(imageIDt);
             assertEquals(3, imageIDt.size(), "Virhe uploadattaessa testikuvia");
 
-            images = base.downloadImages(1, null);
+            images = base.downloadImages(1, null, null);
             assertEquals(3, images.size() - imagesBefore, "Väärä määrä ladattuja kuvia");
 
-            Map<Integer, Pair<String, Image>> imagesWithSearch = base.downloadImages(1, "WithVeryLongFileName12345678901234567");
+            Map<Integer, Pair<String, Image>> imagesWithSearch = base.downloadImages(1, "WithVeryLongFileName12345678901234567", null);
             assertEquals(1, imagesWithSearch.size(), "Väärä määrä tekstihaulla ladattuja kuvia");
             assertDoesNotThrow(()-> {
                 Image img = base.downloadFullImage(imageIDt.get(0));
@@ -490,7 +490,7 @@ public class DatabaseTest {
             assertTrue(base.setImagePublicity(imageIDt.get(0), true), "Virhe asetettaessa kuvaa julkiseksi.");
             assertTrue(base.imageIsPublic(imageIDt.get(0)), "Juuri julkiseksi asetettu kuva ei ollutkaan julkinen.");
 
-            Map<Integer, Pair<String, Image>> images = base.downloadPublicImages(null);
+            Map<Integer, Pair<String, Image>> images = base.downloadPublicImages(null, null);
             assertTrue(images.size() > 0, "Julkisia kuvia latautui 0!");
             assertTrue(images.containsKey(imageIDt.get(0)), "Julkisista kuvista ei löytynyt juuri ladattua ja julkistettua kuvaa!");
 

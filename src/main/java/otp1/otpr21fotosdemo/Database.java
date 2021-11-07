@@ -14,6 +14,8 @@ import java.io.*;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.sql.*;
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.*;
 
@@ -135,7 +137,7 @@ public class Database {
                 }
             }
             if (userId > 0){
-                uploadNewFolder("root", userId);
+                uploadNewFolder("root", userId, 0);
             }
         } else {
             System.out.println("BBBBBBBBBBBBB");
@@ -847,7 +849,7 @@ public class Database {
     }
 
     //Palauttaa Hashmapin jossa key on imageID ja Value on PAIR-rakenne. Pair-rakenteessa taas key on tiedostonimi ja value on imagedata
-    public Map<Integer, Pair<String, javafx.scene.image.Image>> downloadImages(int folderId, String searchString) {
+    public Map<Integer, Pair<String, javafx.scene.image.Image>> downloadImages(int folderId, String searchString, LocalDate uploadDate) {
         System.out.println("Database.downloadImages");
         Connection conn = null;
         ResultSet result = null;
@@ -863,16 +865,33 @@ public class Database {
             try {
 
                 if (searchString != null) {
-                    pstmt = conn.prepareStatement("SELECT imageID, fileName, image, viewingRights FROM Fotos.Image WHERE userID=? AND folderID=? AND fileName LIKE ?");
-                    pstmt.setInt(1, privateUserId);
-                    pstmt.setInt(2, folderId);
-                    pstmt.setString(3, "%" + searchString + "%");
+                    if (uploadDate == null) {
+                        pstmt = conn.prepareStatement("SELECT imageID, fileName, image, viewingRights FROM Fotos.Image WHERE userID=? AND folderID=? AND fileName LIKE ?");
+                        pstmt.setInt(1, privateUserId);
+                        pstmt.setInt(2, folderId);
+                        pstmt.setString(3, "%" + searchString + "%");
+                    } else {
+                        pstmt = conn.prepareStatement("SELECT imageID, fileName, image, viewingRights FROM Fotos.Image WHERE userID=? AND folderID=? AND date=? AND fileName LIKE ?");
+                        pstmt.setInt(1, privateUserId);
+                        pstmt.setInt(2, folderId);
+                        pstmt.setDate(3, Date.valueOf(uploadDate));
+                        pstmt.setString(4, "%" + searchString + "%");
+                    }
                 } else {
-                    pstmt = conn.prepareStatement(
-                        "SELECT imageID, fileName, image, viewingRights FROM Fotos.Image WHERE userID=? AND folderID=?;"
-                );
-                    pstmt.setInt(1, privateUserId);
-                    pstmt.setInt(2, folderId);
+                    if (uploadDate == null) {
+                        pstmt = conn.prepareStatement(
+                                "SELECT imageID, fileName, image, viewingRights FROM Fotos.Image WHERE userID=? AND folderID=?;"
+                        );
+                        pstmt.setInt(1, privateUserId);
+                        pstmt.setInt(2, folderId);
+                    } else {
+                        pstmt = conn.prepareStatement(
+                                "SELECT imageID, fileName, image, viewingRights FROM Fotos.Image WHERE userID=? AND folderID=? AND date=?;"
+                        );
+                        pstmt.setInt(1, privateUserId);
+                        pstmt.setInt(2, folderId);
+                        pstmt.setDate(3, Date.valueOf(uploadDate));
+                    }
                 }
 
 
@@ -924,7 +943,7 @@ public class Database {
         }
         return images;
     }
-    public Map<Integer, Pair<String, javafx.scene.image.Image>> downloadPublicImages(String searchString) {
+    public Map<Integer, Pair<String, javafx.scene.image.Image>> downloadPublicImages(String searchString, LocalDate uploadDate) {
         System.out.println("Database.downloadPublicImages");
         Connection conn = null;
         ResultSet result = null;
@@ -939,12 +958,21 @@ public class Database {
             PreparedStatement pstmt = null;
             try {
                 if (searchString != null) {
-                    pstmt = conn.prepareStatement("SELECT imageID, fileName, image FROM Fotos.Image WHERE viewingRights=1 AND fileName LIKE ?");
-                    pstmt.setString(1, "%" + searchString + "%");
+                    if (uploadDate == null) {
+                        pstmt = conn.prepareStatement("SELECT imageID, fileName, image FROM Fotos.Image WHERE viewingRights=1 AND fileName LIKE ?");
+                        pstmt.setString(1, "%" + searchString + "%");
+                    } else {
+                        pstmt = conn.prepareStatement("SELECT imageID, fileName, image FROM Fotos.Image WHERE viewingRights=1 AND date=? AND fileName LIKE ?");
+                        pstmt.setDate(1, Date.valueOf(uploadDate));
+                        pstmt.setString(2, "%" + searchString + "%");
+                    }
                 } else {
-                    pstmt = conn.prepareStatement(
-                            "SELECT imageID, fileName, image FROM Fotos.Image WHERE viewingRights=1;"
-                    );
+                    if (uploadDate == null) {
+                        pstmt = conn.prepareStatement("SELECT imageID, fileName, image FROM Fotos.Image WHERE viewingRights=1;");
+                    } else {
+                        pstmt = conn.prepareStatement("SELECT imageID, fileName, image FROM Fotos.Image WHERE viewingRights=1 AND date=?;");
+                        pstmt.setDate(1, Date.valueOf(uploadDate));
+                    }
                 }
                 result = pstmt.executeQuery();
 
@@ -1055,11 +1083,10 @@ public class Database {
         return image;
     }
 
-    public HashMap <Integer, String> getUserFolders(int userId) {
+    public HashMap <Integer, String> getUserFolders(int userId, int parentfolderid) {
         System.out.println("Database.getUserFolders");
         Connection conn = null;
         ResultSet result = null;
-        //ArrayList<String> folderlist = new ArrayList<String>();
         HashMap <Integer, String> folders = new HashMap <Integer, String>();
 
         try {
@@ -1070,17 +1097,28 @@ public class Database {
             PreparedStatement myStatement = null;
 
             try {
-                myStatement = conn.prepareStatement(
-                        "SELECT * FROM Fotos.Folder WHERE userID=?;"
-                );
-                myStatement.setInt(1, userId);
-                result = myStatement.executeQuery();
+                //Jos parentfolderid parametriksi on asetettu 0, ladataan root-kansion sisällä olevat kansiot.
+                //Muuten ladataan annetun kansion sisällä olevat kansiot
+                if (parentfolderid == 0) {
+                    myStatement = conn.prepareStatement(
+                            "SELECT * FROM Fotos.Folder WHERE userID=? AND parentFolderID=?;"
+                    );
+                    myStatement.setInt(1, userId);
+                    myStatement.setInt(2, getRootFolderId(userId));
+                    result = myStatement.executeQuery();
+                    //
+                } else {
+                    myStatement = conn.prepareStatement(
+                            "SELECT * FROM Fotos.Folder WHERE userID=? AND parentFolderID=?;"
+                    );
+                    myStatement.setInt(1, userId);
+                    myStatement.setInt(2, parentfolderid);
+                    result = myStatement.executeQuery();
+                }
                 while (result.next()) {
                     String foldername = result.getString("name");
                     int folderid = result.getInt("folderID");
                     if (result.getInt("parentFolderID") != 0) {
-                        //if (result.getInt("parentFolderID".equals(null)))
-                        //folderlist.add(foldername);
                         folders.put(folderid, foldername);
                     }
                 }
@@ -1119,7 +1157,7 @@ public class Database {
         return folders;
     }
 
-    public void uploadNewFolder(String name, int userId) {
+    public void uploadNewFolder(String name, int userId, int parentfolderid) {
         System.out.println("Database.uploadNewFolder");
         Connection conn = null;
 
@@ -1135,7 +1173,13 @@ public class Database {
                     myStatement = conn.prepareStatement("INSERT INTO Fotos.Folder(NAME, EDITDATE, USERID) VALUES (?, CURDATE(), ?)");
                 } else {
                     myStatement = conn.prepareStatement("INSERT INTO Fotos.Folder(NAME, EDITDATE, USERID, PARENTFOLDERID) VALUES (?, CURDATE(), ?, ?)");
-                    myStatement.setInt(3, getParentFolderId(userId));
+                    //Jos parametri parenfolderid on 0, laitetaan uuden kansion parentfolderiksi käyttäjän root-kansio.
+                    //Muuten laitetaan parentfolderiksi annettu parentfolderid.
+                        if (parentfolderid == 0) {
+                            myStatement.setInt(3, getRootFolderId(userId));
+                        } else {
+                            myStatement.setInt(3, parentfolderid);
+                        }
                 }
                 myStatement.setString(1, name);
                 myStatement.setInt(2, userId);
@@ -1204,7 +1248,7 @@ public class Database {
         }
     }
 
-    public int getParentFolderId(int userId) {
+    public int getRootFolderId(int userId) {
         System.out.println("Database.getParentFolderId");
         Connection conn = null;
         ResultSet result = null;
