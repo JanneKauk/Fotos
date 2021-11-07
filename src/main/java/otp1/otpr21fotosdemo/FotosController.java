@@ -1092,6 +1092,7 @@ public class FotosController {
         folderMenu.setVisible(true);
         folderMenuHideButton.setManaged(true);
         folderMenuHideButton.setVisible(true);
+        newFolderButton.setVisible(true);
         loadUserFolders(privateUserID, 0);
         loadUserRootFolder();
         resetBreadCrumbs();
