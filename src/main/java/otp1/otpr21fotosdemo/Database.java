@@ -3,11 +3,15 @@ package otp1.otpr21fotosdemo;
 import javafx.scene.text.Text;
 import javafx.util.Pair;
 import org.apache.commons.codec.binary.Hex;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
 
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.metadata.IIOMetadata;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
@@ -1043,7 +1047,11 @@ public class Database {
                 result = pstmt.executeQuery();
 
                 if (result.next()) {
+//                    System.out.println("METADATA:"+"");
+//                    DumpImageMetadata dImd = new DumpImageMetadata();
                     image = new javafx.scene.image.Image(result.getBinaryStream("image"));
+//                    String name = result.getString("filename");
+//                    System.out.println("FILENAME: "+name);
                     fullImageCache.put(imageID, image);
                 }
 
