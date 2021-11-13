@@ -31,6 +31,7 @@ public class DatabaseTest {
     String url = "jdbc:mysql://10.114.32.13:3306/Fotos";
     private Database database = new Database();
     private ArrayList<Integer> testImageIDs = new ArrayList<>();
+    private ArrayList<Integer> testUserIDs = new ArrayList<>();
 
     @BeforeAll
     public void setDatabaseController() {
@@ -43,6 +44,9 @@ public class DatabaseTest {
     public void resetDbChanges() {
         for (Integer i : testImageIDs){
             database.deleteImage(i);
+        }
+        for (Integer i : testUserIDs){
+            database.deleteUser(i);
         }
         System.out.println("Removing test data from DB");
         Connection conn = null;
@@ -497,6 +501,87 @@ public class DatabaseTest {
             //Poistetaan lisätyt kuvat
             assertTrue(base.deleteImage(imageIDt.get(0)), "Kuvan 1 poisto ei onnistunut!");
             testImageIDs.remove(imageIDt.get(0));
+        });
+
+
+    }
+    @Test
+    @DisplayName("Testataan käyttäjän tason vaihtaminen (user -> admin)")
+    @Order(12)
+    public void changeUserLevelTest(){
+        Database base = new Database();
+        FotosController controller = new FotosController();
+        base.setController(controller);
+        long rnd = Math.round(Math.random()*10000000);
+        String tstUserName = "TestUserName" + rnd;
+        String password = "password";
+        Text loginErrorText = new Text("");
+        assertAll(() -> {
+            base.saltRegister(tstUserName, password, "email", "email", loginErrorText);
+            int id = base.userAndPwExists(tstUserName,password);
+            testUserIDs.add(id);
+            assertTrue(id > 0, "Virhe luotaessa testikäyttäjää");
+
+            assertEquals(1, controller.getPrivateUserLevel(), "Testikäyttäjä \"alkutasossa\"");
+            base.changeUserLevel(id,1000);
+            base.userAndPwExists(tstUserName,password); //Refreshes userdata to controller
+            assertEquals(1000, controller.getPrivateUserLevel(), "Testikäyttäjä \"admintasossa\"");
+            base.deleteUser(id);
+            testUserIDs.remove(Integer.valueOf(id));
+        });
+
+
+    }
+
+    @Test
+    @DisplayName("Testataan käyttäjien listaaminen ja admincount")
+    @Order(13)
+    public void listUsersAndCountAdminsTest(){
+        Database base = new Database();
+        FotosController controller = new FotosController();
+        base.setController(controller);
+        long rnd = Math.round(Math.random()*10000000);
+        String tstUserName = "TestUserName" + rnd;
+        String password = "password";
+        Text loginErrorText = new Text("");
+
+        assertAll(() -> {
+            ArrayList<FotosUser> userList = base.listUsers();
+            int admincount = 0;
+            for (FotosUser user : userList){
+                if (user.getUserLevel() == 1000)
+                    admincount++;
+                System.out.println(user.getUserName());
+                System.out.println(user.getUserID());
+                System.out.println(user.getFirstName());
+                System.out.println(user.getLastName());
+                System.out.println(user.getEmail());
+            }
+            assertEquals(admincount, base.countAdmins(), "Virhe adminien määrässä.");
+
+        });
+
+
+    }
+    @Test
+    @DisplayName("FotosUser testi")
+    @Order(14)
+    public void fotosUserTest(){
+
+        assertAll(() -> {
+            FotosUser user = new FotosUser();
+            user.setUserName("name");
+            user.setUserID(1);
+            user.setUserLevel(2);
+            user.setFirstName("first");
+            user.setLastName("last");
+            user.setEmail("email");
+            assertEquals("name", user.getUserName());
+            assertEquals(1, user.getUserID());
+            assertEquals(2, user.getUserLevel());
+            assertEquals("first", user.getFirstName());
+            assertEquals("last", user.getLastName());
+            assertEquals("email", user.getEmail());
         });
 
 

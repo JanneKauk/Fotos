@@ -1329,7 +1329,7 @@ public class Database {
             pstmt.setInt(1, newUserLevel);
             pstmt.setInt(2, userId);
             pstmt.executeUpdate();
-
+            System.out.println("Userlevel changed");
         } catch (Exception ex) {
             System.err.println("Cannot connect to database server");
             ex.printStackTrace();

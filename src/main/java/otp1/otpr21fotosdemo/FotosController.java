@@ -102,7 +102,7 @@ public class FotosController {
     private boolean loggedIn = false;
     private Database database = null;
     private Integer privateUserID;
-    private int privateUserLevel;
+    protected int privateUserLevel;
     private String settingsSurNameString, settingsFrontNameString, settingsEmailString, userName;
     private int selectedFolderID;
     private boolean databaseChanged = true;
@@ -1601,6 +1601,11 @@ public class FotosController {
         }
 
 
+    }
+
+    public int getPrivateUserLevel() {
+        //For tests
+        return privateUserLevel;
     }
 
 
