@@ -3,11 +3,15 @@ package otp1.otpr21fotosdemo;
 import javafx.scene.text.Text;
 import javafx.util.Pair;
 import org.apache.commons.codec.binary.Hex;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
 
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.metadata.IIOMetadata;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
@@ -1045,7 +1049,11 @@ public class Database {
                 result = pstmt.executeQuery();
 
                 if (result.next()) {
+//                    System.out.println("METADATA:"+"");
+//                    DumpImageMetadata dImd = new DumpImageMetadata();
                     image = new javafx.scene.image.Image(result.getBinaryStream("image"));
+//                    String name = result.getString("filename");
+//                    System.out.println("FILENAME: "+name);
                     fullImageCache.put(imageID, image);
                 }
 
@@ -1212,6 +1220,7 @@ public class Database {
     public void deleteFolder(int folderid) {
         System.out.println("Database.deleteFolder");
         Connection conn = null;
+        ResultSet result;
 
         try {
             // Connection statement
@@ -1221,13 +1230,15 @@ public class Database {
             PreparedStatement myStatement1 = null;
             PreparedStatement myStatement2 = null;
             try {
-                myStatement2 = conn.prepareStatement("DELETE FROM Fotos.Image WHERE folderID=?");
-                myStatement2.setInt(1, folderid);
-                myStatement2.executeUpdate();
-                myStatement1 = conn.prepareStatement("DELETE FROM Fotos.Folder WHERE folderID=?");
-                myStatement1.setInt(1, folderid);
-                myStatement1.executeUpdate();
-                System.out.println("Kansio poistettu tietokannasta.");
+                    //Poistetaan ensin kansion sisällä olevat kansiot ja tämän jälkeen pääkansio
+                    deleteChildFolders(folderid);
+                    myStatement2 = conn.prepareStatement("DELETE FROM Fotos.Image WHERE folderID=?");
+                    myStatement2.setInt(1, folderid);
+                    myStatement2.executeUpdate();
+                    myStatement1 = conn.prepareStatement("DELETE FROM Fotos.Folder WHERE folderID=?");
+                    myStatement1.setInt(1, folderid);
+                    myStatement1.executeUpdate();
+                    System.out.println("Kansio poistettu tietokannasta.");
             } catch (Exception e) {
                 System.err.println("Error in query");
                 e.printStackTrace();
@@ -1340,5 +1351,58 @@ public class Database {
         //TODO delete all folders also
 
     }
+
+    public void deleteChildFolders(int parentfolderid) {
+        System.out.println("Database.deleteParentFolders");
+        Connection conn = null;
+        ResultSet result = null;
+
+        try {
+            // Connection statement
+            conn = DriverManager.getConnection(url, dbUserName, dbPassword);
+            System.out.println("\nDatabase Connection Established...");
+            PreparedStatement myStatement = null;
+            try {
+                //Etsitään sisällä olevat kansiot ja poistetaan ne.
+                myStatement = conn.prepareStatement("SELECT * FROM Fotos.Folder WHERE parentFolderID=?");
+                myStatement.setInt(1, parentfolderid);
+                result = myStatement.executeQuery();
+                while (result.next()) {
+                    deleteFolder(result.getInt("folderID"));
+                }
+
+            } catch (Exception e) {
+                System.err.println("Error in query");
+                e.printStackTrace();
+            } finally {
+                if (myStatement != null) {
+                    try {
+                        myStatement.close();
+                    } catch (Exception ex) {
+                        System.out.println("Error in statement termination!");
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            System.err.println("Cannot connect to database server");
+            e.printStackTrace();
+        } finally {
+            if (conn != null) {
+                try {
+                    System.out.println("\n***** Let terminate the Connection *****");
+                    conn.close();
+                    System.out.println("\nDatabase connection terminated...");
+
+                } catch (Exception ex) {
+                    System.out.println("Error in connection termination!");
+
+                }
+            }
+
+        }
+    }
+
+
 
 }

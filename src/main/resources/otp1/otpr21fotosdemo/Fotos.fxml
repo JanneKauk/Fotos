@@ -473,7 +473,7 @@
             <Region fx:id="imageviewBackgroundRegion" opacity="0.4" style="-fx-background-color: #000000;" />
             <BorderPane prefHeight="200.0" prefWidth="200.0">
                <top>
-                  <StackPane alignment="CENTER_RIGHT" prefHeight="40.0" style="-fx-background-color: #ebebeb;">
+                  <StackPane fx:id="pictureInfo" alignment="CENTER_RIGHT" prefHeight="40.0" style="-fx-background-color: #ebebeb;">
                      <children>
                         <HBox alignment="CENTER_RIGHT" maxWidth="400.0" nodeOrientation="LEFT_TO_RIGHT">
                            <children>
@@ -500,40 +500,109 @@
                <left>
                   <HBox fx:id="pictureInfoBox" maxHeight="600.0" BorderPane.alignment="CENTER">
                      <children>
-                        <Pane fx:id="pictureInfo" prefWidth="200.0" style="-fx-border-color: grey; -fx-background-color: white">
+                        <StackPane fx:id="pictureInfo" prefHeight="600.0" prefWidth="201.0" style="-fx-border-color: grey; -fx-background-color: white;">
                            <children>
-                              <Label layoutX="45.0" layoutY="14.0" text="Kuvan tiedot" textAlignment="CENTER">
-                                 <font>
-                                    <Font size="18.0" />
-                                 </font>
-                              </Label>
-                              <Label layoutX="26.0" layoutY="76.0" text="Päivämäärä: 10/10/2021" textAlignment="CENTER">
-                                 <font>
-                                    <Font size="14.0" />
-                                 </font>
-                              </Label>
-                              <Label layoutX="25.0" layoutY="96.0" text="Koko: 5MB" textAlignment="CENTER">
-                                 <font>
-                                    <Font size="14.0" />
-                                 </font>
-                              </Label>
-                              <Label layoutX="25.0" layoutY="116.0" text="Tyyppi: JPG" textAlignment="CENTER">
-                                 <font>
-                                    <Font size="14.0" />
-                                 </font>
-                              </Label>
-                              <Label layoutX="25.0" layoutY="136.0" text="Omistaja: 1Testi" textAlignment="CENTER">
-                                 <font>
-                                    <Font size="14.0" />
-                                 </font>
-                              </Label>
-                              <Label layoutX="25.0" layoutY="156.0" text="Resoluutio: 1920x1080" textAlignment="CENTER">
-                                 <font>
-                                    <Font size="14.0" />
-                                 </font>
-                              </Label>
+                              <BorderPane>
+                                 <center>
+                                    <VBox alignment="TOP_CENTER">
+                                       <children>
+                                          <HBox>
+                                             <children>
+                                                <Label text="Omistaja: " wrapText="true">
+                                                   <font>
+                                                      <Font size="14.0" />
+                                                   </font>
+                                                </Label>
+                                                <Label fx:id="imageOwner" alignment="TOP_LEFT" layoutX="10.0" layoutY="10.0" text="-">
+                                                   <font>
+                                                      <Font size="14.0" />
+                                                   </font>
+                                                </Label>
+                                             </children>
+                                          </HBox>
+                                          <HBox>
+                                             <children>
+                                                <Label text="Päivämäärä: " textAlignment="CENTER">
+                                                   <font>
+                                                      <Font size="14.0" />
+                                                   </font>
+                                                </Label>
+                                                <Label fx:id="imageDate" layoutX="10.0" layoutY="10.0" text="-" textAlignment="CENTER">
+                                                   <font>
+                                                      <Font size="14.0" />
+                                                   </font>
+                                                </Label>
+                                             </children>
+                                          </HBox>
+                                          <HBox>
+                                             <children>
+                                                <Label text="Koko: " textAlignment="CENTER">
+                                                   <font>
+                                                      <Font size="14.0" />
+                                                   </font>
+                                                </Label>
+                                                <Label fx:id="imageSize" layoutX="10.0" layoutY="10.0" text="-" textAlignment="CENTER">
+                                                   <font>
+                                                      <Font size="14.0" />
+                                                   </font>
+                                                </Label>
+                                             </children>
+                                          </HBox>
+                                          <HBox layoutX="10.0" layoutY="50.0">
+                                             <children>
+                                                <Label text="Resoluutio: " textAlignment="CENTER">
+                                                   <font>
+                                                      <Font size="14.0" />
+                                                   </font>
+                                                </Label>
+                                                <Label fx:id="imageResolution" layoutX="10.0" layoutY="10.0" text="-" wrapText="true">
+                                                   <font>
+                                                      <Font size="14.0" />
+                                                   </font>
+                                                </Label>
+                                             </children>
+                                          </HBox>
+                                          <HBox layoutX="10.0" layoutY="70.0">
+                                             <children>
+                                                <Label text="File format: " textAlignment="CENTER">
+                                                   <font>
+                                                      <Font size="14.0" />
+                                                   </font>
+                                                </Label>
+                                                <Label fx:id="imageFileFormat" layoutX="10.0" layoutY="10.0" text="-" textAlignment="CENTER">
+                                                   <font>
+                                                      <Font size="14.0" />
+                                                   </font>
+                                                </Label>
+                                             </children>
+                                          </HBox>
+                                          <HBox layoutX="10.0" layoutY="10.0">
+                                             <children>
+                                                <Label text="Omistaja: " textAlignment="CENTER">
+                                                   <font>
+                                                      <Font size="14.0" />
+                                                   </font>
+                                                </Label>
+                                                <Label fx:id="imageName" layoutX="10.0" layoutY="10.0" text="-" textAlignment="CENTER">
+                                                   <font>
+                                                      <Font size="14.0" />
+                                                   </font>
+                                                </Label>
+                                             </children>
+                                          </HBox>
+                                       </children>
+                                    </VBox>
+                                 </center>
+                                 <top>
+                                    <Label prefHeight="50.0" prefWidth="101.0" text="Kuvan tiedot" textAlignment="CENTER" BorderPane.alignment="CENTER">
+                                       <font>
+                                          <Font size="18.0" />
+                                       </font>
+                                    </Label>
+                                 </top>
+                              </BorderPane>
                            </children>
-                        </Pane>
+                        </StackPane>
                         <StackPane>
                            <children>
                               <StackPane fx:id="pictureInfoArrow" prefWidth="40.0">

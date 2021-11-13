@@ -34,7 +34,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.Pair;
-
+import org.w3c.dom.*;
 import java.io.*;
 import java.util.*;
 import java.util.List;
@@ -59,7 +59,7 @@ public class FotosController {
     @FXML
     Button omatKuvatButton, julkisetKuvatButton, jaetutKuvatButton, loginButton, cycleBack, cycleForward;
     @FXML
-    Label usernameLabel;
+    Label usernameLabel, imageOwner, imageResolution, imageDate, imageSize, imageFileFormat, imageName;
     @FXML
     Text settingsUserName, settingsUserInfoUpdateResponse, settingsUserPasswordUpdateResponse, settingsSurName, settingsFrontName, settingsEmail;
     @FXML
@@ -381,8 +381,8 @@ public class FotosController {
                             }
                         } else {
                             //EI CTRL EIKÄ SHIFT painettuna
-
                             //Jos kuvia valittuna niin vain clearataan valinta.
+
                             if (imageSelector.countSelected() > 0) {
                                 imageSelector.clearSelection();
                                 return;
@@ -397,6 +397,7 @@ public class FotosController {
                             } else {
                                 bigPicture.setImage(iv.getImage());
                             }
+                            refreshImageData();
                             openImageview();
                         }
                     } else if (event.getButton() == MouseButton.SECONDARY) {
@@ -519,6 +520,21 @@ public class FotosController {
                     pStack.setAlignment(Pos.TOP_RIGHT);
                     pStack.getChildren().add(publicLabel);
                 }
+                //TODO:DRAG TOIMINTO!!!---------------------------------------------------------------------------------------------
+                //TODO:DRAG TOIMINTO!!!---------------------------------------------------------------------------------------------
+                //TODO:DRAG TOIMINTO!!!---------------------------------------------------------------------------------------------
+//                p.setOnDragDetected(event -> {
+//                    /* drag was detected, start a drag-and-drop gesture*/
+//                    /* allow any transfer mode */
+//                    Dragboard db = p.startDragAndDrop(TransferMode.ANY);
+//
+//                    /* Put a string on a dragboard */
+//                    ClipboardContent content = new ClipboardContent();
+//                    content.putString(source.getText());
+//                    db.setContent(content);
+//
+//                    event.consume();
+//                });
                 fotosGridPane.add(pStack, j, i);
                 t++;
                 //Add column constraints
@@ -603,6 +619,17 @@ public class FotosController {
         return success;
     }
 
+    private void refreshImageData(){
+        Image image = bigPicture.getImage();
+
+        imageName.setText("filename");
+        imageOwner.setText("uploader");
+        imageDate.setText("upload date.");
+        imageResolution.setText((int)image.getWidth()+"x"+(int)image.getHeight());
+        imageSize.setText("size");
+        imageFileFormat.setText("Get filename ending.");
+    }
+
     @FXML//Cycle pictures back when viewing them
     private void cycleImageBack() {
         if (currentImageIndex < 1) {
@@ -613,6 +640,7 @@ public class FotosController {
             currentImageIndex = currentImageIndex - 1;
             currentImageID = imageIdList.get(currentImageIndex);
             bigPicture.setImage(database.downloadFullImage(currentImageID.intValue()));
+            refreshImageData();
         } catch (Error e) {
             System.out.println("Full picture not found!:" + e);
         }
@@ -628,6 +656,7 @@ public class FotosController {
             currentImageIndex = currentImageIndex + 1;
             currentImageID = imageIdList.get(currentImageIndex);
             bigPicture.setImage(database.downloadFullImage(currentImageID.intValue()));
+            refreshImageData();
         } catch (Error e) {
             System.out.println("Full picture not found!:" + e);
         }
@@ -1125,6 +1154,7 @@ public class FotosController {
         folderMenu.setVisible(true);
         folderMenuHideButton.setManaged(true);
         folderMenuHideButton.setVisible(true);
+        newFolderButton.setVisible(true);
         loadUserFolders(privateUserID, 0);
         loadUserRootFolder();
         resetBreadCrumbs();
