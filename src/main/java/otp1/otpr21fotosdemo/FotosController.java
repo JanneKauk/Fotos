@@ -13,6 +13,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.geometry.Side;
+import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
@@ -55,17 +56,21 @@ public class FotosController {
     @FXML
     private HBox filterMenuHbox;
     @FXML
-    ScrollPane scrollp;
+    ScrollPane scrollp, adminUsersViewScrollPane, adminViewAdminsScrollPane;
+    @FXML
+    Group adminsGroup, usersGroup;
     @FXML
     Button omatKuvatButton, julkisetKuvatButton, jaetutKuvatButton, loginButton, cycleBack, cycleForward;
     @FXML
-    Label usernameLabel, imageOwner, imageResolution, imageDate, imageSize, imageFileFormat, imageName;
+    Label usernameLabel, imageOwner, imageResolution, imageDate, imageSize, imageFileFormat, imageName, tarkennettuHakuLabel;
     @FXML
     Text settingsUserName, settingsUserInfoUpdateResponse, settingsUserPasswordUpdateResponse, settingsSurName, settingsFrontName, settingsEmail;
     @FXML
-    VBox loginVbox, emailVbox, newFolderVbox;
+    VBox loginVbox, emailVbox, newFolderVbox, newAdminInfoVbox, adminViewUsersVBox, adminViewAdminsVBox;
     @FXML
     TextField usernameField, emailField1, emailField2, folderNameField, settingsSurNameTextField, settingsFrontNameTextField, settingsEmailTextField, searchTextField;
+    @FXML
+    TextField adminUsernameField, adminPasswordField, adminEmailField, adminEmailField2, adminViewSearchUserTextField;
     @FXML
     PasswordField passwordField, settingsOldPassword, settingsNewPassword, settingsNewPasswordAgain;
     @FXML
@@ -79,13 +84,11 @@ public class FotosController {
     @FXML
     private ImageView uploadingRotatingImageview, newFolderButton, addImageButtonImageView;
     @FXML
-    public Text loginErrorText, newFolderErrorText;
+    public Text loginErrorText, newFolderErrorText, newAdminErrorText;
     @FXML
     private DatePicker dateFilter;
     @FXML
     private Label adminSettingsLabel;
-    @FXML
-    private Button applyForAdminButton;
     @FXML
     private BorderPane adminBorderPane;
 
@@ -116,6 +119,7 @@ public class FotosController {
     ArrayList<Integer> imageIdList;
     private ImageSelector imageSelector;
     private ArrayList<Integer> publicImagesInView;
+    private ArrayList<FotosUser> userList; //For admin
 
     @FXML
     private void onFotosGridPaneClick() {
@@ -130,8 +134,10 @@ public class FotosController {
     @FXML
     private void initialize() {
         adminBorderPane.setVisible(false);
+        newAdminInfoVbox.setVisible(false);
         displayImages = DisplayImages.PUBLIC;
         publicImagesInView = new ArrayList<>();
+        userList = new ArrayList<>();
         imageSelector = new ImageSelector();
         database = new Database();
         database.setController(this);
@@ -228,6 +234,10 @@ public class FotosController {
     }
 
     private void adjustImageGrid() {
+        if (loggedIn && privateUserLevel == 1000){
+            //Käyttäjä on admin. Ei tarvita imagegridiä
+            return;
+        }
         //Calc how many columns fit into the parent stackpane
         double parentWidth = centerStackp.getWidth();
         double parentHeight = centerStackp.getHeight();
@@ -675,9 +685,18 @@ public class FotosController {
     }
 
     private void logout() {
-        adminBorderPane.setVisible(false);
+        if (privateUserLevel == 1000){
+            //Käyttäjä oli admin
+            julkisetKuvatButton.setVisible(true);
+            searchTextField.setVisible(true);
+            tarkennettuHakuLabel.setVisible(true);
+            adminBorderPane.setVisible(false);
+            System.out.println("Admin kirjautui ulos");
+        }
+
         loggedIn = false;
         privateUserID = -1;
+        privateUserLevel = -1;
         database.setPrivateUserId(-1);
         databaseChanged = true;
         omatKuvatButton.setVisible(false);
@@ -693,12 +712,13 @@ public class FotosController {
     }
 
     public void fetchUserInfo(int methodUserID, int methodUserLevel, String userSurName, String userFrontName, String userEmail) {
-        privateUserID = methodUserID;
-        privateUserLevel = methodUserLevel;
-        settingsSurNameString = userSurName;
-        settingsFrontNameString = userFrontName;
-        settingsEmailString = userEmail;
-
+        if (!loggedIn) {
+            privateUserID = methodUserID;
+            privateUserLevel = methodUserLevel;
+            settingsSurNameString = userSurName;
+            settingsFrontNameString = userFrontName;
+            settingsEmailString = userEmail;
+        }
     }
 
     @FXML
@@ -707,19 +727,26 @@ public class FotosController {
             loginErrorText.setText("Syötä käyttäjätunnus");
         } else if (database.userAndPwExists(usernameField.getText(), passwordField.getText()) != 0) {
             int userid = database.userAndPwExists(usernameField.getText(), passwordField.getText());
+            loggedIn = true;
             if (privateUserLevel == 1000){
                 //Käyttäjä on admin
-                rootStackPane.setMargin(adminBorderPane, new Insets(topBarGridPane.getHeight(),0,0,0));
-                adminBorderPane.setVisible(true);
-
+                openAdminView();
                 addImageButton.setVisible(false);
-
+                julkisetKuvatButton.setVisible(false);
+                searchTextField.setVisible(false);
+                tarkennettuHakuLabel.setVisible(false);
+            } else {
+                loadUserFolders(userid, 0);
+                omatKuvatButton.setVisible(true);
+                jaetutKuvatButton.setVisible(true);
+                addImageButton.setVisible(true);
+                newFolderButton.setVisible(true);
+                omatKuvatButton.requestFocus();
+                displayImages = DisplayImages.OWN;
+                loadUserRootFolder();
             }
-            loadUserFolders(userid, 0);
-            loggedIn = true;
-            omatKuvatButton.setVisible(true);
-            jaetutKuvatButton.setVisible(true);
-            addImageButton.setVisible(true);
+
+
             usernameLabel.setText(usernameField.getText());
             settingsUserName.setText(usernameField.getText());
             settingsSurNameTextField.setText(settingsSurNameString);
@@ -727,15 +754,12 @@ public class FotosController {
             settingsEmailTextField.setText(settingsEmailString);
             userName = usernameField.getText();
             loginVbox.setVisible(false);
-            newFolderButton.setVisible(true);
+
             clearLoginFields();
             loginErrorText.setText("");
             databaseChanged = true;
-            omatKuvatButton.requestFocus();
-            displayImages = DisplayImages.OWN;
             resetFilters();
-            //adjustImageGrid(); Tää kutsutaan loadUserRootFolder() lopussa
-            loadUserRootFolder();
+
         } else {
             loginErrorText.setText("Käyttäjänimi tai salasana väärin");
         }
@@ -1015,19 +1039,14 @@ public class FotosController {
     @FXML
     public void switchToSettingsScene() throws IOException {
         //Laitetaan asetusten elementit näkyviin ja poistetaan etusivun elementit pois näkyvistä.
-        if (privateUserLevel < 500){
-            adminSettingsLabel.setVisible(false);
-            applyForAdminButton.setVisible(true);
-        } else if (privateUserLevel < 1000) {
-            //Adminoikeuksia pyydetty. Ei vielä vastattu.
-            adminSettingsLabel.setVisible(true);
-            adminSettingsLabel.setText("Ylläpito-oikeuksia pyydetty");
-            applyForAdminButton.setVisible(false);
-        } else {
+        if (privateUserLevel == 1000){
             //Adminoikeudet
             adminSettingsLabel.setVisible(true);
             adminSettingsLabel.setText("Ylläpitäjä");
-            applyForAdminButton.setVisible(false);
+            adminBorderPane.setVisible(false);
+
+        } else {
+            adminSettingsLabel.setVisible(false);
         }
         resetBreadCrumbs();
         settingsBorderPane.setManaged(true);
@@ -1145,6 +1164,7 @@ public class FotosController {
     @FXML
     public void switchToDefaultScene() {
         //Laitetaan etusivun elementit näkyviin ja poistetaan asetusten elementit pois näkyvistä.
+
         settingsBorderPane.setManaged(false);
         settingsBorderPane.setVisible(false);
         scrollp.setManaged(true);
@@ -1155,10 +1175,15 @@ public class FotosController {
         folderMenuHideButton.setManaged(true);
         folderMenuHideButton.setVisible(true);
         newFolderButton.setVisible(true);
-        loadUserFolders(privateUserID, 0);
-        loadUserRootFolder();
-        resetBreadCrumbs();
-        updateBreadCrumbs(selectedFolderID, "root");
+        if (privateUserLevel == 1000){
+            adminBorderPane.setVisible(true);
+        } else {
+            loadUserFolders(privateUserID, 0);
+            loadUserRootFolder();
+            resetBreadCrumbs();
+            updateBreadCrumbs(selectedFolderID, "root");
+        }
+
         /*
         //Laitetaan etusivun elementit takaisin näkyviin.
         folderMenu.setVisible(true);
@@ -1400,31 +1425,186 @@ public class FotosController {
         refreshImageGrid();
     }
 
-    public void onApplyForAdminButtonClick(){
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
-                "Haluatko varmasti pyytää ylläpito-oikeuksia? \n" +
-                        "Jos sinut hyväksytään ylläpitäjäksi, samassa yhteydessä \n" +
-                        "kaikki kuvasi poistetaan!\n\n " +
-                        "(Ylläpitotilillä ei voi olla kuvia)");
-        alert.setTitle("Vahvista");
-        alert.setHeaderText(null);
+    public void openAdminView(){
+        userList = database.listUsers();
+        String userSearchText = adminViewSearchUserTextField.getText();
+        adminViewUsersVBox.getChildren().clear();
+        adminViewAdminsVBox.getChildren().clear();
+        StackPane.setMargin(adminBorderPane, new Insets(topBarGridPane.getHeight(),0,0,0));
+        adminBorderPane.setVisible(true);
+        //Sort according to username
+        userList.sort((usr1,usr2) -> usr1.getUserName().compareTo(usr2.getUserName()));
+        Iterator<FotosUser> it = userList.iterator();
+        int userCount = 0;
+        int adminCount = 0;
+        while (it.hasNext()){
+            FotosUser usr = it.next();
+            VBox row = new VBox();
+            HBox info = new HBox();
+            HBox controls = new HBox();
+            controls.setVisible(false);
+            controls.setManaged(false);
+            info.setOnMouseClicked(event-> {
+                if (!controls.isVisible()){
+                    controls.setVisible(true);
+                    controls.setManaged(true);
+                } else {
+                    controls.setVisible(false);
+                    controls.setManaged(false);
+                }
 
-        Optional<ButtonType> vastaus = alert.showAndWait();
-        if (vastaus.isPresent() && vastaus.get() == ButtonType.OK) {
-            adminSettingsLabel.setVisible(true);
-            adminSettingsLabel.setText("Ylläpito-oikeuksia pyydetty");
-            applyForAdminButton.setVisible(false);
-            applyForAdmin();
+            });
+            row.getChildren().addAll(info,controls);
+
+            Button deleteBtn = new Button();
+            deleteBtn.setText("Poista");
+            deleteBtn.setOnAction(event -> {
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Haluatko varmasti poistaa käyttäjän " + usr.getUserName() + "?");
+                alert.setTitle("Vahvista");
+                alert.setHeaderText(null);
+                Optional<ButtonType> vastaus = alert.showAndWait();
+                if (vastaus.isPresent() && vastaus.get() == ButtonType.OK) {
+                    if (usr.getUserLevel() == 1000 && database.countAdmins() == 1){
+                        Alert i = new Alert(Alert.AlertType.INFORMATION, "Varoitus! Viimeistä adminia ei voi poistaa tätä kautta.");
+                        i.setTitle("Varoitus");
+                        i.setHeaderText(null);
+                        i.showAndWait();
+                    } else {
+                        database.deleteUser(usr.getUserID());
+                        openAdminView();
+                        if (usr.getUserID() == privateUserID){
+                            //Admin poisti itsensä... Kirjaudutaan ulos
+                            logout();
+                        }
+                    }
+
+                }
+            });
+            controls.getChildren().add(deleteBtn);
+
+            if (usr.getUserLevel() == 1000){
+                Label userNameLabel = new Label(usr.getUserName());
+                userNameLabel.setPrefWidth(adminViewAdminsVBox.getWidth());
+                userNameLabel.setAlignment(Pos.CENTER_LEFT);
+                info.getChildren().add(userNameLabel);
+                switch (adminCount%2){
+                    case 0:
+                        row.setBackground(new Background(new BackgroundFill(Color.web("#ebebeb"),CornerRadii.EMPTY,Insets.EMPTY)));
+                        break;
+                    case 1:
+                        row.setBackground(new Background(new BackgroundFill(Color.web("#cbcbcb"),CornerRadii.EMPTY,Insets.EMPTY)));
+                        break;
+                }
+                adminViewAdminsVBox.getChildren().add(row);
+                adminCount++;
+            } else {
+                Label userNameLabel = new Label(usr.getUserName());
+                Label firstNameLabel = new Label(usr.getFirstName());
+                Label lastNameLabel = new Label(usr.getLastName());
+                info.getChildren().addAll(userNameLabel,firstNameLabel,lastNameLabel);
+                info.setSpacing(10);
+
+                switch (userCount%2){
+                    case 0:
+                        row.setBackground(new Background(new BackgroundFill(Color.web("#ebebeb"),CornerRadii.EMPTY,Insets.EMPTY)));
+                    break;
+                    case 1:
+                        row.setBackground(new Background(new BackgroundFill(Color.web("#cbcbcb"),CornerRadii.EMPTY,Insets.EMPTY)));
+                    break;
+                }
+                //hbox.setMaxWidth(Double.MAX_VALUE);
+                double hboxPrefWidth = adminUsersViewScrollPane.getWidth();
+                //hbox.setPrefWidth(hboxPrefWidth);
+                userNameLabel.setPrefWidth(hboxPrefWidth/3);
+                firstNameLabel.setPrefWidth(hboxPrefWidth/3);
+                lastNameLabel.setPrefWidth(hboxPrefWidth/3);
+                userNameLabel.setAlignment(Pos.CENTER_LEFT);
+                firstNameLabel.setAlignment(Pos.CENTER_LEFT);
+                lastNameLabel.setAlignment(Pos.CENTER_LEFT);
+                Button deleteImagesBtn = new Button();
+                deleteImagesBtn.setText("Poista kuvat");
+                deleteImagesBtn.setOnAction(event -> {
+                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Haluatko varmasti poistaa kaikki käyttäjän " + usr.getUserName() + " kuvat?");
+                    alert.setTitle("Vahvista");
+                    alert.setHeaderText(null);
+                    Optional<ButtonType> vastaus = alert.showAndWait();
+                    if (vastaus.isPresent() && vastaus.get() == ButtonType.OK) {
+                        database.deleteAllUserImages(usr.getUserID());
+                        Alert i = new Alert(Alert.AlertType.INFORMATION, "Poistettiin kaikki käyttäjän " + usr.getUserName() + " kuvat?");
+                        i.setTitle("Poistettu");
+                        i.setHeaderText(null);
+                        i.showAndWait();
+                        openAdminView();
+                    }
+                });
+                controls.getChildren().add(deleteImagesBtn);
+
+                adminViewUsersVBox.setMaxWidth(Double.MAX_VALUE);
+                adminViewUsersVBox.getChildren().add(row);
+                userCount++;
+
+
+            }
+
         }
+
+    }
+    @FXML
+    public void onAdminViewUserSearchTextTyped(){
+        String searchString = adminViewSearchUserTextField.getText();
+        Iterator<Node>it = adminViewUsersVBox.getChildren().iterator();
+        while (it.hasNext()){
+            VBox row = (VBox)it.next();
+            HBox info = (HBox)row.getChildren().get(0);
+            String username = ((Label)info.getChildren().get(0)).getText();
+            if (username.contains(searchString)){
+                row.setVisible(true);
+                row.setManaged(true);
+                System.out.print(username + ", ");
+            } else {
+                row.setVisible(false);
+                row.setManaged(false);
+            }
+
+        }
+        System.out.println(".");
+
     }
 
-    public void applyForAdmin(){
-        if (privateUserLevel < 500){
-            // Jos privateUserLevel >= 500, niin on jo pyydetty adminoikeuksia tai kyseessä on admin. -> ei tehä mitää
-            privateUserLevel += 500;
-            database.changeUserLevel(privateUserID, privateUserLevel);
-        }
+    @FXML
+    public void onAddNewAdminButtonClick(){
+        newAdminInfoVbox.setVisible(true);
     }
+    @FXML
+    public void onFinalAddNewAdminButtonClick(){
+        if (adminUsernameField.getText().equals("") || adminPasswordField.getText().equals("") ){
+            newAdminErrorText.setText("Käyttäjätunnus tai salasana ei voi olla tyhjä");
+
+        } else {
+            if (database.userExists(adminUsernameField.getText())){
+                newAdminErrorText.setText("Käyttäjätunnus on jo olemassa.");
+            } else {
+                newAdminErrorText.setText("");
+                database.saltRegister(adminUsernameField.getText(), adminPasswordField.getText(), adminEmailField.getText(), adminEmailField2.getText(), newAdminErrorText);
+                int userId = database.userAndPwExists(adminUsernameField.getText(), adminPasswordField.getText());
+                if (userId > 0){
+                    database.changeUserLevel(userId, 1000);
+                    adminUsernameField.clear();
+                    adminPasswordField.clear();
+                    adminEmailField.clear();
+                    adminEmailField2.clear();
+                    newAdminInfoVbox.setVisible(false);
+                    openAdminView();
+                }
+            }
+
+        }
+
+
+    }
+
+
+
 
 
 }

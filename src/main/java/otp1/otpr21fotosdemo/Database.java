@@ -34,7 +34,8 @@ public class Database {
     private FotosController controller;
 
     public Database() {
-
+        System.out.println("URL: " + url);
+        System.out.println("Env url: " + System.getenv("APP_DB_URL"));
     }
 
     public void setController(FotosController c) {
@@ -1345,12 +1346,6 @@ public class Database {
         }
     }
 
-    public void setAdmin(int userId){
-        changeUserLevel(userId, 1000);
-        deleteAllUserImages(userId);
-        //TODO delete all folders also
-
-    }
 
     public void deleteChildFolders(int parentfolderid) {
         System.out.println("Database.deleteParentFolders");
@@ -1401,6 +1396,73 @@ public class Database {
             }
 
         }
+    }
+
+    public ArrayList<FotosUser> listUsers(){
+        Connection conn = null;
+        ArrayList<FotosUser> list = new ArrayList<>();
+        try {
+            // Connection statement
+            conn = DriverManager.getConnection(url, dbUserName, dbPassword);
+            System.out.println("Database Connection Established...");
+
+            PreparedStatement pstmt = conn.prepareStatement("SELECT userName,userID,userLevel,surName,frontName,email FROM Fotos.User;");
+            ResultSet result = pstmt.executeQuery();
+
+            while (result.next()){
+                FotosUser user = new FotosUser();
+                user.setUserID(result.getInt("userID"));
+                user.setUserLevel(result.getInt("userLevel"));
+                user.setUserName(result.getString("userName"));
+                user.setFirstName(result.getString("frontName"));
+                user.setLastName(result.getString("surName"));
+                user.setEmail(result.getString("email"));
+                list.add(user);
+            }
+
+        } catch (Exception ex) {
+            System.err.println("Cannot connect to database server");
+            ex.printStackTrace();
+        } finally {
+            if (conn != null) {
+                try {
+                    System.out.println("***** Let terminate the Connection *****");
+                    conn.close();
+                    System.out.println("Database connection terminated...");
+                } catch (Exception ex) {
+                    System.out.println("Error in connection termination!");
+                }
+            }
+        }
+        return list;
+    }
+
+    public int countAdmins(){
+        Connection conn = null;
+        int count = 0;
+        try {
+            // Connection statement
+            conn = DriverManager.getConnection(url, dbUserName, dbPassword);
+            PreparedStatement statement = conn.prepareStatement("SELECT COUNT(*) FROM Fotos.User WHERE userLevel=1000");
+            ResultSet res = statement.executeQuery();
+            res.next();
+            count = res.getInt(1);
+
+        } catch (Exception ex) {
+            System.err.println("Cannot connect to database server");
+            ex.printStackTrace();
+        } finally {
+            if (conn != null) {
+                try {
+                    System.out.println("***** Let terminate the Connection *****");
+                    conn.close();
+                    System.out.println("Database connection terminated...");
+                } catch (Exception ex) {
+                    System.out.println("Error in connection termination!");
+                }
+            }
+        }
+        return count;
     }
 
 
