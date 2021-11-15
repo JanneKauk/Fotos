@@ -108,6 +108,7 @@ public class FotosController {
     private boolean databaseChanged = true;
     //private ArrayList<String> breadCrumbArrayList = new ArrayList<>();
     private int breadCrumbGridPaneCounter;
+    private boolean newestToOldestOrder = false;
 
     //Image Grid settings
     private int currentColumnCount, rows, maxCols = 8;
@@ -280,7 +281,13 @@ public class FotosController {
         StringBuilder b = new StringBuilder();
         b.append("Grids imageID:s: ");
         //Järjestetään lista imageID:n mukaan
-        TreeMap<Integer, Pair<String, Image>> sortedImages = new TreeMap<>(images);
+        TreeMap<Integer, Pair<String, Image>> sortedImages;
+        if (newestToOldestOrder) {
+            sortedImages = new TreeMap<>(Comparator.reverseOrder());
+        } else {
+            sortedImages = new TreeMap<>();
+        }
+        sortedImages.putAll(images);
         sortedImages.entrySet().stream().forEach(entry -> {
             b.append(entry.getKey() + " ");
         });
@@ -1419,9 +1426,20 @@ public class FotosController {
         refreshImageGrid();
     }
 
+    public void onNewestToOldestImageOrderButtonClick() {
+        newestToOldestOrder = true;
+        refreshImageGrid();
+    }
+
+    public void onOldestToNewestImageOrderButtonClick() {
+        newestToOldestOrder = false;
+        refreshImageGrid();
+    }
+
     public void resetFilters() {
         searchTextField.setText("");
         dateFilter.setValue(null);
+        newestToOldestOrder = false;
         refreshImageGrid();
     }
 
