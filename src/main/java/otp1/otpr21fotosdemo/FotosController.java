@@ -121,18 +121,28 @@ public class FotosController {
     private ArrayList<Integer> publicImagesInView;
     private ArrayList<FotosUser> userList; //For admin
 
-    @FXML
-    private void onFotosGridPaneClick() {
-        imageSelector.clearSelection();
-    }
-
-    @FXML
-    private void deleteTest() {
-        database.deleteImage(118);
-    }
-
+    private Locale curLocale;
+    private ResourceBundle langBundle;
     @FXML
     private void initialize() {
+        Properties properties = new Properties();
+        try {
+            String configPath = "src/main/resources/otp1/otpr21fotosdemo/Fotos.properties";
+            properties.load(new FileInputStream(configPath));
+            String lang = properties.getProperty("language");
+            String country = properties.getProperty("country");
+            curLocale = new Locale(lang,country);
+            Locale.setDefault(curLocale);
+            System.out.println("lang: " + lang + " country: " + country);
+
+            langBundle = ResourceBundle.getBundle("otp1.otpr21fotosdemo.TextResources", curLocale);
+
+            System.out.println("login: " + langBundle.getString("loginText"));
+
+        } catch (Exception e) {
+            System.err.println("Error loading properties");
+            e.printStackTrace();
+        }
         adminBorderPane.setVisible(false);
         newAdminInfoVbox.setVisible(false);
         displayImages = DisplayImages.PUBLIC;
@@ -568,7 +578,7 @@ public class FotosController {
             selectedImageIds.add(clickedImageDatabaseId);
         }
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Haluatko varmasti poistaa valitut " + selectedImageIds.size() + " kuvaa?");
-        alert.setTitle("Vahvista");
+        alert.setTitle(langBundle.getString("deleteImageConfirmationTitle"));
         alert.setHeaderText(null);
 
         Optional<ButtonType> vastaus = alert.showAndWait();
