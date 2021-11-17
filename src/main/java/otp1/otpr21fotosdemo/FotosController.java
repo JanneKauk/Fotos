@@ -9,12 +9,14 @@ import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.geometry.Side;
 import javafx.scene.Group;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
@@ -91,6 +93,8 @@ public class FotosController {
     private Label adminSettingsLabel;
     @FXML
     private BorderPane adminBorderPane;
+    @FXML
+    private Button kieliTestButton;
 
     private enum DisplayImages {
         OWN, PUBLIC, SHARED
@@ -126,6 +130,7 @@ public class FotosController {
     private ResourceBundle langBundle;
     @FXML
     private void initialize() {
+        /*
         Properties properties = new Properties();
         try {
             String configPath = "src/main/resources/otp1/otpr21fotosdemo/Fotos.properties";
@@ -138,12 +143,13 @@ public class FotosController {
 
             langBundle = ResourceBundle.getBundle("otp1.otpr21fotosdemo.TextResources", curLocale);
 
-            System.out.println("login: " + langBundle.getString("loginText"));
 
         } catch (Exception e) {
             System.err.println("Error loading properties");
             e.printStackTrace();
         }
+        */
+
         adminBorderPane.setVisible(false);
         newAdminInfoVbox.setVisible(false);
         displayImages = DisplayImages.PUBLIC;
@@ -214,6 +220,51 @@ public class FotosController {
             adjustImageGrid();
         });
         stage.setMaximized(true);
+    }
+
+    public void setLangBundleAndCurLocale(ResourceBundle bund, Locale loc){
+        langBundle = bund;
+        curLocale = loc;
+    }
+
+    @FXML
+    public void onKieliTestButtonClick(){
+
+        if (curLocale.getLanguage().equals("fi")){
+            System.out.println("CHANGING LANGUAGE: en" );
+            changeLanguage("en", "GB");
+        } else {
+            System.out.println("CHANGING LANGUAGE: fi" );
+            changeLanguage("fi", "FI");
+        }
+    }
+
+    public void changeLanguage(String lang, String country){
+
+        curLocale = new Locale(lang,country);
+        Locale.setDefault(curLocale);
+        langBundle = ResourceBundle.getBundle("otp1.otpr21fotosdemo.TextResources", curLocale);
+        FXMLLoader fxmlLoader = new FXMLLoader(Fotos.class.getResource("Fotos.fxml"), langBundle);
+
+        try {
+            Scene scene = new Scene(fxmlLoader.load(), 1280, 800);
+            mainStage.setScene(scene);
+            FotosController controller = fxmlLoader.getController();
+            controller.setLangBundleAndCurLocale(langBundle, curLocale);
+            controller.setMainStage(mainStage);
+
+            System.out.println("KIELI VAIHDETTU?!?!?!?");
+
+            //Alustustoimenpiteet
+            controller.initialize();
+
+        } catch (IOException e){
+            e.printStackTrace();
+        }
+
+
+
+
     }
 
     private void openImageview() {
