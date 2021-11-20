@@ -39,6 +39,7 @@ import javafx.util.Duration;
 import javafx.util.Pair;
 import org.w3c.dom.*;
 import java.io.*;
+import java.text.MessageFormat;
 import java.util.*;
 import java.util.List;
 
@@ -167,16 +168,6 @@ public class FotosController {
         filterMenu.setManaged(false);
         pictureInfo.setManaged(false);
 
-        /* Ei toimi vielä.....
-        //Foldermenu piiloo alussa
-        System.out.println("Foldermenu getheight... : " + folderMenu.getHeight() );
-        folderMenu.setViewOrder(1);
-        folderMenu.setTranslateY(-160);
-        System.out.println("Foldermenu translatey... : " + folderMenu.getTranslateY() );
-        folderButtonStackPane.setRotate(180);
-        folderMenu.setManaged(false);
-        BorderPane.setMargin(filterMenuHbox, new Insets(folderMenu.getHeight(), 0, 0, 0));
-*/
         uploadingStackPane.setVisible(false);
 
         //Uuden kansion -ja Login menu piiloo ja sen sisällä rekisteröitymiseen tarvittavat tekstikentät myös.
@@ -240,23 +231,24 @@ public class FotosController {
     }
 
     public void changeLanguage(String lang, String country){
-
         curLocale = new Locale(lang,country);
         Locale.setDefault(curLocale);
         langBundle = ResourceBundle.getBundle("otp1.otpr21fotosdemo.TextResources", curLocale);
         FXMLLoader fxmlLoader = new FXMLLoader(Fotos.class.getResource("Fotos.fxml"), langBundle);
 
-        try {
+        try {/*
             Scene scene = new Scene(fxmlLoader.load(), 1280, 800);
             mainStage.setScene(scene);
+            */
+            StackPane root2 = fxmlLoader.load();
+            mainStage.getScene().setRoot(root2);
             FotosController controller = fxmlLoader.getController();
             controller.setLangBundleAndCurLocale(langBundle, curLocale);
             controller.setMainStage(mainStage);
 
-            System.out.println("KIELI VAIHDETTU?!?!?!?");
-
             //Alustustoimenpiteet
             controller.initialize();
+            System.out.println("KIELI VAIHDETTU?!?!?!?");
 
         } catch (IOException e){
             e.printStackTrace();
@@ -482,16 +474,16 @@ public class FotosController {
                         //Right click
                         ContextMenu menu = new ContextMenu();
                         if (loggedIn) {
-                            MenuItem menuitem1 = new MenuItem("Aseta kaikki julkiseksi");
-                            MenuItem menuitem2 = new MenuItem("Aseta kaikki yksityiseksi");
+                            MenuItem menuitem1 = new MenuItem(langBundle.getString("imgMenuSetAllPublicText"));
+                            MenuItem menuitem2 = new MenuItem(langBundle.getString("imgMenuSetAllPrivateText"));
                             menuitem1.setOnAction(new EventHandler<ActionEvent>() {
                                 @Override
                                 public void handle(ActionEvent event) {
                                     //Julkiseksi
                                     int count = imageSelector.countSelected();
                                     count = count == 0 ? 1 : count; //Jos valittuna ei ole yhtään kuvaa niin asetetaan count=1, koska tällöin toiminto kohdistuu klikattuun kuvaan.
-                                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Haluatko varmasti asettaa valitut " + count + " kuvaa julkiseksi?");
-                                    alert.setTitle("Vahvista");
+                                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION, MessageFormat.format(langBundle.getString("publishMultipleImgConfirmationText"),count));
+                                    alert.setTitle(langBundle.getString("generalConfirmationTitle"));
                                     alert.setHeaderText(null);
 
                                     Optional<ButtonType> vastaus = alert.showAndWait();
@@ -500,13 +492,13 @@ public class FotosController {
                                         boolean success = setSelectedImagesPublicity(imageDatabaseId, true);
                                         refreshImageGrid();
                                         if (success) {
-                                            Alert info = new Alert(Alert.AlertType.INFORMATION, "Asetettiin valitut " + count + " kuvaa julkiseksi.");
-                                            info.setTitle("Julkistettu");
+                                            Alert info = new Alert(Alert.AlertType.INFORMATION, MessageFormat.format(langBundle.getString("publishMultipleImgSuccessText"),count));
+                                            info.setTitle(langBundle.getString("publishMultipleImgSuccessTitle"));
                                             info.setHeaderText(null);
                                             info.showAndWait();
                                         } else {
-                                            Alert info = new Alert(Alert.AlertType.ERROR, "Kuvien julkistuksessa tapahtui virhe");
-                                            info.setTitle("Virhe");
+                                            Alert info = new Alert(Alert.AlertType.ERROR, langBundle.getString("publishMultipleImgFailureText"));
+                                            info.setTitle(langBundle.getString("generalErrorTitle"));
                                             info.setHeaderText(null);
                                             info.showAndWait();
                                         }
@@ -520,8 +512,8 @@ public class FotosController {
                                     //Yksityiseksi
                                     int count = imageSelector.countSelected();
                                     count = count == 0 ? 1 : count; //Jos valittuna ei ole yhtään kuvaa niin asetetaan count=1, koska tällöin toiminto kohdistuu klikattuun kuvaan.
-                                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Haluatko varmasti asettaa valitut " + count + " kuvaa yksityiseksi?");
-                                    alert.setTitle("Vahvista");
+                                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION, MessageFormat.format(langBundle.getString("setPrivateMultipleImgConfirmationText"),count));
+                                    alert.setTitle(langBundle.getString("generalConfirmationTitle"));
                                     alert.setHeaderText(null);
 
                                     Optional<ButtonType> vastaus = alert.showAndWait();
@@ -530,13 +522,13 @@ public class FotosController {
                                         boolean success = setSelectedImagesPublicity(imageDatabaseId, false);
                                         refreshImageGrid();
                                         if (success) {
-                                            Alert info = new Alert(Alert.AlertType.INFORMATION, "Asetettiin valitut " + count + " kuvaa yksityiseksi.");
-                                            info.setTitle("Asetettu yksityiseksi");
+                                            Alert info = new Alert(Alert.AlertType.INFORMATION, MessageFormat.format(langBundle.getString("setPrivateMultipleImgSuccessText"),count));
+                                            info.setTitle(langBundle.getString("setPrivateMultipleImgSuccessTitle"));
                                             info.setHeaderText(null);
                                             info.showAndWait();
                                         } else {
-                                            Alert info = new Alert(Alert.AlertType.ERROR, "Kuvien asettamisessa yksityiseksi tapahtui virhe");
-                                            info.setTitle("Virhe");
+                                            Alert info = new Alert(Alert.AlertType.ERROR, langBundle.getString("setPrivateMultipleImgFailureText"));
+                                            info.setTitle(langBundle.getString("generalErrorTitle"));
                                             info.setHeaderText(null);
                                             info.showAndWait();
                                         }
@@ -548,8 +540,8 @@ public class FotosController {
                                 menu.getItems().addAll(menuitem2);
                             } else {
                                 //Kuvia on valittuna vain yksi tai right klikattiin yhtä kuvaa valitsematta useampaa.
-                                menuitem1.setText("Aseta julkiseksi");
-                                menuitem2.setText("Aseta yksityiseksi");
+                                menuitem1.setText(langBundle.getString("imgMenuSetOnePublicText"));
+                                menuitem2.setText(langBundle.getString("imgMenuSetOnePrivateText"));
                                 //Selvitetään kuvan julkisuus
                                 boolean publc;
                                 if (imageSelector.countSelected() == 0) {
@@ -568,7 +560,7 @@ public class FotosController {
                                 }
                             }
 
-                            MenuItem menuitem3 = new MenuItem("Poista");
+                            MenuItem menuitem3 = new MenuItem(langBundle.getString("imgMenuDeleteText"));
                             menu.getItems().addAll(menuitem3);
                             menuitem3.setOnAction(new EventHandler<ActionEvent>() {
                                 @Override
@@ -591,7 +583,7 @@ public class FotosController {
                 pStack.getChildren().add(p);
                 if (loggedIn && publicImagesInView.contains(imageDatabaseId)) {
                     //Jos kirjauduttu ja kuva on julkinen niin lisätään "Julkinen"-label kuvan oikeaan yläreunaan.
-                    Label publicLabel = new Label("Julkinen");
+                    Label publicLabel = new Label(langBundle.getString("imgThumbnailPublicLabel"));
                     publicLabel.setTextFill(Color.WHITE);
                     publicLabel.setPadding(new Insets(2.0));
                     publicLabel.setBackground(new Background(new BackgroundFill(Color.web("#5aaaf6", 0.85), new CornerRadii(2.0), Insets.EMPTY)));
@@ -635,8 +627,8 @@ public class FotosController {
         if (selectedImageIds.size() == 0) {
             selectedImageIds.add(clickedImageDatabaseId);
         }
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Haluatko varmasti poistaa valitut " + selectedImageIds.size() + " kuvaa?");
-        alert.setTitle(langBundle.getString("deleteImageConfirmationTitle"));
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, MessageFormat.format(langBundle.getString("deleteMultipleImgConfirmationText"),selectedImageIds.size()));
+        alert.setTitle(langBundle.getString("generalConfirmationTitle"));
         alert.setHeaderText(null);
 
         Optional<ButtonType> vastaus = alert.showAndWait();
@@ -657,13 +649,13 @@ public class FotosController {
 
             System.out.println("Deleted images with ids: " + b);
             if (success) {
-                Alert info = new Alert(Alert.AlertType.INFORMATION, "Poistettiin valitut " + selectedImageIds.size() + " kuvaa.");
-                info.setTitle("Poistettu");
+                Alert info = new Alert(Alert.AlertType.INFORMATION, MessageFormat.format(langBundle.getString("deleteMultipleImgSuccessText"),selectedImageIds.size()));
+                info.setTitle(langBundle.getString("deleteMultipleImgSuccessTitle"));
                 info.setHeaderText(null);
                 info.showAndWait();
             } else {
-                Alert info = new Alert(Alert.AlertType.ERROR, "Kuvan poistossa tapahtui virhe");
-                info.setTitle("Virhe");
+                Alert info = new Alert(Alert.AlertType.ERROR, langBundle.getString("deleteMultipleImgFailureText"));
+                info.setTitle(langBundle.getString("generalErrorTitle"));
                 info.setHeaderText(null);
                 info.showAndWait();
             }
@@ -770,7 +762,8 @@ public class FotosController {
         omatKuvatButton.setVisible(false);
         jaetutKuvatButton.setVisible(false);
         addImageButton.setVisible(false);
-        usernameLabel.setText("Kirjaudu/Rekisteröidy");
+        if (langBundle != null) // Tämä on vielä null kun käynnistyksessä initialize kutsuu (logout)
+            usernameLabel.setText(langBundle.getString("usernameLabelNotLoggedinText"));
         folderGridPane.getChildren().clear();
         newFolderButton.setVisible(false);
         switchToDefaultScene();
@@ -807,6 +800,7 @@ public class FotosController {
                 loadUserFolders(userid, 0);
                 omatKuvatButton.setVisible(true);
                 jaetutKuvatButton.setVisible(true);
+
                 addImageButton.setVisible(true);
                 newFolderButton.setVisible(true);
                 omatKuvatButton.requestFocus();
@@ -894,7 +888,7 @@ public class FotosController {
             if (mainStage != null) {
                 //Tiedostonvalintaikkuna
                 FileChooser fileChooser = new FileChooser();
-                fileChooser.setTitle("Valitse kuvatiedosto(t)");
+                fileChooser.setTitle(langBundle.getString("uploadImgFileChooserTitle"));
                 fileChooser.getExtensionFilters().addAll(
                         new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.gif")
                         // new FileChooser.ExtensionFilter("All Files", "*.*")
@@ -906,9 +900,11 @@ public class FotosController {
                     Stage dialog = new Stage();
                     StringBuilder kysymys = new StringBuilder();
                     if (files.size() == 1) {
-                        kysymys.append("Haluatko varmasti ladata palveluun seuraavan kuvan?\n");
+                        kysymys.append(langBundle.getString("uploadImgConfirmOneText"));
+                        kysymys.append("\n");
                     } else {
-                        kysymys.append("Haluatko varmasti ladata palveluun seuraavat " + files.size() + " kuvaa?\n");
+                        kysymys.append(MessageFormat.format(langBundle.getString("uploadImgConfirmMultipleText"), files.size()));
+                        kysymys.append("\n");
                     }
                     final int rows_in_confirmation = 10;
 
@@ -917,14 +913,15 @@ public class FotosController {
                     } else {
                         Iterator<File> it = files.iterator();
                         for (int i = 0; i < rows_in_confirmation; i++) {
-                            kysymys.append(it.next().getName() + '\n');
+                            kysymys.append(it.next().getName());
+                            kysymys.append("\n");
                         }
                         kysymys.append("...\n");
                     }
 
                     //Esitetään varmistuskysymys
                     Alert alert = new Alert(Alert.AlertType.CONFIRMATION, kysymys.toString());
-                    alert.setTitle("Vahvista");
+                    alert.setTitle(langBundle.getString("generalConfirmationTitle"));
                     alert.setHeaderText(null);
 
                     Optional<ButtonType> vastaus = alert.showAndWait();
@@ -947,7 +944,7 @@ public class FotosController {
                                 uploadingStackPane.setVisible(false);
                                 addImageButtonImageView.setVisible(true);
                                 adjustImageGrid();
-                                System.out.println("adjusted?");
+                                //System.out.println("adjusted?");
                             });
 
                         };
@@ -1110,7 +1107,7 @@ public class FotosController {
         if (privateUserLevel == 1000){
             //Adminoikeudet
             adminSettingsLabel.setVisible(true);
-            adminSettingsLabel.setText("Ylläpitäjä");
+            adminSettingsLabel.setText(langBundle.getString("adminStatusLabelText"));
             adminBorderPane.setVisible(false);
 
         } else {
@@ -1536,16 +1533,16 @@ public class FotosController {
             row.getChildren().addAll(info,controls);
 
             Button deleteBtn = new Button();
-            deleteBtn.setText("Poista");
+            deleteBtn.setText(langBundle.getString("adminDeleteUserBtnText"));
             deleteBtn.setOnAction(event -> {
-                Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Haluatko varmasti poistaa käyttäjän " + usr.getUserName() + "?");
-                alert.setTitle("Vahvista");
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION, MessageFormat.format(langBundle.getString("adminDeleteUserConfirmationText"), usr.getUserName()));
+                alert.setTitle(langBundle.getString("generalConfirmationTitle"));
                 alert.setHeaderText(null);
                 Optional<ButtonType> vastaus = alert.showAndWait();
                 if (vastaus.isPresent() && vastaus.get() == ButtonType.OK) {
                     if (usr.getUserLevel() == 1000 && database.countAdmins() == 1){
-                        Alert i = new Alert(Alert.AlertType.INFORMATION, "Varoitus! Viimeistä adminia ei voi poistaa tätä kautta.");
-                        i.setTitle("Varoitus");
+                        Alert i = new Alert(Alert.AlertType.INFORMATION, langBundle.getString("adminLastAdminDeleteWarningText"));
+                        i.setTitle(langBundle.getString("adminLastAdminDeleteWarningTitle"));
                         i.setHeaderText(null);
                         i.showAndWait();
                     } else {
@@ -1601,15 +1598,15 @@ public class FotosController {
                 firstNameLabel.setAlignment(Pos.CENTER_LEFT);
                 lastNameLabel.setAlignment(Pos.CENTER_LEFT);
                 Button deleteImagesBtn = new Button();
-                deleteImagesBtn.setText("Poista kuvat");
+                deleteImagesBtn.setText(langBundle.getString("adminDeleteImagesBtnText"));
                 deleteImagesBtn.setOnAction(event -> {
-                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Haluatko varmasti poistaa kaikki käyttäjän " + usr.getUserName() + " kuvat?");
-                    alert.setTitle("Vahvista");
+                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION, MessageFormat.format(langBundle.getString("adminDeleteUserImagesConfirmationText"), usr.getUserName()));
+                    alert.setTitle(langBundle.getString("generalConfirmationTitle"));
                     alert.setHeaderText(null);
                     Optional<ButtonType> vastaus = alert.showAndWait();
                     if (vastaus.isPresent() && vastaus.get() == ButtonType.OK) {
                         database.deleteAllUserImages(usr.getUserID());
-                        Alert i = new Alert(Alert.AlertType.INFORMATION, "Poistettiin kaikki käyttäjän " + usr.getUserName() + " kuvat?");
+                        Alert i = new Alert(Alert.AlertType.INFORMATION, "Poistettiin kaikki käyttäjän " + usr.getUserName() + " kuvat");
                         i.setTitle("Poistettu");
                         i.setHeaderText(null);
                         i.showAndWait();

@@ -82,7 +82,7 @@
                                     <Button fx:id="jaetutKuvatButton" mnemonicParsing="false" onAction="#onSharedImagesButtonClick" prefWidth="150.0" text="Jaetut kuvat" />
                                     <Region HBox.hgrow="ALWAYS" />
                                     <Button fx:id="kieliTestButton" mnemonicParsing="false" onAction="#onKieliTestButtonClick" prefWidth="150.0" text="KieliTest" />
-                                    <Label fx:id="usernameLabel" text="%usernameLabelText">
+                                    <Label fx:id="usernameLabel" text="%usernameLabelNotLoggedinText">
                                        <font>
                                           <Font name="System Bold" size="12.0" />
                                        </font>
@@ -450,7 +450,7 @@
                               <Image url="@image/loading-icon-transparent-background-white.png" />
                            </image>
                         </ImageView>
-                        <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Ladataan...">
+                        <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="%uploadImgButtonUploadingText">
                            <font>
                               <Font size="18.0" />
                            </font>

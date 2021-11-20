@@ -34,8 +34,8 @@ public class Database {
     private FotosController controller;
 
     public Database() {
-        System.out.println("URL: " + url);
-        System.out.println("Env url: " + System.getenv("APP_DB_URL"));
+        //System.out.println("URL: " + url);
+        //System.out.println("Env url: " + System.getenv("APP_DB_URL"));
     }
 
     public void setController(FotosController c) {
