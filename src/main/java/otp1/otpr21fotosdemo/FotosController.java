@@ -785,7 +785,7 @@ public class FotosController {
     @FXML
     private void login() {
         if (Objects.equals(usernameField.getText(), "")) {
-            loginErrorText.setText("Syötä käyttäjätunnus");
+            loginErrorText.setText(langBundle.getString("loginErrorUsernamePasswordEmpty"));
         } else if (database.userAndPwExists(usernameField.getText(), passwordField.getText()) != 0) {
             int userid = database.userAndPwExists(usernameField.getText(), passwordField.getText());
             loggedIn = true;
@@ -823,21 +823,23 @@ public class FotosController {
             resetFilters();
 
         } else {
-            loginErrorText.setText("Käyttäjänimi tai salasana väärin");
+            loginErrorText.setText(langBundle.getString("loginErrorWrongUsernamePassword"));
         }
     }
 
     @FXML
     private void registerMenu() throws UnsupportedEncodingException {
         System.out.println("emailvbox: " + emailVbox.isVisible());
-        if (emailVbox.isVisible()) {
+        if (Objects.equals(usernameField.getText(), "") || passwordField.getText().equals("")) {
+            loginErrorText.setText(langBundle.getString("loginErrorUsernamePasswordEmpty"));
+        } else if (emailVbox.isVisible()) {
             // Lähetetään pyyntö back-end koodin puolelle, jossa toteutetaan tarkistukset ja datan pusku palvelimelle
             if (!database.userExists(usernameField.getText())) {
                 database.saltRegister(usernameField.getText(), passwordField.getText(), emailField1.getText(), emailField2.getText(), loginErrorText);
                 //Tehdään root-kansio uudelle käyttäjälle
                 int userid = database.userAndPwExists(usernameField.getText(), passwordField.getText());
             } else {
-                loginErrorText.setText("Tämä käyttäjä on jo olemassa");
+                loginErrorText.setText(langBundle.getString("loginErrorRegisterUsernameAlreadyExists"));
             }
 
             loginButton.setVisible(true);
@@ -1606,8 +1608,8 @@ public class FotosController {
                     Optional<ButtonType> vastaus = alert.showAndWait();
                     if (vastaus.isPresent() && vastaus.get() == ButtonType.OK) {
                         database.deleteAllUserImages(usr.getUserID());
-                        Alert i = new Alert(Alert.AlertType.INFORMATION, "Poistettiin kaikki käyttäjän " + usr.getUserName() + " kuvat");
-                        i.setTitle("Poistettu");
+                        Alert i = new Alert(Alert.AlertType.INFORMATION, MessageFormat.format(langBundle.getString("adminDeleteUserImagesSuccessText"),usr.getUserName()));
+                        i.setTitle(langBundle.getString("adminDeleteUserImagesSuccessTitle"));
                         i.setHeaderText(null);
                         i.showAndWait();
                         openAdminView();
@@ -1633,7 +1635,7 @@ public class FotosController {
             VBox row = (VBox)it.next();
             HBox info = (HBox)row.getChildren().get(0);
             String username = ((Label)info.getChildren().get(0)).getText();
-            if (username.contains(searchString)){
+            if (username.toLowerCase().contains(searchString.toLowerCase())){
                 row.setVisible(true);
                 row.setManaged(true);
                 System.out.print(username + ", ");
@@ -1649,16 +1651,17 @@ public class FotosController {
 
     @FXML
     public void onAddNewAdminButtonClick(){
-        newAdminInfoVbox.setVisible(true);
+        newAdminInfoVbox.setVisible(!newAdminInfoVbox.isVisible());
+
     }
     @FXML
     public void onFinalAddNewAdminButtonClick(){
         if (adminUsernameField.getText().equals("") || adminPasswordField.getText().equals("") ){
-            newAdminErrorText.setText("Käyttäjätunnus tai salasana ei voi olla tyhjä");
+            newAdminErrorText.setText(langBundle.getString("adminNewAdminErrorUserEmpty"));
 
         } else {
             if (database.userExists(adminUsernameField.getText())){
-                newAdminErrorText.setText("Käyttäjätunnus on jo olemassa.");
+                newAdminErrorText.setText(langBundle.getString("adminNewAdminErrorUserExists"));
             } else {
                 newAdminErrorText.setText("");
                 database.saltRegister(adminUsernameField.getText(), adminPasswordField.getText(), adminEmailField.getText(), adminEmailField2.getText(), newAdminErrorText);

@@ -356,9 +356,9 @@
             </BorderPane>
             <VBox fx:id="loginVbox" blendMode="SRC_ATOP" maxHeight="200.0" maxWidth="160.0" prefHeight="200.0" prefWidth="100.0" style="-fx-background-color: white; -fx-border-width: 1; -fx-border-color: black; -fx-border-radius: 15; -fx-background-radius: 15;" StackPane.alignment="TOP_RIGHT">
                <children>
-                  <Label text="Käyttäjätunnus" />
+                  <Label text="%loginUserName" />
                   <TextField fx:id="usernameField" onAction="#login" />
-                  <Label text="Salasana">
+                  <Label text="%loginPassword">
                      <VBox.margin>
                         <Insets top="10.0" />
                      </VBox.margin>
@@ -366,13 +366,13 @@
                   <PasswordField fx:id="passwordField" onAction="#login" />
                   <VBox fx:id="emailVbox">
                      <children>
-                        <Label text="Sähköposti">
+                        <Label text="%loginEmail">
                            <VBox.margin>
                               <Insets top="10.0" />
                            </VBox.margin>
                         </Label>
                         <TextField fx:id="emailField1" />
-                        <Label text="Sähköposti uudelleen">
+                        <Label text="%loginEmailAgain">
                            <VBox.margin>
                               <Insets top="10.0" />
                            </VBox.margin>
@@ -385,12 +385,12 @@
                         <Insets bottom="5.0" top="5.0" />
                      </VBox.margin>
                   </Text>
-                  <Button fx:id="loginButton" mnemonicParsing="false" onAction="#login" style="-fx-background-color: #59c3f4;" text="Kirjaudu">
+                  <Button fx:id="loginButton" mnemonicParsing="false" onAction="#login" style="-fx-background-color: #59c3f4;" text="%loginLoginButtonText">
                      <VBox.margin>
                         <Insets />
                      </VBox.margin>
                   </Button>
-                  <Button mnemonicParsing="false" onAction="#registerMenu" text="Rekisteröidy">
+                  <Button mnemonicParsing="false" onAction="#registerMenu" text="%loginRegisterButtonText">
                      <VBox.margin>
                         <Insets top="20.0" />
                      </VBox.margin>
@@ -637,12 +637,12 @@
                      <children>
                         <Group fx:id="usersGroup">
                            <children>
-                              <Label text="Käyttäjät" textFill="#7c7c7c">
+                              <Label text="%adminUsersLabel" textFill="#7c7c7c">
                                  <font>
                                     <Font name="System Bold" size="30.0" />
                                  </font>
                               </Label>
-                              <Label layoutY="45.33333206176758" text="Hae käyttäjätunnuksella:" textFill="#7c7c7c">
+                              <Label layoutY="45.33333206176758" text="%adminSearchByUserNameText" textFill="#7c7c7c">
                                  <font>
                                     <Font size="13.0" />
                                  </font>
@@ -684,12 +684,12 @@
                            <children>
                               <Group fx:id="adminsGroup">
                                  <children>
-                                    <Label text="Ylläpitäjät" textFill="#7c7c7c">
+                                    <Label text="%adminAdminsLabel" textFill="#7c7c7c">
                                        <font>
                                           <Font name="System Bold" size="30.0" />
                                        </font>
                                     </Label>
-                                    <Button layoutY="45.33333206176758" mnemonicParsing="false" onAction="#onAddNewAdminButtonClick" text="Luo uusi" />
+                                    <Button layoutY="45.33333206176758" mnemonicParsing="false" onAction="#onAddNewAdminButtonClick" text="%adminCreateNewAdminBtnText" />
                                  </children>
                               </Group>
                               <ScrollPane fx:id="adminViewAdminsScrollPane" fitToWidth="true" minHeight="30.0" prefHeight="520.0">
@@ -704,9 +704,9 @@
                         </VBox>
                         <VBox fx:id="newAdminInfoVbox" blendMode="SRC_ATOP" maxHeight="200.0" maxWidth="160.0" prefHeight="200.0" prefWidth="160.0" style="-fx-background-color: white; -fx-border-width: 1; -fx-border-color: black; -fx-border-radius: 15; -fx-background-radius: 15;" visible="false" StackPane.alignment="TOP_LEFT">
                            <children>
-                              <Label text="Käyttäjätunnus" />
+                              <Label text="%adminNewAdminUserName" />
                               <TextField fx:id="adminUsernameField" onAction="#login" />
-                              <Label text="Salasana">
+                              <Label text="%adminNewAdminPassword">
                                  <VBox.margin>
                                     <Insets top="10.0" />
                                  </VBox.margin>
@@ -714,13 +714,13 @@
                               <PasswordField fx:id="adminPasswordField" onAction="#login" />
                               <VBox fx:id="emailVbox1">
                                  <children>
-                                    <Label text="Sähköposti">
+                                    <Label text="%adminNewAdminEmail">
                                        <VBox.margin>
                                           <Insets top="10.0" />
                                        </VBox.margin>
                                     </Label>
                                     <TextField fx:id="adminEmailField" />
-                                    <Label text="Sähköposti uudelleen">
+                                    <Label text="%adminNewAdminEmailAgain">
                                        <VBox.margin>
                                           <Insets top="10.0" />
                                        </VBox.margin>
@@ -733,7 +733,7 @@
                                     <Insets top="5.0" />
                                  </VBox.margin>
                               </Text>
-                              <Button mnemonicParsing="false" onAction="#onFinalAddNewAdminButtonClick" text="Lisää uusi ylläpitäjä">
+                              <Button mnemonicParsing="false" onAction="#onFinalAddNewAdminButtonClick" text="%adminCreateNewAdminFinalBtnText">
                                  <VBox.margin>
                                     <Insets top="20.0" />
                                  </VBox.margin>
@@ -752,7 +752,7 @@
             </GridPane>
          </center>
          <top>
-            <Label alignment="CENTER" text="Ylläpito" textAlignment="CENTER" BorderPane.alignment="CENTER">
+            <Label alignment="CENTER" text="%adminAdminViewTitle" textAlignment="CENTER" BorderPane.alignment="CENTER">
                <font>
                   <Font name="System Bold" size="43.0" />
                </font>
