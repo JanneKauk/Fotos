@@ -1180,20 +1180,20 @@ public class FotosController {
 
     @FXML
     public void deleteUserImages() {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Haluatko varmasti poistaa kaikki kuvat");
-        alert.setTitle("Vahvista");
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, langBundle.getString("deleteUserImagesAlertText"));
+        alert.setTitle(langBundle.getString("deleteUserImagesAlertTitle"));
         alert.setHeaderText(null);
 
         Optional<ButtonType> vastaus = alert.showAndWait();
         if (vastaus.isPresent() && vastaus.get() == ButtonType.OK) {
             if (database.deleteAllUserImages(privateUserID)) {
-                Alert alert2 = new Alert(Alert.AlertType.INFORMATION, "Kaikki kuvat poistettu onnistuneesti");
-                alert2.setTitle("Kuvat poistettu");
+                Alert alert2 = new Alert(Alert.AlertType.INFORMATION, langBundle.getString("photosDeletedAlertText"));
+                alert2.setTitle(langBundle.getString("photosDeletedAlertTitle"));
                 alert2.setHeaderText(null);
                 alert2.showAndWait();
             } else {
-                Alert alert3 = new Alert(Alert.AlertType.INFORMATION, "Kuvien poisto epäonnistui, yritä uudestan");
-                alert3.setTitle("Kuvat eivät poistunut");
+                Alert alert3 = new Alert(Alert.AlertType.INFORMATION, langBundle.getString("photosDeletedErrorAlertText"));
+                alert3.setTitle(langBundle.getString("photosDeletedErrorAlertTitle"));
                 alert3.setHeaderText(null);
                 alert3.showAndWait();
             }
@@ -1204,22 +1204,22 @@ public class FotosController {
 
     @FXML
     public void deleteUser() {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Haluatko varmasti poistaa tilin? Huom. myös kaikki tallennetut kuvat poistetaan!");
-        alert.setTitle("Vahvista");
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, langBundle.getString("deleteAccountAlertText"));
+        alert.setTitle(langBundle.getString("deleteAccountAlertTitle"));
         alert.setHeaderText(null);
 
         Optional<ButtonType> vastaus = alert.showAndWait();
         if (vastaus.isPresent() && vastaus.get() == ButtonType.OK) {
             if (database.deleteUser(privateUserID)) {
-                Alert alert2 = new Alert(Alert.AlertType.INFORMATION, "Tili poistettu onnistuneesti");
-                alert2.setTitle("Tili poistettu");
+                Alert alert2 = new Alert(Alert.AlertType.INFORMATION, langBundle.getString("accountDeletedAlertText"));
+                alert2.setTitle(langBundle.getString("accountDeletedAlertTitle"));
                 alert2.setHeaderText(null);
                 alert2.showAndWait();
 
                 logout();
             } else {
-                Alert alert3 = new Alert(Alert.AlertType.INFORMATION, "Tilin poisto epäonnistui, yritä uudestan");
-                alert3.setTitle("Tili ei poistunut");
+                Alert alert3 = new Alert(Alert.AlertType.INFORMATION, langBundle.getString("accountDeletedErrorAlertText"));
+                alert3.setTitle(langBundle.getString("accountDeletedErrorAlertTitle"));
                 alert3.setHeaderText(null);
                 alert3.showAndWait();
             }
@@ -1461,6 +1461,8 @@ public class FotosController {
     }
 
     public void onOwnImagesButtonClick() {
+        folderGridPane.getChildren().clear();
+        loadUserRootFolder();
         displayImages = DisplayImages.OWN;
         refreshImageGrid();
     }
