@@ -811,8 +811,12 @@ public class FotosController {
 
             usernameLabel.setText(usernameField.getText());
             settingsUserName.setText(usernameField.getText());
-            settingsSurNameTextField.setText(settingsSurNameString);
-            settingsFrontNameTextField.setText(settingsFrontNameString);
+            if (!settingsSurNameString.equals("empty")) {
+                settingsSurNameTextField.setText(settingsSurNameString);
+            }
+            if (!settingsFrontNameString.equals("empty")) {
+                settingsFrontNameTextField.setText(settingsFrontNameString);
+            }
             settingsEmailTextField.setText(settingsEmailString);
             userName = usernameField.getText();
             loginVbox.setVisible(false);
@@ -974,7 +978,7 @@ public class FotosController {
             //Tehdään valikko, joka ilmestyy profiilikuvan alle.
             ContextMenu menu = new ContextMenu();
             //Tehdään valikon valinnat ja lisätään niille tarvittavat toiminnot.
-            MenuItem settings = new MenuItem("Asetukset");
+            MenuItem settings = new MenuItem(langBundle.getString("settingsMenuItemText"));
             settings.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent event) {
@@ -986,7 +990,7 @@ public class FotosController {
                     }
                 }
             });
-            MenuItem logout = new MenuItem("Kirjaudu ulos");
+            MenuItem logout = new MenuItem(langBundle.getString("logOutMenuItemText"));
             logout.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent event) {
@@ -1150,10 +1154,10 @@ public class FotosController {
         String userFrontName = settingsFrontNameTextField.getText();
         String userEmail = settingsEmailTextField.getText();
         if (database.changeUserInfoDB(userSurName, userFrontName, userEmail, privateUserID)) {
-            settingsUserInfoUpdateResponse.setText("Käyttäjän tiedot päivitetty onnistuneesti");
+            settingsUserInfoUpdateResponse.setText(langBundle.getString("successfulUserInfoUpdate"));
             settingsUserInfoUpdateResponse.setStyle("-fx-text-fill: black");
         } else {
-            settingsUserInfoUpdateResponse.setText("Käyttäjän tietojen päivittäminen epäonnistui");
+            settingsUserInfoUpdateResponse.setText(langBundle.getString("unsuccessfulUserInfoUpdate"));
             settingsUserInfoUpdateResponse.setStyle("-fx-text-fill: red");
         }
     }
@@ -1165,15 +1169,15 @@ public class FotosController {
         String newPasswordAgain = settingsNewPasswordAgain.getText();
 
         if (!Objects.equals(newPassword, newPasswordAgain)) {
-            settingsUserPasswordUpdateResponse.setText("Uuden salasanan pitää olla samanlainen molemmassa kentässä");
+            settingsUserPasswordUpdateResponse.setText(langBundle.getString("samePasswordInBothFieldsText"));
             settingsUserPasswordUpdateResponse.setStyle("-fx-text-fill: red");
         } else if (database.userAndPwExists(userName, oldPassword) != 0) {
             if (database.changeUserPassword(privateUserID, newPassword)) {
-                settingsUserPasswordUpdateResponse.setText("Uuden salasanan uusiminen onnistui");
+                settingsUserPasswordUpdateResponse.setText(langBundle.getString("passwordChangeSuccessfulText"));
                 settingsUserPasswordUpdateResponse.setStyle("-fx-text-fill: black");
             }
         } else {
-            settingsUserPasswordUpdateResponse.setText("Salasanan uusimisessa tapahtui virhe");
+            settingsUserPasswordUpdateResponse.setText(langBundle.getString("passwordChangeUnsuccessfulText"));
             settingsUserPasswordUpdateResponse.setStyle("-fx-text-fill: red");
         }
     }

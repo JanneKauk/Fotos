@@ -183,30 +183,24 @@
                      <children>
                         <Pane fx:id="filterMenu" prefWidth="200.0" style="-fx-border-color: grey; -fx-background-color: white">
                            <children>
-                              <Label layoutX="45.0" layoutY="140.0" text="Latauspäivämäärä">
+                              <Label layoutX="50.0" layoutY="140.0" text="%uploadDateText">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
                               </Label>
-                              <DatePicker fx:id="dateFilter" layoutX="15.0" layoutY="160.0" onAction="#onDatepickerClick" prefHeight="25.0" prefWidth="172.0" promptText="Syötä latauspäivämäärä..." />
-                              <Slider layoutX="25.0" layoutY="215.0" prefHeight="25.0" prefWidth="140.0" value="50.0" />
-                              <SplitMenuButton fx:id="imageOrderButton" layoutX="60.0" layoutY="95.0" mnemonicParsing="false" text="Järjestä">
+                              <DatePicker fx:id="dateFilter" layoutX="15.0" layoutY="160.0" onAction="#onDatepickerClick" prefHeight="25.0" prefWidth="172.0" promptText="%datePickerPlaceholder" />
+                              <SplitMenuButton fx:id="imageOrderButton" layoutX="55.0" layoutY="95.0" mnemonicParsing="false" text="%organizeSplitMenuPlaceholder">
                                 <items>
-                                  <MenuItem mnemonicParsing="false" onAction="#onNewestToOldestImageOrderButtonClick" text="Uusimmasta vanhimpaan" />
-                                  <MenuItem mnemonicParsing="false" onAction="#onOldestToNewestImageOrderButtonClick" text="Vanhimmasta uusimpaan" />
+                                  <MenuItem mnemonicParsing="false" onAction="#onNewestToOldestImageOrderButtonClick" text="%organizeNewestToOldest" />
+                                  <MenuItem mnemonicParsing="false" onAction="#onOldestToNewestImageOrderButtonClick" text="%organizeOldestToNewest" />
                                 </items>
                               </SplitMenuButton>
-                              <Label layoutX="31.0" layoutY="14.0" text="Tarkennettu haku" textAlignment="CENTER">
+                              <Label layoutX="31.0" layoutY="14.0" text="%advancedSearchHeader" textAlignment="CENTER">
                                  <font>
                                     <Font size="18.0" />
                                  </font>
                               </Label>
-                              <Label layoutX="60.0" layoutY="200.0" text="Kuvan koko" textAlignment="CENTER">
-                                 <font>
-                                    <Font size="14.0" />
-                                 </font>
-                              </Label>
-                              <Button fx:id="resetFilters" layoutX="45.0" layoutY="259.0" mnemonicParsing="false" onAction="#resetFilters" text="Tyhjennä valinnat" />
+                              <Button fx:id="resetFilters" layoutX="45.0" layoutY="210.0" mnemonicParsing="false" onAction="#resetFilters" text="%resetFiltersButtonText" />
                            </children>
                         </Pane>
                         <StackPane>
