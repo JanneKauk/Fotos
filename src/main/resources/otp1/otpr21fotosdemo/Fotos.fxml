@@ -62,7 +62,10 @@
                                     <Region HBox.hgrow="ALWAYS" />
                                     <Button fx:id="jaetutKuvatButton" mnemonicParsing="false" onAction="#onSharedImagesButtonClick" prefWidth="150.0" text="Jaetut kuvat" />
                                     <Region HBox.hgrow="ALWAYS" />
-                                    <Button fx:id="kieliTestButton" mnemonicParsing="false" onAction="#onKieliTestButtonClick" prefWidth="150.0" text="KieliTest" />
+                                    <ChoiceBox fx:id="languageChoiceBox" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="60.0">
+                                       <HBox.margin>
+                                          <Insets right="20.0" />
+                                       </HBox.margin></ChoiceBox>
                                     <Label fx:id="usernameLabel" text="%usernameLabelNotLoggedinText">
                                        <font>
                                           <Font name="System Bold" size="12.0" />

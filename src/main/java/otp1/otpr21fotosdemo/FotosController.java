@@ -95,7 +95,7 @@ public class FotosController {
     @FXML
     private BorderPane adminBorderPane;
     @FXML
-    private Button kieliTestButton;
+    private ChoiceBox<String> languageChoiceBox;
 
     private enum DisplayImages {
         OWN, PUBLIC, SHARED
@@ -150,7 +150,6 @@ public class FotosController {
             e.printStackTrace();
         }
         */
-
         adminBorderPane.setVisible(false);
         newAdminInfoVbox.setVisible(false);
         displayImages = DisplayImages.PUBLIC;
@@ -216,18 +215,16 @@ public class FotosController {
     public void setLangBundleAndCurLocale(ResourceBundle bund, Locale loc){
         langBundle = bund;
         curLocale = loc;
-    }
-
-    @FXML
-    public void onKieliTestButtonClick(){
-
-        if (curLocale.getLanguage().equals("fi")){
-            System.out.println("CHANGING LANGUAGE: en" );
-            changeLanguage("en", "GB");
-        } else {
-            System.out.println("CHANGING LANGUAGE: fi" );
-            changeLanguage("fi", "FI");
-        }
+        languageChoiceBox.getItems().addAll("FI", "EN");
+        languageChoiceBox.setValue(curLocale.getLanguage().toUpperCase());
+        languageChoiceBox.setOnAction(event -> {
+            String selection = languageChoiceBox.getValue();
+            if (selection.equals("FI") && !curLocale.getLanguage().equals("fi")) {
+                changeLanguage("fi", "FI");
+            } else if (selection.equals("EN")  && !curLocale.getLanguage().equals("en")) {
+                changeLanguage("en", "GB");
+            }
+        });
     }
 
     public void changeLanguage(String lang, String country){
