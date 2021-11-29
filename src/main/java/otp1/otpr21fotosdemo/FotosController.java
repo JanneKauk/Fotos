@@ -470,7 +470,7 @@ public class FotosController {
                     } else if (event.getButton() == MouseButton.SECONDARY) {
                         //Right click
                         ContextMenu menu = new ContextMenu();
-                        if (loggedIn) {
+                        if (loggedIn && displayImages == DisplayImages.OWN) {
                             MenuItem menuitem1 = new MenuItem(langBundle.getString("imgMenuSetAllPublicText"));
                             MenuItem menuitem2 = new MenuItem(langBundle.getString("imgMenuSetAllPrivateText"));
                             menuitem1.setOnAction(new EventHandler<ActionEvent>() {
