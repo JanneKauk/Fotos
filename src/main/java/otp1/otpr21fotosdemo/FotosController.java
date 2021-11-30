@@ -1310,7 +1310,7 @@ public class FotosController {
                 public void handle(MouseEvent mouseEvent) {
                     if (mouseEvent.getButton() == MouseButton.SECONDARY) {
                         ContextMenu menu = new ContextMenu();
-                        MenuItem menuitem1 = new MenuItem("Poista");
+                        MenuItem menuitem1 = new MenuItem(langBundle.getString("foldersContextMenuDeleteFolder"));
                         menu.getItems().addAll(menuitem1);
                         menuitem1.setOnAction(new EventHandler<ActionEvent>() {
                             @Override
@@ -1342,11 +1342,11 @@ public class FotosController {
         String newfoldername;
 
         if (folderNameField.getText().equals("")) {
-            newFolderErrorText.setText("Anna kansiolle nimi");
+            newFolderErrorText.setText(langBundle.getString("newFolderNoFolderNameErrorText"));
             newFolderErrorText.setVisible(true);
             newFolderErrorText.setManaged(true);
         } else if (folderNameField.getText().equals("root") || folderNameField.getText().equals("ROOT")) {
-            newFolderErrorText.setText("Kansiolle ei voi antaa nimeksi root");
+            newFolderErrorText.setText(langBundle.getString("newFolderFolderNameIsRootErrorText"));
             newFolderErrorText.setVisible(true);
             newFolderErrorText.setManaged(true);
         } else {

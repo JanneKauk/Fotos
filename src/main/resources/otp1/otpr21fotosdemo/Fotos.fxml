@@ -272,7 +272,7 @@
                                             <TextField fx:id="settingsFrontNameTextField" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="223.0" GridPane.rowIndex="6" />
                                             <Label text="%emailLabel" GridPane.rowIndex="7" />
                                             <TextField fx:id="settingsEmailTextField" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="223.0" GridPane.rowIndex="8" />
-                                    <Text fx:id="settingsUserName" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" GridPane.rowIndex="1">
+                                    <Text fx:id="settingsUserName" strokeType="OUTSIDE" strokeWidth="0.0" text="" GridPane.rowIndex="1">
                                        <GridPane.margin>
                                           <Insets left="100.0" />
                                        </GridPane.margin></Text>
@@ -281,7 +281,7 @@
                                                     <Font size="13.0" />
                                                 </font>
                                     </Label>
-                                    <Label fx:id="adminSettingsLabel" text="Ylläpitäjä" textFill="#ef5353" GridPane.rowIndex="2">
+                                    <Label fx:id="adminSettingsLabel" text="" textFill="#ef5353" GridPane.rowIndex="2">
                                        <font>
                                           <Font size="13.0" />
                                        </font>
@@ -653,17 +653,17 @@
                                  <children>
                                     <HBox prefHeight="100.0" prefWidth="200.0" spacing="10.0">
                                        <children>
-                                          <Label text="Sukunimi" textFill="#7c7c7c">
+                                          <Label text="Placeholder" textFill="#7c7c7c">
                                              <font>
                                                 <Font size="13.0" />
                                              </font>
                                           </Label>
-                                          <Label text="Sukunimi" textFill="#cbcbcb">
+                                          <Label text="Placeholder" textFill="#cbcbcb">
                                              <font>
                                                 <Font size="13.0" />
                                              </font>
                                           </Label>
-                                          <Label prefHeight="19.0" prefWidth="70.0" text="Sukunimi" textFill="#7c7c7c">
+                                          <Label prefHeight="19.0" prefWidth="70.0" text="Placeholder" textFill="#7c7c7c">
                                              <font>
                                                 <Font size="13.0" />
                                              </font>
