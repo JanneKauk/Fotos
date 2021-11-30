@@ -47,13 +47,13 @@
                            <children>
                               <HBox alignment="CENTER" GridPane.hgrow="ALWAYS">
                                  <children>
-                                    <Circle fill="DODGERBLUE" onMouseClicked="#switchToDefaultScene" radius="17.0" stroke="BLACK" strokeType="INSIDE">
+                                    <Circle fill="DODGERBLUE" onMouseClicked="#onFotosLogoClick" radius="17.0" stroke="BLACK" strokeType="INSIDE">
                                        <HBox.margin>
                                           <Insets left="15.0" />
                                        </HBox.margin>
                                     </Circle>
                                     <Region HBox.hgrow="ALWAYS" />
-                                    <Button fx:id="omatKuvatButton" mnemonicParsing="false" onAction="#onOwnImagesButtonClick" onMouseClicked="#switchToDefaultScene" prefWidth="150.0" text="%ownImagesButtonText" />
+                                    <Button fx:id="omatKuvatButton" mnemonicParsing="false" onAction="#onOwnImagesButtonClick" prefWidth="150.0" text="%ownImagesButtonText" />
                                     <Region HBox.hgrow="ALWAYS" />
                                     <Button fx:id="julkisetKuvatButton" mnemonicParsing="false" onAction="#onPublicImagesButtonClick" prefWidth="150.0" text="%publicImagesButtonText" />
                                     <Region HBox.hgrow="ALWAYS" />
@@ -462,7 +462,7 @@
 
          </children>
       </StackPane>
-      <StackPane fx:id="imageViewStackPane">
+      <StackPane fx:id="imageViewStackPane" visible="false">
          <children>
             <Region fx:id="imageviewBackgroundRegion" opacity="0.4" style="-fx-background-color: #000000;" />
             <BorderPane prefHeight="200.0" prefWidth="200.0">

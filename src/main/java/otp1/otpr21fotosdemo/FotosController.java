@@ -245,7 +245,7 @@ public class FotosController {
 
             //Alustustoimenpiteet
             controller.initialize();
-            System.out.println("KIELI VAIHDETTU?!?!?!?");
+            System.out.println("KIELI VAIHDETTU!");
 
         } catch (IOException e){
             e.printStackTrace();
@@ -893,7 +893,7 @@ public class FotosController {
                 FileChooser fileChooser = new FileChooser();
                 fileChooser.setTitle(langBundle.getString("uploadImgFileChooserTitle"));
                 fileChooser.getExtensionFilters().addAll(
-                        new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.gif")
+                        new FileChooser.ExtensionFilter(langBundle.getString("uploadImgFileFormatFilterText"), "*.png", "*.jpg", "*.gif")
                         // new FileChooser.ExtensionFilter("All Files", "*.*")
                 );
                 List<File> files = fileChooser.showOpenMultipleDialog(mainStage);
@@ -1242,16 +1242,17 @@ public class FotosController {
         folderMenu.setVisible(true);
         folderMenuHideButton.setManaged(true);
         folderMenuHideButton.setVisible(true);
-        newFolderButton.setVisible(true);
-        if (privateUserLevel == 1000){
-            adminBorderPane.setVisible(true);
-        } else {
-            loadUserFolders(privateUserID, 0);
-            loadUserRootFolder();
-            resetBreadCrumbs();
-            updateBreadCrumbs(selectedFolderID, "root");
+        if (loggedIn) {
+            newFolderButton.setVisible(true);
+            if (privateUserLevel == 1000) {
+                adminBorderPane.setVisible(true);
+            } else {
+                loadUserFolders(privateUserID, 0);
+                loadUserRootFolder();
+                resetBreadCrumbs();
+                updateBreadCrumbs(selectedFolderID, "root");
+            }
         }
-
         /*
         //Laitetaan etusivun elementit takaisin näkyviin.
         folderMenu.setVisible(true);
@@ -1461,7 +1462,13 @@ public class FotosController {
         onFolderClick(folderid, foldername);
     }
 
+    public void onFotosLogoClick(){
+        onOwnImagesButtonClick();
+        omatKuvatButton.requestFocus();
+    }
+
     public void onOwnImagesButtonClick() {
+        switchToDefaultScene();
         folderGridPane.getChildren().clear();
         loadUserRootFolder();
         displayImages = DisplayImages.OWN;
