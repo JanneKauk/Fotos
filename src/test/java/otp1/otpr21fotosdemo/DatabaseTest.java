@@ -26,15 +26,16 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class DatabaseTest {
     // Variables
-    String dbUserName = "otpdb";
-    String dbPassWord = "Asdfghjkl1234567890";
-    String url = "jdbc:mysql://10.114.32.13:3306/Fotos";
+    String dbUserName = System.getenv("APP_DB_USERNAME");
+    String dbPassWord = System.getenv("APP_DB_PASSWORD");
+    String url = System.getenv("APP_DB_URL");
     private Database database = new Database();
     private ArrayList<Integer> testImageIDs = new ArrayList<>();
     private ArrayList<Integer> testUserIDs = new ArrayList<>();
 
     @BeforeAll
     public void setDatabaseController() {
+        System.out.println("DATABASTEST Env url: " + System.getenv("APP_DB_URL"));
         database.setController(new FotosController());
     }
 

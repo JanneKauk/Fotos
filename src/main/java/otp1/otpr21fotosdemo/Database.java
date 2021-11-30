@@ -24,9 +24,9 @@ import java.util.List;
 import java.util.*;
 
 public class Database {
-    private String dbUserName = "otpdb";
-    private String dbPassword = "Asdfghjkl1234567890";
-    private String url = "jdbc:mysql://10.114.32.13:3306/";
+    private String dbUserName = System.getenv("APP_DB_USERNAME");
+    private String dbPassword = System.getenv("APP_DB_PASSWORD");
+    private String url = System.getenv("APP_DB_URL");
     private final int MAX_THUMB_HEIGHT = 400;
     private final int MAX_THUMB_WIDTH = 400;
     private HashMap<Integer, javafx.scene.image.Image> fullImageCache = new HashMap<>();
@@ -34,8 +34,7 @@ public class Database {
     private FotosController controller;
 
     public Database() {
-        //System.out.println("URL: " + url);
-        //System.out.println("Env url: " + System.getenv("APP_DB_URL"));
+
     }
 
     public void setController(FotosController c) {
@@ -91,19 +90,17 @@ public class Database {
         if (userAndPwExists(userName, passWord) == 0) {
             // Variables
             Connection conn = null;
-            String dbUserName = "otpdb";
-            String dbPassWord = "Asdfghjkl1234567890";
-            String url = "jdbc:mysql://10.114.32.13:3306/Fotos";
+
             int userId = -1;
             try {
                 // Connection statement
-                conn = DriverManager.getConnection(url, dbUserName, dbPassWord);
+                conn = DriverManager.getConnection(url, dbUserName, dbPassword);
                 System.out.println("\nDatabase Connection Established...");
 
                 // USER statement VALUES(userID (int11), frontName (varchar32), surName(varchar32), userLevel(int11)
                 // email(varchar32), passWord(varchar64), dbUserName(varchar32)
                 PreparedStatement pstmt = conn.prepareStatement(
-                        "INSERT INTO User(frontName, surName, userLevel, email, passWord, userName) VALUES(?,?,?,?,?,?)",
+                        "INSERT INTO Fotos.User(frontName, surName, userLevel, email, passWord, userName) VALUES(?,?,?,?,?,?)",
                         Statement.RETURN_GENERATED_KEYS
                 );
                 // frontName

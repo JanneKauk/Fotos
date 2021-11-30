@@ -14,6 +14,8 @@ import java.util.ResourceBundle;
 public class Fotos extends Application {
     @Override
     public void start(Stage stage) throws IOException {
+
+        //System.out.println("Env url: " + System.getenv("APP_DB_URL"));
         Locale curLocale = null;
         ResourceBundle langBundle = null;
         Properties properties = new Properties();
