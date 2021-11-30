@@ -74,3 +74,9 @@ Kehitysympäristönä käytimme Intellij Ideaa. Projektin saa ladattua Intellij 
 1. Laita version control päälle: vcs > enable version control > valitse valikosta git ja paina ok.
 2. Git > manage remotes ja lisää sinne uusi remote jonka url-osoitteeksi https://gitlab.metropolia.fi/jurit/otp-r21-fotos
 3. Lataa projekti: git > pull
+4. Mene: File -> Settings -> Build, Execution, Deployment -> Build Tools -> Maven -> Runner
+5. Aseta Environment valiablet databasen käyttäjätunnukselle ja urlille seuraavasti:
+   APP_DB_USERNAME=`**käyttäjätunnus**`;APP_DB_PASSWORD=`**salasana**`;APP_DB_URL=`**url**`
+6. Mene: Run -> Edit Configurations 
+7. Aseta samat Environment Variablet JUnit testaus configuraatiolle ja Application configuraatiolle jos ajat ohjelmaa ilman Mavenia.
+8. Tunnukset saat tietoosi kehittäjiltä.

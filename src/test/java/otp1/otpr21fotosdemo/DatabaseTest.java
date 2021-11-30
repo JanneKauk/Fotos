@@ -59,17 +59,17 @@ public class DatabaseTest {
             System.out.println("\nDatabase Connection Established...");
 
             // Deleting entry from Image table
-            PreparedStatement pstmtImage = conn.prepareStatement("DELETE FROM Image WHERE userID = ?;");
+            PreparedStatement pstmtImage = conn.prepareStatement("DELETE FROM Fotos.Image WHERE userID = ?;");
             pstmtImage.setInt(1, userid);
             pstmtImage.execute();
 
            // Deleting entry from Folder table
-            PreparedStatement pstmtFolder = conn.prepareStatement("DELETE FROM Folder WHERE userID = ?;");
+            PreparedStatement pstmtFolder = conn.prepareStatement("DELETE FROM Fotos.Folder WHERE userID = ?;");
             pstmtFolder.setInt(1, userid);
             pstmtFolder.execute();
 
             // Deleting entry from User table
-            PreparedStatement pstmtUser = conn.prepareStatement("DELETE FROM User WHERE userID = ?;");
+            PreparedStatement pstmtUser = conn.prepareStatement("DELETE FROM Fotos.User WHERE userID = ?;");
             pstmtUser.setInt(1, userid);
             pstmtUser.execute();
 
