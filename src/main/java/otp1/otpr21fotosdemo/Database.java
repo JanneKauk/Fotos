@@ -815,17 +815,13 @@ public class Database {
                 try {
                     //Uploadataan thumbnail
                     pstmt = conn.prepareStatement(
-                            "INSERT INTO Fotos.Image(viewingRights, fileName, image, date, userID, folderID) values (?, ?, ?, ?, ?, ?)",//TODO:change
+                            "INSERT INTO Fotos.Image(viewingRights, image, userID, folderID) values (?, ?, ?, ?)",//TODO:change
                             Statement.RETURN_GENERATED_KEYS
                     );
-
                     pstmt.setInt(1, 0);
-                    pstmt.setBinaryStream(3, is);
-
-                    long dateLong = new java.util.Date().getTime();
-                    pstmt.setDate(4, new java.sql.Date(dateLong));
-                    pstmt.setInt(5, userId);
-                    pstmt.setInt(6, folderId);
+                    pstmt.setBinaryStream(2, is);
+                    pstmt.setInt(3, userId);
+                    pstmt.setInt(4, folderId);
                     System.out.println("Executing statement...");
                     pstmt.execute();
 
