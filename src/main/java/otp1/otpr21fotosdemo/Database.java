@@ -37,7 +37,7 @@ public class Database {
     private String url = System.getenv("APP_DB_URL");
     private final int MAX_THUMB_HEIGHT = 400;
     private final int MAX_THUMB_WIDTH = 400;
-    private HashMap<Integer, javafx.scene.image.Image> fullImageCache = new HashMap<>();
+    private HashMap<Integer, ImageData> fullImageCache = new HashMap<>();
     private int privateUserId;
     private FotosController controller;
     public static ImageData imageData;
@@ -1062,13 +1062,14 @@ public class Database {
         return images;
     }
 
-    public static record ImageData(float fileSize, String fileName, String fileOwner, String fileResolution, String fileType, Date creationDate) {}
+    public static record ImageData(float fileSize, String fileName, String fileOwner, String fileResolution, String fileType, Date creationDate, javafx.scene.image.Image image) {}
 
     public javafx.scene.image.Image downloadFullImage(int imageID) {
         System.out.println("Database.downloadFullImage");
         if (fullImageCache.containsKey(imageID)) {
             System.out.println("Full image found in cache. Showing that instead.");
-            return fullImageCache.get(imageID);
+            imageData = fullImageCache.get(imageID);
+            return fullImageCache.get(imageID).image;
         }
         Connection conn = null;
         ResultSet result = null;
@@ -1092,11 +1093,12 @@ public class Database {
                 if (result.next()) {
                     System.out.println("Got here!");
                     image = new javafx.scene.image.Image(result.getBinaryStream("image"));
-                    imageData = new ImageData(result.getFloat("fileSize"), result.getString("fileName"), result.getString("fileOwner"), result.getString("fileResolution"), result.getString("fileType"), result.getDate("creationDate"));
+                    ImageData imagedata = new ImageData(result.getFloat("fileSize"), result.getString("fileName"), result.getString("fileOwner"), result.getString("fileResolution"), result.getString("fileType"), result.getDate("creationDate"), image);
+                    imageData = imagedata;
                     System.out.println("ImageData loaded!");
                     String name = result.getString("fileName");
                     System.out.println("FILENAME: "+name);
-                    fullImageCache.put(imageID, image);
+                    fullImageCache.put(imageID, imagedata);
                     System.out.println("Full Image retrieval successful.");
                 }
             } catch (Exception e) {

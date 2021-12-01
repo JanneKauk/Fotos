@@ -708,7 +708,7 @@ public class FotosController {
             imageOwner.setText(data.fileOwner());
             imageDate.setText(""+data.creationDate());
             imageResolution.setText(data.fileResolution());
-            imageSize.setText(""+data.fileSize());
+            imageSize.setText(""+data.fileSize()+"MB");
             imageFileFormat.setText(data.fileType());
         } catch (Exception e) {
             e.printStackTrace();
