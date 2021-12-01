@@ -769,7 +769,7 @@ public class Database {
                 } else {
                     String end = filename.substring(filename.lastIndexOf("."));
                     String filenameNoEnd = filename.substring(0, (filename.length() - end.length()));
-                    PreparedStatement statement = conn.prepareStatement("SELECT COUNT(*) FROM Fotos.Image WHERE userID=? AND filename LIKE ?");
+                    PreparedStatement statement = conn.prepareStatement("SELECT COUNT(*) FROM Fotos.Image WHERE userID=? AND filename LIKE ?");//TODO: change
                     statement.setInt(1, privateUserId);
                     statement.setString(2, filenameNoEnd + "%");
                     ResultSet res = statement.executeQuery();
@@ -815,17 +815,15 @@ public class Database {
                 try {
                     //Uploadataan thumbnail
                     pstmt = conn.prepareStatement(
-                            "INSERT INTO Fotos.Image(viewingRights, fileName, image, date, userID, folderID) values (?, ?, ?, ?, ?, ?)",
+                            "INSERT INTO Fotos.Image(viewingRights, fileName, image, date, userID, folderID) values (?, ?, ?, ?, ?, ?)",//TODO:change
                             Statement.RETURN_GENERATED_KEYS
                     );
 
                     pstmt.setInt(1, 0);
-                    pstmt.setString(2, filename);
                     pstmt.setBinaryStream(3, is);
 
                     long dateLong = new java.util.Date().getTime();
                     pstmt.setDate(4, new java.sql.Date(dateLong));
-
                     pstmt.setInt(5, userId);
                     pstmt.setInt(6, folderId);
                     System.out.println("Executing statement...");
