@@ -465,7 +465,7 @@
       <StackPane fx:id="imageViewStackPane" visible="false">
          <children>
             <Region fx:id="imageviewBackgroundRegion" opacity="0.4" style="-fx-background-color: #000000;" />
-            <BorderPane prefHeight="200.0" prefWidth="200.0">
+            <BorderPane fx:id="imageViewBorderPane" prefHeight="200.0" prefWidth="200.0">
                <top>
                   <StackPane fx:id="pictureInfo" alignment="CENTER_RIGHT" prefHeight="40.0" style="-fx-background-color: #ebebeb;">
                      <children>

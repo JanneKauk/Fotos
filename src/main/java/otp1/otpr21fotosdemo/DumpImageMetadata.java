@@ -151,22 +151,28 @@ public class DumpImageMetadata
         }
     }
 
-//    private static void processDirectory(File directory) throws IOException
-//    {
-//        System.out.println("Processing all files in " + directory.getAbsolutePath());
-//
-//        File[] contents = directory.listFiles();
-//        for (File file : contents)
-//        {
-//            if (file.isFile())
-//            {
-//                processFile(file);
-//            }
-//        }
-//    }
-//
+    private static void processDirectory(File directory) throws IOException
+    {
+        System.out.println("Processing all files in " + directory.getAbsolutePath());
+
+        File[] contents = directory.listFiles();
+        for (File file : contents)
+        {
+            if (file.isFile())
+            {
+                processFile(file);
+            }
+        }
+    }
+
 //    public static void main(String[] args)
 //    {
+//        File file = new File("-");
+//        try {
+//            processFile(file);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 //        try
 //        {
 //            for (int i = 0; i < args.length; i++)

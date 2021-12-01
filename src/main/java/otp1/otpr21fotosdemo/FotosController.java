@@ -38,16 +38,18 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.Pair;
 import org.w3c.dom.*;
+
+import java.awt.event.KeyAdapter;
 import java.io.*;
+import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.List;
-
 import static java.lang.Double.valueOf;
 
 public class FotosController {
     @FXML
-    private BorderPane rootborderpane, settingsBorderPane;
+    private BorderPane rootborderpane, settingsBorderPane, imageViewBorderPane;
     @FXML
     private Circle profile;
     @FXML
@@ -197,6 +199,16 @@ public class FotosController {
                 imageSelector.clearSelection();
             }
         });
+        imageViewStackPane.setOnKeyPressed(event -> {//TODO: adjust this so it works DX
+            if(event.getCode() == KeyCode.RIGHT && imageViewStackPane.isVisible()) {
+                cycleImageForward();
+                imageViewStackPane.requestFocus();
+            }
+            if(event.getCode() == KeyCode.LEFT && imageViewStackPane.isVisible()) {
+                cycleImageBack();
+                imageViewStackPane.requestFocus();
+            }
+        });
     }
 
     public void setMainStage(Stage stage) {
@@ -257,8 +269,10 @@ public class FotosController {
     }
 
     private void openImageview() {
+        if(!imageViewStackPane.isVisible())
         blurringStackPane.setEffect(new GaussianBlur());
         imageViewStackPane.setVisible(true);
+        imageViewStackPane.requestFocus();
     }
 
     @FXML
@@ -687,14 +701,18 @@ public class FotosController {
     }
 
     private void refreshImageData(){
-        Image image = bigPicture.getImage();
-
-        imageName.setText("filename");
-        imageOwner.setText("uploader");
-        imageDate.setText("upload date.");
-        imageResolution.setText((int)image.getWidth()+"x"+(int)image.getHeight());
-        imageSize.setText("size");
-        imageFileFormat.setText("Get filename ending.");
+        //TODO: insert values
+        try {
+            Database.ImageData data = Database.imageData;
+            imageName.setText(data.fileName());
+            imageOwner.setText(data.fileOwner());
+            imageDate.setText(""+data.creationDate());
+            imageResolution.setText(data.fileResolution());
+            imageSize.setText(""+data.fileSize());
+            imageFileFormat.setText(data.fileType());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML//Cycle pictures back when viewing them
@@ -711,6 +729,7 @@ public class FotosController {
         } catch (Error e) {
             System.out.println("Full picture not found!:" + e);
         }
+        imageViewStackPane.requestFocus();//TODO: cycle images with arrow keys.
     }
 
     @FXML//Cycle pictures forward when viewing them
@@ -727,6 +746,7 @@ public class FotosController {
         } catch (Error e) {
             System.out.println("Full picture not found!:" + e);
         }
+        imageViewStackPane.requestFocus();
     }
 
     private void clearLoginFields() {

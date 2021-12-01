@@ -12,9 +12,17 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.metadata.IIOMetadata;
+import javax.xml.transform.Result;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileAttributeView;
+import java.nio.file.attribute.FileOwnerAttributeView;
+import java.nio.file.attribute.FileTime;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.sql.*;
@@ -32,10 +40,12 @@ public class Database {
     private HashMap<Integer, javafx.scene.image.Image> fullImageCache = new HashMap<>();
     private int privateUserId;
     private FotosController controller;
+    public static ImageData imageData;
 
     public Database() {
 
     }
+
 
     public void setController(FotosController c) {
         controller = c;
@@ -536,10 +546,7 @@ public class Database {
 
                     }
                 }
-
             }
-
-
         } catch (Exception ex) {
             System.err.println("Cannot connect to database server");
             ex.printStackTrace();
@@ -555,7 +562,6 @@ public class Database {
 
                 }
             }
-
         }
         return deleted;
     }
@@ -673,6 +679,29 @@ public class Database {
             return false;
         }
     }
+    private static String getFileExtension(File file) {
+        String fileName = file.getName();
+        int lastDot = fileName.lastIndexOf('.');
+        return fileName.substring(lastDot + 1);
+    }
+    public float getFileSize(File file) {
+        Path path = file.toPath();
+        try {
+            // size of a file (in bytes)
+            long bytes = Files.size(path);
+            float kB = (float) bytes / 1024;
+            float mB = kB/1024;
+            mB = (float)Math.round(mB*100)/100;
+
+            System.out.printf("%,d bytes%n", bytes);
+            System.out.printf("%,f kilobytes%n", kB);
+            System.out.printf("%,f megabytes%n", mB);
+            return mB;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
     public List<Integer> uploadImages(int userId, int folderId, List<File> files) {
 
         System.out.println("UploadTask starting.");
@@ -689,7 +718,27 @@ public class Database {
                 File originalFile = it.next();
 
                 //Rajataan tiedostonimeä jos se on pidempi kuin tietokannan raja (- 5 merkkiä tiedostonimen perään lisättävää numerointia varten)
+                //TODO: image data to save
+                System.out.println("------Image Data------");
+                BufferedImage originalBufferedImage = ImageIO.read(originalFile);
+                int origWidth = originalBufferedImage.getWidth();
+                int origHeight = originalBufferedImage.getHeight();
                 String filename = originalFile.getName();
+                String filetype = getFileExtension(originalFile);
+                float filesize = getFileSize(originalFile);
+                FileOwnerAttributeView file = Files.getFileAttributeView(originalFile.toPath(), FileOwnerAttributeView.class);
+                String fileowner = file.getOwner().getName();
+                fileowner = fileowner.substring(fileowner.indexOf("\\")+1);//TODO: change to author or uploader.
+                String fileresolution = origWidth+"x"+origHeight;
+                Date creationdate = new Date(Files.readAttributes(originalFile.toPath(), BasicFileAttributes.class).creationTime().toMillis());
+                //Debug
+                System.out.println("Original filename: "+filename);
+                System.out.println("Filetype: "+filetype);
+                System.out.println("Filesize: "+filesize);
+                System.out.println("File owner: "+fileowner);
+                System.out.println("File resolution: "+fileresolution);
+                System.out.println("File creation date: "+creationdate);
+
                 if (filename.length() > 59) {
                     String end = filename.substring(filename.lastIndexOf("."));
                     String shortenedFilename = filename.substring(0, (59 - end.length() - 3));
@@ -700,7 +749,6 @@ public class Database {
                     ResultSet res = statement.executeQuery();
                     res.next();
                     int countDuplicateFilenames = res.getInt(1);
-
                     System.out.println("DuplicateFilenames: " + countDuplicateFilenames);
                     System.out.println("Filename length1: " + filename.length());
                     System.out.println("Filename: " + filename);
@@ -736,15 +784,12 @@ public class Database {
                         builder.append(end);
                         filename = builder.toString();
                     }
-
                 }
                 System.out.println("Filename: " + filename);
 
                 //Muodostetaan thumbnail InputStream kuvalle
                 System.out.println("Thumbthumb... Thumbnailing");
-                BufferedImage originalBufferedImage = ImageIO.read(originalFile);
-                int origWidth = originalBufferedImage.getWidth();
-                int origHeight = originalBufferedImage.getHeight();
+
                 int thumbWidth, thumbHeight;
                 if (origHeight > origWidth) {
                     thumbHeight = MAX_THUMB_HEIGHT;
@@ -765,6 +810,7 @@ public class Database {
                 System.out.println("Thumbthumbthumbthumb... Thumbnailed!");
                 PreparedStatement pstmt = null;
                 PreparedStatement pstmt2 = null;
+                PreparedStatement pstmt3 = null;
 
                 try {
                     //Uploadataan thumbnail
@@ -800,7 +846,17 @@ public class Database {
                     System.out.println("Executing statement 2...");
                     pstmt2.execute();
                     System.out.println("Sent " + originalFile.length() + " bytes.");
-
+                    pstmt3 = conn.prepareStatement(
+                            "INSERT INTO Fotos.ImageData(imageID, fileSize, fileName, fileOwner, fileResolution, fileType, creationDate) values (?,?,?,?,?,?,?)"
+                    );
+                    pstmt3.setInt(1, key.getInt(1));
+                    pstmt3.setFloat(2, filesize);
+                    pstmt3.setString(3, filename);
+                    pstmt3.setString(4, fileowner);
+                    pstmt3.setString(5, fileresolution);
+                    pstmt3.setString(6, filetype);
+                    pstmt3.setDate(7, creationdate);
+                    pstmt3.execute();
 
                 } catch (Exception e) {
                     System.err.println("Error in query");
@@ -810,10 +866,8 @@ public class Database {
                     if (pstmt != null) {
                         try {
                             pstmt.close();
-
                         } catch (Exception ex) {
                             System.out.println("Error in statement 1 termination!");
-
                         }
                     }
                     if (pstmt2 != null) {
@@ -822,14 +876,10 @@ public class Database {
 
                         } catch (Exception ex) {
                             System.out.println("Error in statement 2 termination!");
-
                         }
                     }
-
                 }
             }
-
-
         } catch (Exception ex) {
             System.err.println("Cannot connect to database server");
             ex.printStackTrace();
@@ -842,14 +892,11 @@ public class Database {
 
                 } catch (Exception ex) {
                     System.out.println("Error in connection termination!");
-
                 }
             }
-
         }
         System.out.println("UploadTask done.");
         return newImageIDs;
-
     }
 
     //Palauttaa Hashmapin jossa key on imageID ja Value on PAIR-rakenne. Pair-rakenteessa taas key on tiedostonimi ja value on imagedata
@@ -1020,6 +1067,9 @@ public class Database {
         }
         return images;
     }
+
+    public static record ImageData(float fileSize, String fileName, String fileOwner, String fileResolution, String fileType, Date creationDate) {}
+
     public javafx.scene.image.Image downloadFullImage(int imageID) {
         System.out.println("Database.downloadFullImage");
         if (fullImageCache.containsKey(imageID)) {
@@ -1038,39 +1088,35 @@ public class Database {
 
             PreparedStatement pstmt = null;
             try {
-
-
+                System.out.println("Try to retrieve a full image.");
                 pstmt = conn.prepareStatement(
-                        "SELECT image FROM Fotos.Full_Image WHERE imageID=?;"
+                        "SELECT * FROM Fotos.fullimagedata WHERE imageID = ?;"
                 );
                 pstmt.setInt(1, imageID);
                 result = pstmt.executeQuery();
 
                 if (result.next()) {
-//                    System.out.println("METADATA:"+"");
-//                    DumpImageMetadata dImd = new DumpImageMetadata();
+                    System.out.println("Got here!");
                     image = new javafx.scene.image.Image(result.getBinaryStream("image"));
-//                    String name = result.getString("filename");
-//                    System.out.println("FILENAME: "+name);
+                    imageData = new ImageData(result.getFloat("fileSize"), result.getString("fileName"), result.getString("fileOwner"), result.getString("fileResolution"), result.getString("fileType"), result.getDate("creationDate"));
+                    System.out.println("ImageData loaded!");
+                    String name = result.getString("fileName");
+                    System.out.println("FILENAME: "+name);
                     fullImageCache.put(imageID, image);
+                    System.out.println("Full Image retrieval successful.");
                 }
-
             } catch (Exception e) {
                 System.err.println("Error in query");
                 e.printStackTrace();
-
             } finally {
                 if (pstmt != null) {
                     try {
                         pstmt.close();
-
                     } catch (Exception ex) {
                         System.out.println("Error in statement termination!");
-
                     }
                 }
             }
-
         } catch (Exception ex) {
             System.err.println("Cannot connect to database server");
             ex.printStackTrace();
@@ -1083,10 +1129,8 @@ public class Database {
 
                 } catch (Exception ex) {
                     System.out.println("Error in connection termination!");
-
                 }
             }
-
         }
         return image;
     }
