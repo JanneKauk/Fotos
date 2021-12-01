@@ -718,7 +718,6 @@ public class Database {
                 File originalFile = it.next();
 
                 //Rajataan tiedostonimeä jos se on pidempi kuin tietokannan raja (- 5 merkkiä tiedostonimen perään lisättävää numerointia varten)
-                //TODO: image data to save
                 System.out.println("------Image Data------");
                 BufferedImage originalBufferedImage = ImageIO.read(originalFile);
                 int origWidth = originalBufferedImage.getWidth();
@@ -1062,14 +1061,13 @@ public class Database {
         return images;
     }
 
-    public static record ImageData(float fileSize, String fileName, String fileOwner, String fileResolution, String fileType, Date creationDate, javafx.scene.image.Image image) {}
 
     public javafx.scene.image.Image downloadFullImage(int imageID) {
         System.out.println("Database.downloadFullImage");
         if (fullImageCache.containsKey(imageID)) {
             System.out.println("Full image found in cache. Showing that instead.");
             imageData = fullImageCache.get(imageID);
-            return fullImageCache.get(imageID).image;
+            return fullImageCache.get(imageID).image();
         }
         Connection conn = null;
         ResultSet result = null;

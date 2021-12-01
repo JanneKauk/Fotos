@@ -703,7 +703,7 @@ public class FotosController {
     private void refreshImageData(){
         //TODO: insert values
         try {
-            Database.ImageData data = Database.imageData;
+            ImageData data = Database.imageData;
             imageName.setText(data.fileName());
             imageOwner.setText(data.fileOwner());
             imageDate.setText(""+data.creationDate());
