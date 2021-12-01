@@ -742,7 +742,7 @@ public class Database {
                     String end = filename.substring(filename.lastIndexOf("."));
                     String shortenedFilename = filename.substring(0, (59 - end.length() - 3));
 
-                    PreparedStatement statement = conn.prepareStatement("SELECT COUNT(*) FROM Fotos.Image, Fotos.ImageData WHERE userID=? AND fileName LIKE ?");//todo:change
+                    PreparedStatement statement = conn.prepareStatement("SELECT COUNT(*) FROM Fotos.imagedata WHERE userID=? AND fileName LIKE ?");//todo:change
                     statement.setInt(1, privateUserId);
                     statement.setString(2, shortenedFilename + "%");
                     ResultSet res = statement.executeQuery();
@@ -768,7 +768,7 @@ public class Database {
                 } else {
                     String end = filename.substring(filename.lastIndexOf("."));
                     String filenameNoEnd = filename.substring(0, (filename.length() - end.length()));
-                    PreparedStatement statement = conn.prepareStatement("SELECT COUNT(*) FROM Fotos.Image, Fotos.ImageData WHERE userID=? AND fileName LIKE ?");//TODO: change
+                    PreparedStatement statement = conn.prepareStatement("SELECT COUNT(*) FROM Fotos.imagedata WHERE userID=? AND fileName LIKE ?");//TODO: change
                     statement.setInt(1, privateUserId);
                     statement.setString(2, filenameNoEnd + "%");
                     ResultSet res = statement.executeQuery();
@@ -910,12 +910,12 @@ public class Database {
 
                 if (searchString != null) {
                     if (uploadDate == null) {
-                        pstmt = conn.prepareStatement("SELECT Fotos.Image.imageID, fileName, image, viewingRights FROM Fotos.Image, Fotos.ImageData WHERE userID=? AND folderID=? AND fileName LIKE ?");
+                        pstmt = conn.prepareStatement("SELECT imageID, fileName, image, viewingRights FROM Fotos.imagedata WHERE userID=? AND folderID=? AND fileName LIKE ?");
                         pstmt.setInt(1, privateUserId);
                         pstmt.setInt(2, folderId);
                         pstmt.setString(3, "%" + searchString + "%");
                     } else {
-                        pstmt = conn.prepareStatement("SELECT Fotos.Image.imageID, fileName, image, viewingRights FROM Fotos.Image, Fotos.ImageData WHERE userID=? AND folderID=? AND creationDate=? AND fileName LIKE ?");
+                        pstmt = conn.prepareStatement("SELECT imageID, fileName, image, viewingRights FROM Fotos.imagedata WHERE userID=? AND folderID=? AND creationDate=? AND fileName LIKE ?");
                         pstmt.setInt(1, privateUserId);
                         pstmt.setInt(2, folderId);
                         pstmt.setDate(3, Date.valueOf(uploadDate));
@@ -924,13 +924,13 @@ public class Database {
                 } else {
                     if (uploadDate == null) {
                         pstmt = conn.prepareStatement(
-                                "SELECT Fotos.Image.imageID, fileName, image, viewingRights FROM Fotos.Image, Fotos.ImageData WHERE userID=? AND folderID=?;"
+                                "SELECT imageID, fileName, image, viewingRights FROM Fotos.imagedata WHERE userID=? AND folderID=?;"
                         );
                         pstmt.setInt(1, privateUserId);
                         pstmt.setInt(2, folderId);
                     } else {
                         pstmt = conn.prepareStatement(
-                                "SELECT Fotos.Image.imageID, fileName, image, viewingRights FROM Fotos.Image, Fotos.ImageData WHERE userID=? AND folderID=? AND creationDate=?;"
+                                "SELECT imageID, fileName, image, viewingRights FROM Fotos.imagedata WHERE userID=? AND folderID=? AND creationDate=?;"
                         );
                         pstmt.setInt(1, privateUserId);
                         pstmt.setInt(2, folderId);
@@ -1003,18 +1003,18 @@ public class Database {
             try {
                 if (searchString != null) {
                     if (uploadDate == null) {
-                        pstmt = conn.prepareStatement("SELECT Fotos.Image.imageID, fileName, image FROM Fotos.Image, Fotos.ImageData WHERE viewingRights=1 AND fileName LIKE ?");
+                        pstmt = conn.prepareStatement("SELECT imageID, fileName, image FROM Fotos.imagedata WHERE viewingRights=? AND fileName LIKE ?");
                         pstmt.setString(1, "%" + searchString + "%");
                     } else {
-                        pstmt = conn.prepareStatement("SELECT Fotos.Image.imageID, fileName, image FROM Fotos.Image, Fotos.ImageData WHERE viewingRights=1 AND creationDate=? AND fileName LIKE ?");
+                        pstmt = conn.prepareStatement("SELECT imageID, fileName, image FROM Fotos.imagedata WHERE viewingRights=1 AND creationDate=? AND fileName LIKE ?");
                         pstmt.setDate(1, Date.valueOf(uploadDate));
                         pstmt.setString(2, "%" + searchString + "%");
                     }
                 } else {
                     if (uploadDate == null) {
-                        pstmt = conn.prepareStatement("SELECT Fotos.Image.imageID, fileName, image FROM Fotos.Image, Fotos.ImageData WHERE viewingRights=1;");
+                        pstmt = conn.prepareStatement("SELECT imageID, fileName, image FROM Fotos.imagedata WHERE viewingRights=1;");
                     } else {
-                        pstmt = conn.prepareStatement("SELECT Fotos.Image.imageID, fileName, image FROM Fotos.Image, Fotos.ImageData WHERE viewingRights=1 AND creationDate=?;");
+                        pstmt = conn.prepareStatement("SELECT imageID, fileName, image FROM Fotos.imagedata WHERE viewingRights=1 AND creationDate=?;");
                         pstmt.setDate(1, Date.valueOf(uploadDate));
                     }
                 }
