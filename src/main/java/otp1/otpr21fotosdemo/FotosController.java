@@ -47,6 +47,11 @@ import java.util.*;
 import java.util.List;
 import static java.lang.Double.valueOf;
 
+/**
+ * Controller class has all the listeners and handlers for the Fotos.fxml ui.
+ * @author Kalle Voutilainen, Petri Immonen, Jüri Tihane
+ */
+
 public class FotosController {
     @FXML
     private BorderPane rootborderpane, settingsBorderPane, imageViewBorderPane;
@@ -161,7 +166,7 @@ public class FotosController {
         database = new Database();
         database.setController(this);
         logout();
-        //Filtermenu piiloon alussa
+        //Filtermenu hidden at the start.
         filterMenu.setTranslateX(-200);
         pictureInfo.setTranslateX(-200);
         filterButtonStackPane.setRotate(180);
@@ -171,7 +176,7 @@ public class FotosController {
 
         uploadingStackPane.setVisible(false);
 
-        //Uuden kansion -ja Login menu piiloo ja sen sisällä rekisteröitymiseen tarvittavat tekstikentät myös.
+        //New folder and Login menu hidden and inside that register textfields as well.
         loginVbox.setVisible(false);
         emailVbox.setVisible(false);
         emailVbox.setManaged(false);
@@ -180,7 +185,7 @@ public class FotosController {
         imageViewStackPane.setVisible(false);
         newFolderVbox.setVisible(false);
         newFolderButton.setVisible(false);
-        //Hakukentälle kuuntelija
+        //Listener for searchfield.
         searchTextField.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent keyEvent) {
@@ -190,7 +195,7 @@ public class FotosController {
                 }
             }
         });
-        //Tämä tarvitaan jotta kuvien valinta saadaan clearattua kun klikataan muualle.
+        //This is needed for the picture selections to be cleared when clicked somewhere else.
         rootborderpane.setOnMouseClicked(event -> {
             if (event.isControlDown() ||event.isShiftDown() || event.getPickResult().getIntersectedNode().getTypeSelector().equals("ImageView")) {
                 //Klikattiin imageviewiin tai CTRL tai SHIFT pohjas
@@ -211,6 +216,9 @@ public class FotosController {
         });
     }
 
+    /**
+     * @param stage
+     */
     public void setMainStage(Stage stage) {
         mainStage = stage;
         setGridConstraints();
@@ -224,6 +232,12 @@ public class FotosController {
         stage.setMaximized(true);
     }
 
+    /**
+     * Adds the language selection menu and adds listeners for changing the language.
+     *
+     * @param bund  New resource bundle
+     * @param loc   New locale
+     */
     public void setLangBundleAndCurLocale(ResourceBundle bund, Locale loc){
         langBundle = bund;
         curLocale = loc;
@@ -239,6 +253,11 @@ public class FotosController {
         });
     }
 
+    /**
+     * Reloads the scene and sets the new language.
+     * @param lang      New language
+     * @param country   New country
+     */
     public void changeLanguage(String lang, String country){
         curLocale = new Locale(lang,country);
         Locale.setDefault(curLocale);
@@ -292,15 +311,21 @@ public class FotosController {
         rc.setMinHeight(150);
     }
 
+    /**
+     * Convenience-method for forcing new imagegrid
+     */
     private void refreshImageGrid() {
         //Convenience-method for forcing new imagegrid
         databaseChanged = true;
         adjustImageGrid();
     }
 
+    /**
+     * Downloads images from database and shows them in the application.
+     */
     private void adjustImageGrid() {
         if (loggedIn && privateUserLevel == 1000){
-            //Käyttäjä on admin. Ei tarvita imagegridiä
+            //User is an admin. No need for imagegrid.
             return;
         }
         //Calc how many columns fit into the parent stackpane
@@ -314,9 +339,9 @@ public class FotosController {
         Map<Integer, Pair<String, Image>> images;
         imageIdList = new ArrayList<>();
         if (privateUserID > 0) {
-            //Käyttäjä on kirjautunut.
+            //User is logged in.
             if (displayImages == DisplayImages.PUBLIC) {
-                //Valittuna "Julkiset kuvat"
+                //Selected "Public images"
                 if (!Objects.equals(searchTextField.getText(), "")) {
                     System.out.println("Searching by: " + searchTextField.getText());
                     images = database.downloadPublicImages(searchTextField.getText(), dateFilter.getValue());
@@ -325,7 +350,7 @@ public class FotosController {
                 }
 
             } else if (displayImages == DisplayImages.OWN) {
-                //Valittuna "Omat kuvat"
+                //Selected "Own photos"
                 if (!Objects.equals(searchTextField.getText(), "")) {
                     System.out.println("Searching by: " + searchTextField.getText());
                     images = database.downloadImages(selectedFolderID, searchTextField.getText(), dateFilter.getValue());
@@ -333,9 +358,9 @@ public class FotosController {
                     images = database.downloadImages(selectedFolderID, null,  dateFilter.getValue());
                 }
             } else {
-                //Valittuna "Jaetut kuvat"
+                //Selected "Shared photos"
                 //TODO Jaetut kuvat toteutus
-                //Annetaan toistaiseksi vain tyhjä hashmap
+                //Giving an empty hashmap for now.
                 images = new HashMap<Integer, Pair<String, javafx.scene.image.Image>>();
             }
         } else {
@@ -344,7 +369,7 @@ public class FotosController {
         }
         StringBuilder b = new StringBuilder();
         b.append("Grids imageID:s: ");
-        //Järjestetään lista imageID:n mukaan
+        //Organizing list by imageID.
         TreeMap<Integer, Pair<String, Image>> sortedImages;
         if (newestToOldestOrder) {
             sortedImages = new TreeMap<>(Comparator.reverseOrder());
@@ -433,19 +458,19 @@ public class FotosController {
                     if (event.getButton() == MouseButton.PRIMARY) {
                         //Left click
                         if (event.isControlDown()) {
-                            //CTRL painettuna
+                            //CTRL clicked
                             if (imageSelector.isSelected(imageDatabaseId))
                                 imageSelector.removeFromSelection(imageDatabaseId);
                             else
                                 imageSelector.addToSelection(imageDatabaseId);
 
                         } else if (event.isShiftDown()) {
-                            //SHIFT painettuna
+                            //SHIFT clicked
                             if (imageSelector.countSelected() == 0) {
                                 imageSelector.addToSelection(imageDatabaseId);
                             } else {
                                 ArrayList<Integer> lista = imageSelector.getSelectedIds();
-                                //Edellinen valittu
+                                //Previous selected
                                 int lastId = lista.get(lista.size() - 1);
                                 int eka, toka;
                                 eka = Math.min(lastId, imageDatabaseId);
@@ -461,8 +486,8 @@ public class FotosController {
 
                             }
                         } else {
-                            //EI CTRL EIKÄ SHIFT painettuna
-                            //Jos kuvia valittuna niin vain clearataan valinta.
+                            //NO CTRL OR SHIFT clicked.
+                            //If images selected, just clear choices.
 
                             if (imageSelector.countSelected() > 0) {
                                 imageSelector.clearSelection();
@@ -490,9 +515,9 @@ public class FotosController {
                             menuitem1.setOnAction(new EventHandler<ActionEvent>() {
                                 @Override
                                 public void handle(ActionEvent event) {
-                                    //Julkiseksi
+                                    //Set to public
                                     int count = imageSelector.countSelected();
-                                    count = count == 0 ? 1 : count; //Jos valittuna ei ole yhtään kuvaa niin asetetaan count=1, koska tällöin toiminto kohdistuu klikattuun kuvaan.
+                                    count = count == 0 ? 1 : count; //If no images selected, set count=1, because then function is aimed at selected image
                                     Alert alert = new Alert(Alert.AlertType.CONFIRMATION, MessageFormat.format(langBundle.getString("publishMultipleImgConfirmationText"),count));
                                     alert.setTitle(langBundle.getString("generalConfirmationTitle"));
                                     alert.setHeaderText(null);
@@ -520,9 +545,9 @@ public class FotosController {
                             menuitem2.setOnAction(new EventHandler<ActionEvent>() {
                                 @Override
                                 public void handle(ActionEvent event) {
-                                    //Yksityiseksi
+                                    //To private
                                     int count = imageSelector.countSelected();
-                                    count = count == 0 ? 1 : count; //Jos valittuna ei ole yhtään kuvaa niin asetetaan count=1, koska tällöin toiminto kohdistuu klikattuun kuvaan.
+                                    count = count == 0 ? 1 : count; //If no images selected, set count=1, because then function is aimed at selected image
                                     Alert alert = new Alert(Alert.AlertType.CONFIRMATION, MessageFormat.format(langBundle.getString("setPrivateMultipleImgConfirmationText"),count));
                                     alert.setTitle(langBundle.getString("generalConfirmationTitle"));
                                     alert.setHeaderText(null);
@@ -550,10 +575,10 @@ public class FotosController {
                                 menu.getItems().addAll(menuitem1);
                                 menu.getItems().addAll(menuitem2);
                             } else {
-                                //Kuvia on valittuna vain yksi tai right klikattiin yhtä kuvaa valitsematta useampaa.
+                                //Only one image selected or one image was right-clicked without selecting other images.
                                 menuitem1.setText(langBundle.getString("imgMenuSetOnePublicText"));
                                 menuitem2.setText(langBundle.getString("imgMenuSetOnePrivateText"));
-                                //Selvitetään kuvan julkisuus
+                                //Figuring out images publicity
                                 boolean publc;
                                 if (imageSelector.countSelected() == 0) {
                                     publc = database.imageIsPublic(imageDatabaseId);
@@ -563,10 +588,10 @@ public class FotosController {
                                 }
 
                                 if (publc) {
-                                    //Yksityiseksi
+                                    //To private
                                     menu.getItems().addAll(menuitem2);
                                 } else {
-                                    //Julkiseksi
+                                    //To public
                                     menu.getItems().addAll(menuitem1);
                                 }
                             }
@@ -593,7 +618,7 @@ public class FotosController {
                 StackPane pStack = new StackPane();
                 pStack.getChildren().add(p);
                 if (loggedIn && publicImagesInView.contains(imageDatabaseId)) {
-                    //Jos kirjauduttu ja kuva on julkinen niin lisätään "Julkinen"-label kuvan oikeaan yläreunaan.
+                    //If logged in and image is public, add "public"-label to images top-right corner
                     Label publicLabel = new Label(langBundle.getString("imgThumbnailPublicLabel"));
                     publicLabel.setTextFill(Color.WHITE);
                     publicLabel.setPadding(new Insets(2.0));
@@ -630,11 +655,15 @@ public class FotosController {
         System.out.println("Grid done");
     }
 
-    //Poistaa valitut kuvat tai jos ei mitään valittuna niin sen mistä klikattiin juuri oikealla hiirellä.
+    /**
+     * Deletes selected images or if nothing is selected, deletes where right-clicked.
+     *
+     * @param clickedImageDatabaseId    Image id in database.
+     */
     private void deleteSelectedImages(int clickedImageDatabaseId) {
         ArrayList<Integer> selectedImageIds = imageSelector.getSelectedIds();
 
-        //Jos mitään ei ollut valittuna niin lisätään poistettavien listaan se kuva josta klikattiin juuri oikealla.
+        //If nothing is selected, add right-clicked image to the to-be-deleted list.
         if (selectedImageIds.size() == 0) {
             selectedImageIds.add(clickedImageDatabaseId);
         }
@@ -647,7 +676,7 @@ public class FotosController {
         if (vastaus.isPresent() && vastaus.get() == ButtonType.OK) {
 
             for (Integer i : selectedImageIds) {
-                //success jää falseksi jos yksikin kuvanpoisto epäonnistuu.
+                //Success stays false if even one image deletion fails.
                 success = success && database.deleteImage(i);
             }
             imageSelector.clearSelection();
@@ -677,6 +706,12 @@ public class FotosController {
 
     }
 
+    /**
+     *
+     * @param clickedImageId    Clicked image
+     * @param publc             true=public and false=private
+     * @return                  true=success and false=failed
+     */
     private boolean setSelectedImagesPublicity(int clickedImageId, boolean publc) {
         boolean success = true;
         int count = 0;
@@ -700,6 +735,9 @@ public class FotosController {
         return success;
     }
 
+    /**
+     * Refreshes image info panel.
+     */
     private void refreshImageData(){
         //TODO: insert values
         try {
@@ -715,6 +753,9 @@ public class FotosController {
         }
     }
 
+    /**
+     * Shows previous image when viewing images in full screen mode.
+     */
     @FXML//Cycle pictures back when viewing them
     private void cycleImageBack() {
         if (currentImageIndex < 1) {
@@ -732,6 +773,9 @@ public class FotosController {
         imageViewStackPane.requestFocus();//TODO: cycle images with arrow keys.
     }
 
+    /**
+     * Shows next image when viewing images in full screen mode.
+     */
     @FXML//Cycle pictures forward when viewing them
     private void cycleImageForward() {
         if (currentImageIndex == imageIdList.size() - 1) {
@@ -761,9 +805,12 @@ public class FotosController {
         newFolderErrorText.setText("");
     }
 
+    /**
+     * Performs actions that need to be performed when logging out.
+     */
     private void logout() {
         if (privateUserLevel == 1000){
-            //Käyttäjä oli admin
+            //User was admin
             julkisetKuvatButton.setVisible(true);
             searchTextField.setVisible(true);
             tarkennettuHakuLabel.setVisible(true);
@@ -779,7 +826,7 @@ public class FotosController {
         omatKuvatButton.setVisible(false);
         jaetutKuvatButton.setVisible(false);
         addImageButton.setVisible(false);
-        if (langBundle != null) // Tämä on vielä null kun käynnistyksessä initialize kutsuu (logout)
+        if (langBundle != null) //This is still null, when on startup initialize calls (logout)
             usernameLabel.setText(langBundle.getString("usernameLabelNotLoggedinText"));
         folderGridPane.getChildren().clear();
         newFolderButton.setVisible(false);
@@ -789,6 +836,15 @@ public class FotosController {
         adjustImageGrid();
     }
 
+    /**
+     * Method for passing information to the controller
+     *
+     * @param methodUserID
+     * @param methodUserLevel
+     * @param userSurName
+     * @param userFrontName
+     * @param userEmail
+     */
     public void fetchUserInfo(int methodUserID, int methodUserLevel, String userSurName, String userFrontName, String userEmail) {
         if (!loggedIn) {
             privateUserID = methodUserID;
@@ -799,6 +855,9 @@ public class FotosController {
         }
     }
 
+    /**
+     * Performs actions that need to be performed when logged in.
+     */
     @FXML
     private void login() {
         if (Objects.equals(usernameField.getText(), "")) {
@@ -848,6 +907,11 @@ public class FotosController {
         }
     }
 
+    /**
+     * Validates registering fields.
+     *
+     * @throws UnsupportedEncodingException
+     */
     @FXML
     private void registerMenu() throws UnsupportedEncodingException {
         System.out.println("emailvbox: " + emailVbox.isVisible());
@@ -877,6 +941,11 @@ public class FotosController {
         }
     }
 
+    /**
+     * Performs actions that need to be performed when clicked on the main stack pane.
+     *
+     * @param event Used for locating where the user clicked.
+     */
     @FXML
     private void onMainBorderPaneClick(Event event) {
        /* System.out.println("onMainBorderPaneClick: 1 " + loginVbox.isVisible());
@@ -902,14 +971,17 @@ public class FotosController {
         }
     }
 
+    /**
+     * Performs the image selection process when uploading new images.
+     */
     @FXML
     protected void onAddImgButtonClick() {
         if (loggedIn) {
-            //Tähän tullaa ku painetaan sinistä pluspallo-kuvaketta kuvan lisäämiseks.
+            //When clicked on blue plus button
             System.out.println("Add image");
-            //Varmistetaan että controller on saanut start-metodilta mainStagen
+            //Confirming that controller got the mainStage from start-method
             if (mainStage != null) {
-                //Tiedostonvalintaikkuna
+                //File selection window
                 FileChooser fileChooser = new FileChooser();
                 fileChooser.setTitle(langBundle.getString("uploadImgFileChooserTitle"));
                 fileChooser.getExtensionFilters().addAll(
@@ -917,7 +989,7 @@ public class FotosController {
                         // new FileChooser.ExtensionFilter("All Files", "*.*")
                 );
                 List<File> files = fileChooser.showOpenMultipleDialog(mainStage);
-                //Valittiinko tiedostoja?
+                //Were any files selected?
                 if (files != null) {
                     //Rakennetaan varmistuskysymys
                     Stage dialog = new Stage();
@@ -942,7 +1014,7 @@ public class FotosController {
                         kysymys.append("...\n");
                     }
 
-                    //Esitetään varmistuskysymys
+                    //Showing confirmation message
                     Alert alert = new Alert(Alert.AlertType.CONFIRMATION, kysymys.toString());
                     alert.setTitle(langBundle.getString("generalConfirmationTitle"));
                     alert.setHeaderText(null);
@@ -987,14 +1059,17 @@ public class FotosController {
     }
 
 
+    /**
+     * Shows profile menu.
+     */
     @FXML
     protected void onProfileClick() {
         if (loggedIn) {
-            //Kun hiiri viedään proffilikuvan päälle
+            //When clicked on profile photo.
             System.out.println("Cursor on profile picture.");
-            //Tehdään valikko, joka ilmestyy profiilikuvan alle.
+            //Making a menu that appears under the profile picture.
             ContextMenu menu = new ContextMenu();
-            //Tehdään valikon valinnat ja lisätään niille tarvittavat toiminnot.
+            //Making options for the menu and functions for them.
             MenuItem settings = new MenuItem(langBundle.getString("settingsMenuItemText"));
             settings.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
@@ -1015,14 +1090,14 @@ public class FotosController {
                     logout();
                 }
             });
-            //Lisätään valinnat valikkoon.
+            //Adding menu options to the menu.
             menu.getItems().addAll(settings, logout);
-            //Näytetään valikko käyttäjälle.
+            //Showing the menu to the user.
             double boundsInScenex = profile.localToScene(profile.getBoundsInLocal()).getMaxX();
             double boundsInSceney = profile.localToScene(profile.getBoundsInLocal()).getMaxY();
             menu.show(profile, boundsInScenex, boundsInSceney);
         } else {
-            //loginmenu auki
+            //Login menu open.
             loginVbox.setVisible(true);
             usernameField.requestFocus();
         }
@@ -1033,12 +1108,15 @@ public class FotosController {
     @FXML
     private StackPane filterButtonStackPane, pictureInfoArrow;
 
+    /**
+     * Shows or hides the filter menu depending on if it's open or closed.
+     */
     @FXML
     private void onFilterShowHidebuttonClick() {
         TranslateTransition transitionMenu = new TranslateTransition(new Duration(500), filterMenu);
         RotateTransition rotateButton = new RotateTransition(new Duration(500), filterButtonStackPane);
         if (filterMenu.getTranslateX() != 0) {
-            //Avataan kiinni oleva filtermenu
+            //Opening filter menu that was closed
             System.out.println("Filterit auki!");
             transitionMenu.setToX(0);
             transitionMenu.play();
@@ -1048,7 +1126,7 @@ public class FotosController {
             System.out.println("LayoutX: " + filterMenu.getLayoutX());
             System.out.println("TranslateX: " + filterMenu.getTranslateX());
         } else {
-            //Suljetaan auki oleva filtermenu
+            //Closing filter menu that was open
             System.out.println("Filterit kiinni!");
             transitionMenu.setToX(-(filterMenu.getWidth()));
             transitionMenu.play();
@@ -1063,12 +1141,15 @@ public class FotosController {
         }
     }
 
+    /**
+     *  Shows or hides the picture info menu depending on if it's open or closed.
+     */
     @FXML
     private void onPictureInfoShowHideButtonClick() {
         TranslateTransition transitionMenu = new TranslateTransition(new Duration(500), pictureInfo);
         RotateTransition rotateButton = new RotateTransition(new Duration(500), pictureInfoArrow);
         if (pictureInfo.getTranslateX() != 0) {
-            //Avataan kiinni oleva menu
+            //Opening menu that was closed
             System.out.println("Kuva infot auki!");
             transitionMenu.setToX(0);
             transitionMenu.play();
@@ -1078,7 +1159,7 @@ public class FotosController {
             System.out.println("LayoutX: " + pictureInfo.getLayoutX());
             System.out.println("TranslateX: " + pictureInfo.getTranslateX());
         } else {
-            //Suljetaan auki oleva menu
+            //Closing menu that was open
             System.out.println("Kuva infot kiinni!");
             transitionMenu.setToX(-(pictureInfo.getWidth()));
             transitionMenu.play();
@@ -1092,13 +1173,16 @@ public class FotosController {
         }
     }
 
+    /**
+     *  Shows or hides the folder menu depending on if it's open or closed.
+     */
     @FXML
     private void onFolderShowHidebuttonClick() {
         TranslateTransition transitionMenu = new TranslateTransition(new Duration(500), folderMenu);
         RotateTransition rotateButton = new RotateTransition(new Duration(500), folderButtonStackPane);
         System.out.println("Folder translateY: " + folderMenu.getTranslateY());
         if (folderMenu.getTranslateY() != 0) {
-            //Avataan kiinni oleva foldermenu
+            //Opening menu that was closed
             System.out.println("Folderit auki!");
             transitionMenu.setToY(0);
             transitionMenu.play();
@@ -1108,7 +1192,7 @@ public class FotosController {
             //filterMenuHbox.setPadding(Insets.EMPTY);
             rootborderpane.setMargin(filterMenuHbox, Insets.EMPTY);
         } else {
-            //Suljetaan auki oleva foldermenu
+            //Closing menu that was open
             System.out.println("Folderit kiinni!");
             folderMenu.setViewOrder(1);
             transitionMenu.setToY(-(folderMenu.getHeight() * 2));
@@ -1124,11 +1208,16 @@ public class FotosController {
         }
     }
 
+    /**
+     * Turns on the settings scene.
+     *
+     * @throws IOException
+     */
     @FXML
     public void switchToSettingsScene() throws IOException {
-        //Laitetaan asetusten elementit näkyviin ja poistetaan etusivun elementit pois näkyvistä.
+        //Showing settings elements and hiding main scene elements.
         if (privateUserLevel == 1000){
-            //Adminoikeudet
+            //Admin privileges
             adminSettingsLabel.setVisible(true);
             adminSettingsLabel.setText(langBundle.getString("adminStatusLabelText"));
             adminBorderPane.setVisible(false);
@@ -1165,6 +1254,9 @@ public class FotosController {
         */
     }
 
+    /**
+     * Updates user data in database.
+     */
     @FXML
     public void changeUserInfo() {
         String userSurName = settingsSurNameTextField.getText();
@@ -1179,6 +1271,9 @@ public class FotosController {
         }
     }
 
+    /**
+     * Updates users password in database.
+     */
     @FXML
     public void changeUserPassword() {
         String oldPassword = settingsOldPassword.getText();
@@ -1199,6 +1294,9 @@ public class FotosController {
         }
     }
 
+    /**
+     * Deletes all user images in database.
+     */
     @FXML
     public void deleteUserImages() {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION, langBundle.getString("deleteUserImagesAlertText"));
@@ -1223,6 +1321,9 @@ public class FotosController {
         }
     }
 
+    /**
+     * Deletes user from database.
+     */
     @FXML
     public void deleteUser() {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION, langBundle.getString("deleteAccountAlertText"));
@@ -1249,9 +1350,12 @@ public class FotosController {
         }
     }
 
+    /**
+     * Turns on default scene.
+     */
     @FXML
     public void switchToDefaultScene() {
-        //Laitetaan etusivun elementit näkyviin ja poistetaan asetusten elementit pois näkyvistä.
+        //Showing main scene elements and hiding settings scene elements.
 
         settingsBorderPane.setManaged(false);
         settingsBorderPane.setVisible(false);
@@ -1299,16 +1403,21 @@ public class FotosController {
 */
     }
 
+    /**
+     * Loads and shows user folders.
+     *
+     * @param userId Users id, used for database query.
+     * @param parentfolder Needed for showing inner folders.
+     */
     @FXML
-    //Käyttäjän kansioiden lataamiseen
     public void loadUserFolders(int userId, int parentfolder) {
-        //Haetaan tietokannasta
+        //Searching from database
         System.out.println("Ladataan kansioita...");
         HashMap<Integer, String> folderinfo;
         folderinfo = database.getUserFolders(userId, parentfolder);
 
         int i = 0;
-        //Asetetaan kansiot käyttöliittymään
+        //Showing the folders in interface
         for (Integer folder : folderinfo.keySet()) {
             Image img = new Image("file:src/main/resources/otp1/otpr21fotosdemo/image/folder-1484.png");
             ImageView imgview = new ImageView(img);
@@ -1324,7 +1433,7 @@ public class FotosController {
             folderGridPane.add(vbox, i, 0, 1, 1);
             i++;
 
-            //Kansion poistamiseen
+            //For folder deletion
             vbox.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
                 @Override
                 public void handle(MouseEvent mouseEvent) {
@@ -1347,8 +1456,10 @@ public class FotosController {
         }
     }
 
+    /**
+     * Shows menu for creating a new folder.
+     */
     @FXML
-    //Uuden kansion luontiin
     public void onNewFolderButtonClick() {
         System.out.println("Uuden kansion kuvaketta painettu");
         newFolderVbox.setVisible(true);
@@ -1356,8 +1467,10 @@ public class FotosController {
         newFolderErrorText.setManaged(false);
     }
 
+    /**
+     * Validates text-fields and uploads the new folder to database.
+     */
     @FXML
-    //Kun käyttäjä klikkaa valmis-nappia kun ollaan tekemässä uutta kansiota.
     public void onNewFolderReadyButtonClick() {
         String newfoldername;
 
@@ -1379,16 +1492,25 @@ public class FotosController {
         }
     }
 
+    /**
+     * Deletes the folder and its images from database.
+     *
+     * @param folderid Folder to be deleted.
+     */
     @FXML
-    //Kansioiden poistaminen
     public void onDeleteFolderButtonClick(Integer folderid) {
         database.deleteFolder(folderid);
         folderGridPane.getChildren().clear();
         loadUserFolders(privateUserID, selectedFolderID);
     }
 
+    /**
+     * Shows images from the clicked folder from database.
+     *
+     * @param folderid      Folder to be shown.
+     * @param foldername    Folders name.
+     */
     @FXML
-    //Kun kansiota klikataan
     public void onFolderClick(Integer folderid, String foldername) {
         selectedFolderID = folderid;
         System.out.println("Näytetään folderid: " + selectedFolderID);
@@ -1399,8 +1521,10 @@ public class FotosController {
         adjustImageGrid();
     }
 
+    /**
+     * Loads users root folder from database and shows the images in it.
+     */
     @FXML
-    //käyttäjän root-kansion näyttämiseen
     public void loadUserRootFolder() {
         selectedFolderID = database.getRootFolderId(privateUserID);
         databaseChanged = true;
@@ -1408,6 +1532,12 @@ public class FotosController {
         updateBreadCrumbs(selectedFolderID, "root");
     }
 
+    /**
+     * Adds a new folder breadcrumb to the interface.
+     *
+     * @param folderid      for setting an id to the new breadcrumb element
+     * @param foldername    folders name to be shown in the breadcrumb.
+     */
     //Breadcrumbssien päivitykseen
     public void updateBreadCrumbs(Integer folderid, String foldername) {
 
@@ -1450,14 +1580,22 @@ public class FotosController {
 
 //}
 
-    //Breadcrumbssien resetointiin
+    /**
+     * Clears the breadcrumbs.
+     */
     public void resetBreadCrumbs() {
         //breadCrumbArrayList.clear();
         breadCrumbGridPane.getChildren().clear();
         breadCrumbGridPaneCounter = 0;
     }
 
-    //Kun jotain breadcrumbia klikataan, poistetaan edellä olevat breadcrumbit
+    /**
+     * Deletes previous breadcrumbs before the clicked breadcrumb and shows images from the clicked folder.
+     *
+     * @param folderid      Clicked folder id.
+     * @param node          Clicked node.
+     * @param foldername    Name of the folder that was clicked.
+     */
     public void onBreadCrumbClick(Integer folderid, Node node, String foldername) {
 
         //System.out.println("BREADCRUMB SIZE: " + breadCrumbArrayList.size());
@@ -1533,6 +1671,9 @@ public class FotosController {
         refreshImageGrid();
     }
 
+    /**
+     * Turns on admin view scene.
+     */
     public void openAdminView(){
         userList = database.listUsers();
         String userSearchText = adminViewSearchUserTextField.getText();
@@ -1657,6 +1798,10 @@ public class FotosController {
         }
 
     }
+
+    /**
+     * Searches for users in the user list.
+     */
     @FXML
     public void onAdminViewUserSearchTextTyped(){
         String searchString = adminViewSearchUserTextField.getText();
@@ -1716,9 +1861,4 @@ public class FotosController {
         //For tests
         return privateUserLevel;
     }
-
-
-
-
-
 }
