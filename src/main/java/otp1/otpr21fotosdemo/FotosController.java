@@ -1634,7 +1634,7 @@ public class FotosController {
 
     public void onOwnImagesButtonClick() {
         switchToDefaultScene();
-        folderGridPane.getChildren().clear();
+        resetBreadCrumbs();
         loadUserRootFolder();
         displayImages = DisplayImages.OWN;
         refreshImageGrid();
