@@ -443,7 +443,7 @@
 
          </children>
       </StackPane>
-      <StackPane fx:id="imageViewStackPane" visible="false">
+      <StackPane fx:id="imageViewStackPane">
          <children>
             <Region fx:id="imageviewBackgroundRegion" opacity="0.4" style="-fx-background-color: #000000;" />
             <BorderPane fx:id="imageViewBorderPane" prefHeight="200.0" prefWidth="200.0">
@@ -465,13 +465,6 @@
                      </children>
                   </StackPane>
                </top>
-               <center>
-                  <VBox alignment="CENTER" onMouseClicked="#closeImageview" BorderPane.alignment="CENTER">
-                     <children>
-                        <ImageView fx:id="bigPicture" fitHeight="658.0" fitWidth="1154.0" pickOnBounds="true" preserveRatio="true" />
-                     </children>
-                  </VBox>
-               </center>
                <left>
                   <HBox fx:id="pictureInfoBox" maxHeight="600.0" prefHeight="600.0" prefWidth="269.0" BorderPane.alignment="CENTER">
                      <children>
@@ -608,6 +601,27 @@
                      </children>
                   </HBox>
                </left>
+               <center>
+                  <VBox alignment="CENTER" BorderPane.alignment="CENTER">
+                     <BorderPane.margin>
+                        <Insets bottom="50.0" left="50.0" right="50.0" top="50.0" />
+                     </BorderPane.margin>
+                     <children>
+                        <HBox alignment="CENTER" VBox.vgrow="ALWAYS">
+                           <VBox.margin>
+                              <Insets />
+                           </VBox.margin>
+                           <children>
+                              <Pane fx:id="bigpicParent" HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <ImageView fx:id="bigPicture" fitHeight="658.0" fitWidth="1000.0" pickOnBounds="true" preserveRatio="true" />
+                                 </children>
+                              </Pane>
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+               </center>
             </BorderPane>
          </children>
       </StackPane>

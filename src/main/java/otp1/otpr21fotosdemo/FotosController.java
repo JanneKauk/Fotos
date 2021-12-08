@@ -59,7 +59,9 @@ public class FotosController {
     @FXML
     private GridPane fotosGridPane, folderGridPane, breadCrumbGridPane, topBarGridPane;
     @FXML
-    private HBox filterMenuHbox;
+    private HBox filterMenuHbox, pictureInfoBox;
+    @FXML
+    private Pane bigpicParent;
     @FXML
     ScrollPane scrollp, adminUsersViewScrollPane, adminViewAdminsScrollPane;
     @FXML
@@ -163,12 +165,11 @@ public class FotosController {
         logout();
         //Filtermenu piiloon alussa
         filterMenu.setTranslateX(-200);
-        pictureInfo.setTranslateX(-200);
+//        pictureInfoBox.setTranslateX(-230);
         filterButtonStackPane.setRotate(180);
-        pictureInfoArrow.setRotate(180);
+//        pictureInfoArrow.setRotate(180);
         filterMenu.setManaged(false);
-        pictureInfo.setManaged(false);
-
+//        pictureInfoBox.setManaged(false);
         uploadingStackPane.setVisible(false);
 
         //Uuden kansion -ja Login menu piiloo ja sen sisällä rekisteröitymiseen tarvittavat tekstikentät myös.
@@ -475,6 +476,8 @@ public class FotosController {
                             Image fullImage = database.downloadFullImage(currentImageID.intValue());//Find the original version of the clicked picture
                             if (fullImage != null) {
                                 bigPicture.setImage(fullImage);
+                                bigPicture.fitHeightProperty().bind(bigpicParent.heightProperty());
+                                bigPicture.fitWidthProperty().bind(bigpicParent.widthProperty());
                             } else {
                                 bigPicture.setImage(iv.getImage());
                             }
@@ -703,6 +706,10 @@ public class FotosController {
     private void refreshImageData(){
         //TODO: insert values
         try {
+//            bigpicParent.maxHeight(bigPicture.getImage().getHeight());
+//            System.out.println("picture height"+bigPicture.getImage().getHeight());
+//            System.out.println(bigpicParent.getHeight());
+//            bigpicParent.maxWidth(bigPicture.getImage().getWidth());
             ImageData data = Database.imageData;
             imageName.setText(data.fileName());
             imageOwner.setText(data.fileOwner());
@@ -1065,18 +1072,18 @@ public class FotosController {
 
     @FXML
     private void onPictureInfoShowHideButtonClick() {
-        TranslateTransition transitionMenu = new TranslateTransition(new Duration(500), pictureInfo);
+        TranslateTransition transitionMenu = new TranslateTransition(new Duration(500), pictureInfoBox);
         RotateTransition rotateButton = new RotateTransition(new Duration(500), pictureInfoArrow);
-        if (pictureInfo.getTranslateX() != 0) {
+        if (pictureInfoBox.getTranslateX() != 0) {
             //Avataan kiinni oleva menu
             System.out.println("Kuva infot auki!");
             transitionMenu.setToX(0);
             transitionMenu.play();
             rotateButton.setByAngle(180);
             rotateButton.play();
-            pictureInfo.setManaged(true);
-            System.out.println("LayoutX: " + pictureInfo.getLayoutX());
-            System.out.println("TranslateX: " + pictureInfo.getTranslateX());
+            pictureInfoBox.setManaged(true);
+            System.out.println("LayoutX: " + pictureInfoBox.getLayoutX());
+            System.out.println("TranslateX: " + pictureInfoBox.getTranslateX());
         } else {
             //Suljetaan auki oleva menu
             System.out.println("Kuva infot kiinni!");
@@ -1085,9 +1092,9 @@ public class FotosController {
             rotateButton.setByAngle(180);
             rotateButton.play();
             transitionMenu.setOnFinished(event -> {
-                pictureInfo.setManaged(false);
-                System.out.println("LayoutX: " + pictureInfo.getLayoutX());
-                System.out.println("TranslateX: " + pictureInfo.getTranslateX());
+                pictureInfoBox.setManaged(false);
+                System.out.println("LayoutX: " + pictureInfoBox.getLayoutX());
+                System.out.println("TranslateX: " + pictureInfoBox.getTranslateX());
             });
         }
     }
