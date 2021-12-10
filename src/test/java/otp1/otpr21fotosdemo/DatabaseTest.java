@@ -223,23 +223,17 @@ public class DatabaseTest {
 
                 // Image statement VALUES(imageID (int11), viewingRights (int11), fileName(varchar64), image(blob), date(date)
                 // userID(int11), folderID(int11)
-                PreparedStatement pstmt = conn.prepareStatement("INSERT INTO Fotos.Image(viewingRights, fileName, image, date, userID, folderID) VALUES(?,?,?,?,?,?)");
+                PreparedStatement pstmt = conn.prepareStatement("INSERT INTO Fotos.Image(viewingRights, image, userID, folderID) VALUES(?,?,?,?)");
 
                 // viewingRights
                 pstmt.setInt(1, 0);
-                // fileName
-                pstmt.setString(2, "testing1");
                 // blob
                 InputStream in = new FileInputStream("src/test/resources/image/noimage.jpg");
-                pstmt.setBlob(3, in);
-                // date
-                Date date = Calendar.getInstance().getTime();
-                java.sql.Date sqlDate = new java.sql.Date(date.getTime());
-                pstmt.setDate(4, sqlDate);
+                pstmt.setBlob(2, in);
                 // userID
-                pstmt.setInt(5, userid);
+                pstmt.setInt(3, userid);
                 // folderID
-                pstmt.setInt(6, rootFolder);
+                pstmt.setInt(4, rootFolder);
                 //Executing the statement
                 pstmt.execute();
                 System.out.println("Record inserted......");
