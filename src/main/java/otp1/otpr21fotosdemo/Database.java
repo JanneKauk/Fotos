@@ -31,6 +31,11 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.*;
 
+/**
+ * Database class handles all connections and datatransfers to and from the mySQL database.
+ * @author Kalle Voutilainen, Petri Immonen, Jüri Tihane, Janne Kaukua
+ */
+
 public class Database {
     private String dbUserName = System.getenv("APP_DB_USERNAME");
     private String dbPassword = System.getenv("APP_DB_PASSWORD");
@@ -46,11 +51,18 @@ public class Database {
 
     }
 
-
+    /**
+     * Set FotosController for communicating with the controller.
+     * @param c current FotosController in use.
+     */
     public void setController(FotosController c) {
         controller = c;
     }
 
+    /**
+     * When user is logging in, store the userID also for database functions.
+     * @param i ID of the current user.
+     */
     public void setPrivateUserId(int i) {
         privateUserId = i;
     }
@@ -304,6 +316,11 @@ public class Database {
         return true;
     }
 
+    /**
+     * Checks if a user with a username of <i>user</i> exists
+     * @param user username of the user to be searched for.
+     * @return true if the username is found in the database.
+     */
     public boolean userExists(String user) {
         boolean found = false;
         Connection conn = null;
@@ -366,6 +383,11 @@ public class Database {
 
     }
 
+    /**
+     * Checks if an image with the specified imageID exits.
+     * @param imageID imageID to be searched for.
+     * @return true if an image with <i>imageID</i> is found. Note: will return false if image-thumbnail with imageID is found but full resolution image is missing or vice versa.
+     */
     public boolean imageExists(int imageID){
         System.out.println("Database.imageExists");
         boolean foundThumb = false;
@@ -515,6 +537,11 @@ public class Database {
         return true;
     }
 
+    /**
+     * Deletes the image with specified imageID.
+     * @param imageID ID of the image to be deleted.
+     * @return true if rows where deleted from database.
+     */
     public boolean deleteImage(int imageID){
         boolean deleted = false;
         Connection conn = null;
@@ -566,6 +593,12 @@ public class Database {
         return deleted;
     }
 
+    /**
+     * Sets the publicity status of the image with specified imageID.
+     * @param imageID ID of the image in question.
+     * @param publc publicity of the image. True being public and false being private.
+     * @return true if a row was changed in the database.
+     */
     public boolean setImagePublicity(int imageID, boolean publc){
         System.out.println("Database.setImagePublicity");
         boolean success = false;

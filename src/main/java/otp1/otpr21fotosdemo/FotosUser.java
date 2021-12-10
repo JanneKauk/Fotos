@@ -1,5 +1,9 @@
 package otp1.otpr21fotosdemo;
 
+/**
+ * Class for relaying user data.
+ * @author Petri Immonen
+ */
 public class FotosUser {
     private String firstName, lastName, email, userName;
     private int userID, userLevel;
@@ -44,6 +48,10 @@ public class FotosUser {
         this.userID = userID;
     }
 
+    /**
+     * UserLevel represents the status of the user (Free user, Premium user or Admin user)
+     * @return userLevel integer
+     */
     public int getUserLevel() {
         return userLevel;
     }

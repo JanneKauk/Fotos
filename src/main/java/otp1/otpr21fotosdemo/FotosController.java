@@ -49,7 +49,7 @@ import static java.lang.Double.valueOf;
 
 /**
  * Controller class has all the listeners and handlers for the Fotos.fxml ui.
- * @author Kalle Voutilainen, Petri Immonen, Jüri Tihane
+ * @author Kalle Voutilainen, Petri Immonen, Jüri Tihane, Janne Kaukua
  */
 
 public class FotosController {
@@ -1626,12 +1626,16 @@ public class FotosController {
 
         onFolderClick(folderid, foldername);
     }
-
+    /**
+     * At the moment changes the view to own images
+     */
     public void onFotosLogoClick(){
         onOwnImagesButtonClick();
         omatKuvatButton.requestFocus();
     }
-
+    /**
+     * Changes the view to own images
+     */
     public void onOwnImagesButtonClick() {
         switchToDefaultScene();
         resetBreadCrumbs();
@@ -1639,7 +1643,9 @@ public class FotosController {
         displayImages = DisplayImages.OWN;
         refreshImageGrid();
     }
-
+    /**
+     * Changes the view to public images
+     */
     public void onPublicImagesButtonClick() {
         displayImages = DisplayImages.PUBLIC;
         folderGridPane.getChildren().clear();
@@ -1647,11 +1653,15 @@ public class FotosController {
         resetBreadCrumbs();
         refreshImageGrid();
     }
-
+    /**
+     * (TODO) Changes the view to shared images
+     */
     public void onSharedImagesButtonClick() {
         //displayImages = DisplayImages.SHARED;
     }
-
+    /**
+     * Sets the list of public images in current view (usually folder). Needed for "public"-labels
+     */
     public void setPublicImagesInView(ArrayList<Integer> list) {
         publicImagesInView = list;
 
@@ -1807,7 +1817,7 @@ public class FotosController {
     }
 
     /**
-     * Searches for users in the user list.
+     * Searches for users in the user list in adminview.
      */
     @FXML
     public void onAdminViewUserSearchTextTyped(){
@@ -1830,12 +1840,17 @@ public class FotosController {
         System.out.println(".");
 
     }
-
+    /**
+     * Opens the view for adding new admin-user
+     */
     @FXML
     public void onAddNewAdminButtonClick(){
         newAdminInfoVbox.setVisible(!newAdminInfoVbox.isVisible());
 
     }
+    /**
+     * Attepmts to register new admin with information given in new admin view textfields.
+     */
     @FXML
     public void onFinalAddNewAdminButtonClick(){
         if (adminUsernameField.getText().equals("") || adminPasswordField.getText().equals("") ){
