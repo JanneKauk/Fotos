@@ -61,13 +61,13 @@ Ylläpitäjä voi resetoida käyttäjän salasanan esim. jos on epäilys, että 
 
 Ylläpitäjä voi poistaa käyttäjän tilin jos käyttäjä niin haluaa eikä pysty sitä itse tekemään.
 
-#Tarkoitus
+# Tarkoitus
 
 Tarkoituksena on tehdä pilvipalvelusovellus, johon käyttäjät voivat ladata
 kuvia. Palvelussa käyttäjä voi tarkastella omia kuviaan, ladata niitä pilvestä omalle tietokoneelle
 ja lajitella kuvia eri kansioihin joita käyttäjä voi tehdä.
 
-#Kehitysympäristö ja projektin asennusohjeet Intellij Ideaan.
+# Kehitysympäristö ja projektin asennusohjeet Intellij Ideaan.
 
 1. Hae Intellij lisenssi osoitteesta https://www.jetbrains.com/community/education/#students, joka on ilmainen Metropolia opiskelijoille ja opettajille.
 2. Asenna Intellij Idea koneelle
@@ -80,6 +80,6 @@ ja lajitella kuvia eri kansioihin joita käyttäjä voi tehdä.
 9. Paina ylä oikeasta kulmasta "Fotos" pudotus valikko nappi -> “Edit configurations” -> Kirjoita “Environment variables” kohtaan -> APP_DB_USERNAME=otpdb;APP_DB_PASSWORD=Qwertyuiop0987654321;APP_DB_URL=jdbc:mysql://10.114.32.13:3306/ -> Apply -> OK
 10. Aja Fotos.java luokka uusiksi, jolloin ohjelma käynnistyy oikein yhdistämällä tietokantaan.
 
-#JDK versio, käytetyt kirjastot ja niiden versionumerot
+# JDK versio, käytetyt kirjastot ja niiden versionumerot
 
 Java JDK 11, JavaFX 11.0.2, JUnit 5.8.0, mysql 8.0.26, jacoco 0.8.7
