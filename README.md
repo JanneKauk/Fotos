@@ -69,8 +69,6 @@ ja lajitella kuvia eri kansioihin joita käyttäjä voi tehdä.
 
 #Kehitysympäristö ja projektin asennusohjeet Intellij Ideaan.
 
-Kehitysympäristönä käytimme Intellij Ideaa. Projektin saa ladattua Intellij Ideaan gitin kautta näin:
-
 1. Hae Intellij lisenssi osoitteesta https://www.jetbrains.com/community/education/#students, joka on ilmainen Metropolia opiskelijoille ja opettajille.
 2. Asenna Intellij Idea koneelle
 3. Käynnistä Intellij Idea ja luo java 11 projekti
