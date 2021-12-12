@@ -80,3 +80,7 @@ Kehitysympäristönä käytimme Intellij Ideaa. Projektin saa ladattua Intellij 
 6. Mene: Run -> Edit Configurations 
 7. Aseta samat Environment Variablet JUnit testaus configuraatiolle ja Application configuraatiolle jos ajat ohjelmaa ilman Mavenia.
 8. Tunnukset saat tietoosi kehittäjiltä.
+
+#JDK versio, käytetyt kirjastot ja niiden versionumerot
+
+Java JDK 11, JavaFX 11.0.2, JUnit 5.8.0, mysql 8.0.26, jacoco 0.8.7, commons-codec 1.15
