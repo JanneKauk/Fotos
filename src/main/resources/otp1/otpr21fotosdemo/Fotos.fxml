@@ -60,7 +60,7 @@
                               <HBox alignment="CENTER" GridPane.columnIndex="2">
                                  <children>
                                     <Region HBox.hgrow="ALWAYS" />
-                                    <Button fx:id="jaetutKuvatButton" mnemonicParsing="false" onAction="#onSharedImagesButtonClick" prefWidth="150.0" text="%sharedImagesButtonText" />
+                                    <Button fx:id="jaetutKuvatButton" disable="true" mnemonicParsing="false" onAction="#onSharedImagesButtonClick" prefWidth="150.0" text="%sharedImagesButtonText" visible="false" />
                                     <Region HBox.hgrow="ALWAYS" />
                                     <ChoiceBox fx:id="languageChoiceBox" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="60.0">
                                        <HBox.margin>
@@ -443,7 +443,7 @@
 
          </children>
       </StackPane>
-      <StackPane fx:id="imageViewStackPane">
+      <StackPane fx:id="imageViewStackPane" visible="false">
          <children>
             <Region fx:id="imageviewBackgroundRegion" opacity="0.4" style="-fx-background-color: #000000;" />
             <BorderPane fx:id="imageViewBorderPane" prefHeight="200.0" prefWidth="200.0">

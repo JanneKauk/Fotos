@@ -831,7 +831,7 @@ public class FotosController {
         database.setPrivateUserId(-1);
         databaseChanged = true;
         omatKuvatButton.setVisible(false);
-        jaetutKuvatButton.setVisible(false);
+//        jaetutKuvatButton.setVisible(false);
         addImageButton.setVisible(false);
         if (langBundle != null) //This is still null, when on startup initialize calls (logout)
             usernameLabel.setText(langBundle.getString("usernameLabelNotLoggedinText"));
@@ -882,7 +882,7 @@ public class FotosController {
             } else {
                 loadUserFolders(userid, 0);
                 omatKuvatButton.setVisible(true);
-                jaetutKuvatButton.setVisible(true);
+//                jaetutKuvatButton.setVisible(true);
 
                 addImageButton.setVisible(true);
                 newFolderButton.setVisible(true);
