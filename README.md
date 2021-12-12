@@ -71,16 +71,17 @@ ja lajitella kuvia eri kansioihin joita käyttäjä voi tehdä.
 
 Kehitysympäristönä käytimme Intellij Ideaa. Projektin saa ladattua Intellij Ideaan gitin kautta näin:
 
-1. Laita version control päälle: vcs > enable version control > valitse valikosta git ja paina ok.
-2. Git > manage remotes ja lisää sinne uusi remote jonka url-osoitteeksi https://gitlab.metropolia.fi/jurit/otp-r21-fotos
-3. Lataa projekti: git > pull
-4. Mene: File -> Settings -> Build, Execution, Deployment -> Build Tools -> Maven -> Runner
-5. Aseta Environment valiablet databasen käyttäjätunnukselle ja urlille seuraavasti:
-   APP_DB_USERNAME=`**käyttäjätunnus**`;APP_DB_PASSWORD=`**salasana**`;APP_DB_URL=`**url**`
-6. Mene: Run -> Edit Configurations 
-7. Aseta samat Environment Variablet JUnit testaus configuraatiolle ja Application configuraatiolle jos ajat ohjelmaa ilman Mavenia.
-8. Tunnukset saat tietoosi kehittäjiltä.
+1. Hae Intellij lisenssi osoitteesta https://www.jetbrains.com/community/education/#students, joka on ilmainen Metropolia opiskelijoille ja opettajille.
+2. Asenna Intellij Idea koneelle
+3. Käynnistä Intellij Idea ja luo java 11 projekti
+4. Kun java projekti on luotu, paina ylä-valikosta Git -> Enable Version Control
+5. Git -> Manage Remotes -> Lisää uusi remote, jonka URL on https://gitlab.metropolia.fi/jurit/otp-r21-fotos
+6. Terminaali -> git pull origin master -> Seuraa ohjeita, jotka tulee terminaaliin
+7. Paina “Load Maven Project” ponnahdusikkunasta.
+8. Kun saat projektin kehitysympäristöön, käynnistä Fotos.java luokka jolloin se kaatuu, mutta luo automaattisesti konfiguraation.
+9. Paina ylä oikeasta kulmasta "Fotos" pudotus valikko nappi -> “Edit configurations” -> Kirjoita “Environment variables” kohtaan -> APP_DB_USERNAME=otpdb;APP_DB_PASSWORD=Qwertyuiop0987654321;APP_DB_URL=jdbc:mysql://10.114.32.13:3306/ -> Apply -> OK
+10. Aja Fotos.java luokka uusiksi, jolloin ohjelma käynnistyy oikein yhdistämällä tietokantaan.
 
 #JDK versio, käytetyt kirjastot ja niiden versionumerot
 
-Java JDK 11, JavaFX 11.0.2, JUnit 5.8.0, mysql 8.0.26, jacoco 0.8.7, commons-codec 1.15
+Java JDK 11, JavaFX 11.0.2, JUnit 5.8.0, mysql 8.0.26, jacoco 0.8.7
