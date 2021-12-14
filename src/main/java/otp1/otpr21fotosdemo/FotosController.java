@@ -49,7 +49,7 @@ import static java.lang.Double.valueOf;
 
 /**
  * Controller class has all the listeners and handlers for the Fotos.fxml ui.
- * @author Kalle Voutilainen, Petri Immonen, Jüri Tihane, Janne Kaukua
+ * @author Kalle Voutilainen, Petri Immonen, J&uuml;ri Tihane, Janne Kaukua
  */
 
 public class FotosController {

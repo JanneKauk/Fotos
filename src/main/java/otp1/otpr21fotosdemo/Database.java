@@ -33,7 +33,7 @@ import java.util.*;
 
 /**
  * Database class handles all connections and datatransfers to and from the mySQL database.
- * @author Kalle Voutilainen, Petri Immonen, Jüri Tihane, Janne Kaukua
+ * @author Kalle Voutilainen, Petri Immonen, J&uuml;ri Tihane, Janne Kaukua
  */
 
 public class Database {
@@ -67,6 +67,14 @@ public class Database {
         privateUserId = i;
     }
 
+    /**
+     * Used for adding a new user to database before creating a password hash.
+     * @param userName username for the user.
+     * @param passWord plaintext password.
+     * @param email1 email of the user.
+     * @param email2 email of the user again.
+     * @param loginErrorText reference to a JavaFX Text -element for displaying error message or other information.
+     */
     public void saltRegister(String userName, String passWord, String email1, String email2, Text loginErrorText) {
         String salt = "1234";
         int iterations = 10000;
@@ -81,6 +89,11 @@ public class Database {
         register(userName, hashedString, email1, email2, loginErrorText);
     }
 
+    /**
+     * Creates a hash from plaintext password using hashPassword-method.
+     * @param passWord plaintext password
+     * @return hash generated from the password.
+     */
     public String saltLogin(String passWord) {
         String salt = "1234";
         int iterations = 10000;
@@ -95,6 +108,14 @@ public class Database {
         return hashedString;
     }
 
+    /**
+     * Creates a hash from plaintext password.
+     * @param password plaintext password
+     * @param salt salt.
+     * @param iterations number of iterations.
+     * @param keyLength key length
+     * @return hash generated from the password.
+     */
     public byte[] hashPassword(final char[] password, final byte[] salt, final int iterations, final int keyLength) {
         try {
             SecretKeyFactory skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512");
@@ -107,6 +128,14 @@ public class Database {
         }
     }
 
+    /**
+     * Used for adding a new user to database after creating a password hash.
+     * @param userName username for the user.
+     * @param passWord password hash for the user.
+     * @param email1 email of the user.
+     * @param email2 email of the user again.
+     * @param loginErrorText reference to a JavaFX Text -element for displaying error message or other information.
+     */
     // For registering
     public void register(String userName, String passWord, String email1, String email2, Text loginErrorText) {
         if (userAndPwExists(userName, passWord) == 0) {
@@ -173,6 +202,12 @@ public class Database {
         System.out.println("\n\n***** MySQL JDBC Connection Testing *****");
     }
 
+    /**
+     * Checks if username <i>user</i> exists with password <i>passWord</i>. If user and password match, also passes user information to controller with controllers fetchUserInfo-method.
+     * @param user username to be searched for.
+     * @param passWord password for the user.
+     * @return returns the userID of the user if password was correct. If username and password combination was wrong or the user doesnt exist, returns 0.
+     */
     public Integer userAndPwExists(String user, String passWord) {
         passWord = saltLogin(passWord);
 
@@ -249,6 +284,12 @@ public class Database {
         return found;
     }
 
+    /**
+     * Changes the users password
+     * @param userID ID of the user in question
+     * @param newPassword new password
+     * @return true if password was changed. False if not.
+     */
     public boolean changeUserPassword(int userID, String newPassword) {
         Connection conn = null;
         newPassword = saltLogin(newPassword);
@@ -281,6 +322,14 @@ public class Database {
         return true;
     }
 
+    /**
+     * Changes the users information in database.
+     * @param userSurname new surname for the user.
+     * @param userFrontName new first name for the user.
+     * @param userEmail new email for the user.
+     * @param userID existing userID of the user.
+     * @return true if some information was changed. Otherwise false.
+     */
     public boolean changeUserInfoDB(String userSurname, String userFrontName, String userEmail, int userID) {
         Connection conn = null;
         try {
@@ -469,6 +518,11 @@ public class Database {
         return (foundThumb && foundFullres);
     }
 
+    /**
+     * Deletes all the images in database with userID of <i>userID</i>.
+     * @param userID users ID
+     * @return true if deletion was succesful.
+     */
     public boolean deleteAllUserImages(int userID) {
         Connection conn = null;
         try {
@@ -499,6 +553,11 @@ public class Database {
         return true;
     }
 
+    /**
+     * Deletes a user.
+     * @param userID userID of the user to be deleted
+     * @return true if deletion was succesful.
+     */
     public boolean deleteUser(int userID) {
         Connection conn = null;
         try {
@@ -660,6 +719,11 @@ public class Database {
         return success;
     }
 
+    /**
+     * Checks whether image is public or not
+     * @param imageID ID of the image in question.
+     * @return true if image is public and false if it is private.
+     */
     public boolean imageIsPublic(int imageID){
         System.out.println("Database.imageIsPublic");
         Connection conn = null;
@@ -712,11 +776,23 @@ public class Database {
             return false;
         }
     }
+
+    /**
+     * Returns files file extension.
+     * @param file file in question.
+     * @return String containing only the file extension.
+     */
     private static String getFileExtension(File file) {
         String fileName = file.getName();
         int lastDot = fileName.lastIndexOf('.');
         return fileName.substring(lastDot + 1);
     }
+
+    /**
+     * returns file size of the specified file.
+     * @param file file in question.
+     * @return file size in megabytes.
+     */
     public float getFileSize(File file) {
         Path path = file.toPath();
         try {
@@ -735,6 +811,16 @@ public class Database {
             return 0;
         }
     }
+
+    /**
+     * Uploads a list of files to database for given userID and folderID.
+     * This method creates a smaller thumbnail Image from original image and also extracts image information from the file and saves those to the Database.
+     * NOTE!: This method is time-consuming and should be only run in a separate thread.
+     * @param userId ID of the user in question.
+     * @param folderId folder ID of the folder where the images are uploaded.
+     * @param files List&#60;File&#62; containing imagefiles to be uploaded.
+     * @return ArrayList&#60;Integer&#62; of image ID:s (generated by the Database) that were uploaded.
+     */
     public List<Integer> uploadImages(int userId, int folderId, List<File> files) {
 
         System.out.println("UploadTask starting.");
@@ -925,6 +1011,13 @@ public class Database {
         return newImageIDs;
     }
 
+    /**
+     * Downloads specified images from the Database. If no searchString and uploadDate are specified, all images in folder are returned.
+     * @param folderId ID of the folder where to search for the images.
+     * @param searchString search-text to match against images filenames. (Optional. Use NULL if not used)
+     * @param uploadDate upload date of the images to be selected. (Optional. Use NULL if not used)
+     * @return Map&#60;Integer, Pair&#60;String, javafx.scene.image.Image&#62;&#62; -structure where Map-key contains imageID. Map-value is ja Pair containing filename String and actual image data as javafx.scene.image.Image
+     */
     //Palauttaa Hashmapin jossa key on imageID ja Value on PAIR-rakenne. Pair-rakenteessa taas key on tiedostonimi ja value on imagedata
     public Map<Integer, Pair<String, javafx.scene.image.Image>> downloadImages(int folderId, String searchString, LocalDate uploadDate) {
         System.out.println("Database.downloadImages");
@@ -1020,6 +1113,12 @@ public class Database {
         }
         return images;
     }
+    /**
+     * Downloads public images from the Database. If no searchString and uploadDate are specified, all public images are returned.
+     * @param searchString search-text to match against images filenames. (Optional. Use NULL if not used)
+     * @param uploadDate upload date of the images to be selected. (Optional. Use NULL if not used)
+     * @return Map&#60;Integer, Pair&#60;String, javafx.scene.image.Image&#62;&#62; -structure where Map-key contains imageID. Map-value is ja Pair containing filename String and actual image data as javafx.scene.image.Image
+     */
     public Map<Integer, Pair<String, javafx.scene.image.Image>> downloadPublicImages(String searchString, LocalDate uploadDate) {
         System.out.println("Database.downloadPublicImages");
         Connection conn = null;
@@ -1094,7 +1193,11 @@ public class Database {
         return images;
     }
 
-
+    /**
+     * Downloads a full resolution image with specified image ID
+     * @param imageID ID of the image to be downloaded
+     * @return image date as javafx.scene.image.Image
+     */
     public javafx.scene.image.Image downloadFullImage(int imageID) {
         System.out.println("Database.downloadFullImage");
         if (fullImageCache.containsKey(imageID)) {
@@ -1162,6 +1265,12 @@ public class Database {
         return image;
     }
 
+    /**
+     * Returns users folders.
+     * @param userId ID of the user in question.
+     * @param parentfolderid folder ID of the current folder. 0 if root.
+     * @return HashMap&#60;Integer, String&#62; containing folder ID and folder name for each folder.
+     */
     public HashMap <Integer, String> getUserFolders(int userId, int parentfolderid) {
         System.out.println("Database.getUserFolders");
         Connection conn = null;
@@ -1236,6 +1345,12 @@ public class Database {
         return folders;
     }
 
+    /**
+     * Uploads a new folder.
+     * @param name name for the folder.
+     * @param userId ID of the current user.
+     * @param parentfolderid folder ID of the root folder of current user.
+     */
     public void uploadNewFolder(String name, int userId, int parentfolderid) {
         System.out.println("Database.uploadNewFolder");
         Connection conn = null;
@@ -1286,6 +1401,10 @@ public class Database {
         }
     }
 
+    /**
+     * Deletes a folder. Also deletes all subfolders using deleteChildFolders-method.
+     * @param folderid ID of the folder to be deleted.
+     */
     public void deleteFolder(int folderid) {
         System.out.println("Database.deleteFolder");
         Connection conn = null;
@@ -1330,6 +1449,11 @@ public class Database {
         }
     }
 
+    /**
+     * Returns the folder ID for users root folder.
+     * @param userId ID of the user in question.
+     * @return folder ID of the users root folder.
+     */
     public int getRootFolderId(int userId) {
         System.out.println("Database.getParentFolderId");
         Connection conn = null;
@@ -1386,6 +1510,11 @@ public class Database {
         return parentfolderid;
     }
 
+    /**
+     * Changes the userlevel for specified user. Used for changing a free user to premium user of vice versa or setting admin status to user.
+     * @param userId ID of the user.
+     * @param newUserLevel new user level. 1 being free user, 2 being premium user and 1000 being admin.
+     */
     public void changeUserLevel(int userId, int newUserLevel){
         Connection conn = null;
         try {
@@ -1414,7 +1543,10 @@ public class Database {
         }
     }
 
-
+    /**
+     * Deletes all subfolders of the specified folder.
+     * @param parentfolderid ID of the folder for which all subfolders will be deleted.
+     */
     public void deleteChildFolders(int parentfolderid) {
         System.out.println("Database.deleteParentFolders");
         Connection conn = null;
@@ -1466,6 +1598,10 @@ public class Database {
         }
     }
 
+    /**
+     * Returns an list of users and their user information. Used by adminview.
+     * @return ArrayList&#60;FotosUser&#62; containing all users in database.
+     */
     public ArrayList<FotosUser> listUsers(){
         Connection conn = null;
         ArrayList<FotosUser> list = new ArrayList<>();
@@ -1505,6 +1641,10 @@ public class Database {
         return list;
     }
 
+    /**
+     * Returns the number of admins in database.
+     * @return number of admin users in database.
+     */
     public int countAdmins(){
         Connection conn = null;
         int count = 0;
