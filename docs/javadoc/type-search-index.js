@@ -1,0 +1,1 @@
+typeSearchIndex = [{"l":"All Classes","url":"allclasses-index.html"},{"p":"otp1.otpr21fotosdemo","l":"Database"},{"p":"otp1.otpr21fotosdemo","l":"Fotos"},{"p":"otp1.otpr21fotosdemo","l":"FotosController"},{"p":"otp1.otpr21fotosdemo","l":"FotosUser"},{"p":"otp1.otpr21fotosdemo","l":"ImageData"},{"p":"otp1.otpr21fotosdemo","l":"ImageSelector"}]
