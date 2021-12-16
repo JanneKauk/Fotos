@@ -51,7 +51,6 @@ import static java.lang.Double.valueOf;
  * Controller class has all the listeners and handlers for the Fotos.fxml ui.
  * @author Kalle Voutilainen, Petri Immonen, J&uuml;ri Tihane, Janne Kaukua
  */
-
 public class FotosController {
     @FXML
     private BorderPane rootborderpane, settingsBorderPane, imageViewBorderPane;
@@ -138,27 +137,13 @@ public class FotosController {
 
     private Locale curLocale;
     private ResourceBundle langBundle;
+
+    /**
+     * Set initial state to application components on start or when changing language.
+     */
     @FXML
     private void initialize() {
-        /*
-        Properties properties = new Properties();
-        try {
-            String configPath = "src/main/resources/otp1/otpr21fotosdemo/Fotos.properties";
-            properties.load(new FileInputStream(configPath));
-            String lang = properties.getProperty("language");
-            String country = properties.getProperty("country");
-            curLocale = new Locale(lang,country);
-            Locale.setDefault(curLocale);
-            System.out.println("lang: " + lang + " country: " + country);
 
-            langBundle = ResourceBundle.getBundle("otp1.otpr21fotosdemo.TextResources", curLocale);
-
-
-        } catch (Exception e) {
-            System.err.println("Error loading properties");
-            e.printStackTrace();
-        }
-        */
         adminBorderPane.setVisible(false);
         newAdminInfoVbox.setVisible(false);
         displayImages = DisplayImages.PUBLIC;
@@ -218,7 +203,8 @@ public class FotosController {
     }
 
     /**
-     * @param stage
+     * Binds this controller to stage in view.
+     * @param stage stage
      */
     public void setMainStage(Stage stage) {
         mainStage = stage;
@@ -288,6 +274,9 @@ public class FotosController {
 
     }
 
+    /**
+     * Opens a imageview for viewing full resolution image. Also blurs the background.
+     */
     private void openImageview() {
         if(!imageViewStackPane.isVisible())
         blurringStackPane.setEffect(new GaussianBlur());
@@ -295,6 +284,9 @@ public class FotosController {
         imageViewStackPane.requestFocus();
     }
 
+    /**
+     * Closes full resolution imageview and clears background blur.
+     */
     @FXML
     private void closeImageview() {
         imageViewStackPane.setVisible(false);
@@ -302,6 +294,9 @@ public class FotosController {
         currentImageID = null;
     }
 
+    /**
+     * Resets grid constraints for image-grid.
+     */
     private void setGridConstraints() {
         fotosGridPane.getChildren().clear();
         fotosGridPane.getRowConstraints().clear();
@@ -316,13 +311,12 @@ public class FotosController {
      * Convenience-method for forcing new imagegrid
      */
     private void refreshImageGrid() {
-        //Convenience-method for forcing new imagegrid
         databaseChanged = true;
         adjustImageGrid();
     }
 
     /**
-     * Downloads images from database and shows them in the application.
+     * Downloads images from database and shows them in the application. Also adds listeners to image thumbnails for selections and for viewing full resolution image.
      */
     private void adjustImageGrid() {
         if (loggedIn && privateUserLevel == 1000){
@@ -396,25 +390,6 @@ public class FotosController {
         //System.out.println("rows in Igrid: "+rows); DEBUG
         Iterator<Integer> it = sortedImages.keySet().iterator();
 
-        /*
-        //Palauttaa Hashmapin jossa key on imageID ja Value on PAIR-rakenne. Pair-rakenteessa taas key on tiedostonimi ja value on imagedata
-        //Esimerkiksi:  luetellaan tiedostonimet konsolii.
-        {
-            //iteraattori imageID:iden läpikäymiseen
-            Iterator<Integer> it = sortedImages.keySet().iterator();
-            int count = 1;
-            while (it.hasNext()) {
-                int imageID = it.next();
-                Pair<String, Image> filenameAndImage = sortedImages.get(imageID);
-                //Tällä saa tiedostonimen
-                String filename = filenameAndImage.getKey();
-                //Tällä saa imagedatan Image-muodossa (javafx.scene...)
-                Image image = filenameAndImage.getValue();
-                System.out.println("File " + count + " " + filename);
-                count++;
-            }
-        }
-        */
         imageSelector.clearAll();
         int t = 0;
         System.out.println("Creating imagegrid");
@@ -427,10 +402,6 @@ public class FotosController {
                 imageIdList.add(imageDatabaseId);//Add the next ImageID to a list
                 //New elements
                 Pane p = new Pane();
-                /*
-                p.setStyle("-fx-border-color: red;");
-                p.setStyle("-fx-border-width: 10;");
-                */
                 ImageView iv = new ImageView();
                 p.getChildren().add(iv);
                 p.prefWidthProperty().bind(Bindings.min(fotosGridPane.widthProperty().divide(currentColumnCount), fotosGridPane.heightProperty().divide(rows)));
@@ -438,7 +409,6 @@ public class FotosController {
 
                 //ImageView settings
                 iv.setImage(sortedImages.get(imageIdList.get(t)).getValue());//Gets the ImageID from the list
-                //System.out.println("Displaying: " + filenameAndImage.getKey());
                 iv.setSmooth(true);
                 iv.setPreserveRatio(false);
                 //Viewport settings
@@ -629,9 +599,7 @@ public class FotosController {
                     pStack.setAlignment(Pos.TOP_RIGHT);
                     pStack.getChildren().add(publicLabel);
                 }
-                //TODO:DRAG TOIMINTO!!!---------------------------------------------------------------------------------------------
-                //TODO:DRAG TOIMINTO!!!---------------------------------------------------------------------------------------------
-                //TODO:DRAG TOIMINTO!!!---------------------------------------------------------------------------------------------
+                //TODO:DRAG TOIMINTO!
 //                p.setOnDragDetected(event -> {
 //                    /* drag was detected, start a drag-and-drop gesture*/
 //                    /* allow any transfer mode */
@@ -661,7 +629,7 @@ public class FotosController {
     /**
      * Deletes selected images or if nothing is selected, deletes where right-clicked.
      *
-     * @param clickedImageDatabaseId    Image id in database.
+     * @param clickedImageDatabaseId    Image id in database for the image clicked.
      */
     private void deleteSelectedImages(int clickedImageDatabaseId) {
         ArrayList<Integer> selectedImageIds = imageSelector.getSelectedIds();
@@ -710,7 +678,7 @@ public class FotosController {
     }
 
     /**
-     *
+     * Sets selected images public or private using Database.setImagePublicity -method.
      * @param clickedImageId    Clicked image
      * @param publc             true=public and false=private
      * @return                  true=success and false=failed
@@ -800,6 +768,9 @@ public class FotosController {
         imageViewStackPane.requestFocus();
     }
 
+    /**
+     * Clears the login/register information text fields.
+     */
     private void clearLoginFields() {
         usernameField.setText("");
         passwordField.setText("");
@@ -807,6 +778,9 @@ public class FotosController {
         emailField2.setText("");
     }
 
+    /**
+     * Clears the new folder information text fields.
+     */
     private void clearNewFolderMenuFields() {
         folderNameField.setText("");
         newFolderErrorText.setText("");
@@ -844,7 +818,7 @@ public class FotosController {
     }
 
     /**
-     * Method for passing information to the controller
+     * Method for passing information to the controller. Used by the Database-class.
      *
      * @param methodUserID
      * @param methodUserLevel
@@ -1067,7 +1041,7 @@ public class FotosController {
 
 
     /**
-     * Shows profile menu.
+     * Shows profile menu for settings and logging out.
      */
     @FXML
     protected void onProfileClick() {
@@ -1248,17 +1222,6 @@ public class FotosController {
         settingsNewPassword.setText("");
         settingsNewPasswordAgain.setText("");
 
-
-        /*
-        Stage stage;
-        Scene scene;
-        //Vaihdetaan asetukset-näkymään.
-        FXMLLoader fxmlLoader = new FXMLLoader(Fotos.class.getResource("Settings.fxml"));
-        scene = new Scene(fxmlLoader.load(), 1280, 800);
-        stage = (Stage) rootborderpane.getScene().getWindow();
-        stage.setScene(scene);
-        stage.show();
-        */
     }
 
     /**
@@ -1384,17 +1347,7 @@ public class FotosController {
                 updateBreadCrumbs(selectedFolderID, "root");
             }
         }
-        /*
-        //Laitetaan etusivun elementit takaisin näkyviin.
-        folderMenu.setVisible(true);
-        folderMenuHideButton.setVisible(true);
-        fotosGridPane.setVisible(true);
-        filterMenuHbox.setVisible(true);
-        folderMenu.setManaged(true);
-        folderMenuHideButton.setManaged(true);
-        fotosGridPane.setManaged(true);
-        filterMenuHbox.setManaged(true);
-         */
+
     }
 
     @FXML
@@ -1561,17 +1514,6 @@ public class FotosController {
         breadCrumbGridPane.add(label1, breadCrumbGridPaneCounter + 1, 0, 1, 1);
         breadCrumbGridPaneCounter += 2;
 
-       /* int j = 0;
-        for (int i = 0; i < breadCrumbArrayList.size(); i++) {
-            Label label1 = new Label(breadCrumbArrayList.get(i));
-            Label label2 = new Label(">");
-            label1.setFont(new Font(14));
-            label1.setAlignment(Pos.CENTER_LEFT);
-            label1.setId(String.valueOf(folderid));
-            breadCrumbGridPane.add(label2, j, 0, 1, 1);
-            breadCrumbGridPane.add(label1, j + 1, 0, 1, 1);
-
-            int finalI = i;*/
         System.out.println("Label id: " + label1.getId());
         label1.setOnMouseEntered(mouseEvent1 -> {
             label1.setUnderline(true);
@@ -1584,8 +1526,6 @@ public class FotosController {
         //j += 2;
 
     }
-
-//}
 
     /**
      * Clears the breadcrumbs.
@@ -1615,14 +1555,6 @@ public class FotosController {
                 breadCrumbGridPaneCounter--;
             }
         }
-
-        /*for (int i = breadCrumbArrayList.size() - 1; i >= 0; i--) {
-            if (i >= arrayindex) {
-                System.out.println("REMOVED INDEX: " + i);
-                breadCrumbArrayList.remove(i);
-            }
-        }*/
-        //onFolderClick(folderid, foldername);
 
         onFolderClick(folderid, foldername);
     }
@@ -1667,20 +1599,32 @@ public class FotosController {
 
     }
 
+    /**
+     * Redraws the image grid after date picker clicked.
+     */
     public void onDatepickerClick() {
         refreshImageGrid();
     }
 
+    /**
+     * Changes the order of the images displayed to newest to oldest.
+     */
     public void onNewestToOldestImageOrderButtonClick() {
         newestToOldestOrder = true;
         refreshImageGrid();
     }
 
+    /**
+     * Changes the order of the images displayed to oldest to newest.
+     */
     public void onOldestToNewestImageOrderButtonClick() {
         newestToOldestOrder = false;
         refreshImageGrid();
     }
 
+    /**
+     * Clears image filtering fields.
+     */
     public void resetFilters() {
         searchTextField.setText("");
         dateFilter.setValue(null);
@@ -1879,6 +1823,9 @@ public class FotosController {
 
     }
 
+    /**
+     * For testing only.
+     */
     public int getPrivateUserLevel() {
         //For tests
         return privateUserLevel;

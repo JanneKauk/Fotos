@@ -1,7 +1,7 @@
 package otp1.otpr21fotosdemo;
 
 /**
- * Class for relaying user data.
+ * Class for wrapping user data to single object. Contains only setters and getters.
  * @author Petri Immonen
  */
 public class FotosUser {

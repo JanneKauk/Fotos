@@ -12,6 +12,11 @@ import java.util.Properties;
 import java.util.ResourceBundle;
 
 public class Fotos extends Application {
+    /**
+     * Start point of the javafx app. Sets initial UI language and loads UI from fxml-file.
+     * @param stage stage
+     * @throws IOException
+     */
     @Override
     public void start(Stage stage) throws IOException {
 

@@ -3,7 +3,10 @@ package otp1.otpr21fotosdemo;
 import javafx.scene.image.Image;
 
 import java.sql.Date;
-
+/**
+ * Class for wrapping image data to single object.
+ * @author Janne Kaukua
+ */
 public class ImageData {
     private float fileSize;
     private String fileName, fileOwner, fileResolution, fileType;
