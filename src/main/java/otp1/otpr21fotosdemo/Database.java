@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.*;
 
 /**
- * Database class handles all connections and datatransfers to and from the mySQL database.
+ * Database class handles all connections and data transfers to and from the mySQL database.
  * @author Kalle Voutilainen, Petri Immonen, J&uuml;ri Tihane, Janne Kaukua
  */
 
@@ -136,7 +136,6 @@ public class Database {
      * @param email2 email of the user again.
      * @param loginErrorText reference to a JavaFX Text -element for displaying error message or other information.
      */
-    // For registering
     public void register(String userName, String passWord, String email1, String email2, Text loginErrorText) {
         if (userAndPwExists(userName, passWord) == 0) {
             // Variables
@@ -1018,8 +1017,8 @@ public class Database {
      * @param uploadDate upload date of the images to be selected. (Optional. Use NULL if not used)
      * @return Map&#60;Integer, Pair&#60;String, javafx.scene.image.Image&#62;&#62; -structure where Map-key contains imageID. Map-value is ja Pair containing filename String and actual image data as javafx.scene.image.Image
      */
-    //Palauttaa Hashmapin jossa key on imageID ja Value on PAIR-rakenne. Pair-rakenteessa taas key on tiedostonimi ja value on imagedata
     public Map<Integer, Pair<String, javafx.scene.image.Image>> downloadImages(int folderId, String searchString, LocalDate uploadDate) {
+        //Palauttaa Hashmapin jossa key on imageID ja Value on PAIR-rakenne. Pair-rakenteessa taas key on tiedostonimi ja value on imagedata
         System.out.println("Database.downloadImages");
         Connection conn = null;
         ResultSet result = null;
