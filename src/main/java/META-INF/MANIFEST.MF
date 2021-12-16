@@ -1,0 +1,3 @@
+Manifest-Version: 1.0
+Main-Class: otp1.otpr21fotosdemo.Fotos
+
