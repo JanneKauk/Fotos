@@ -37,13 +37,9 @@ import java.util.*;
  */
 
 public class Database {
-    // JAR varten
-//    private String dbUserName = System.getenv("otpdb");
-//    private String dbPassword = System.getenv("Qwertyuiop0987654321");
-//    private String url = System.getenv("jdbc:mysql://10.114.32.13:3306/");
-    private String dbUserName = "otpdb";
-    private String dbPassword = "Qwertyuiop0987654321";
-    private String url = "jdbc:mysql://10.114.32.13:3306/";
+    private String dbUserName = System.getenv("APP_DB_USERNAME");
+    private String dbPassword = System.getenv("APP_DB_PASSWORD");
+    private String url = System.getenv("APP_DB_URL");
     private final int MAX_THUMB_HEIGHT = 400;
     private final int MAX_THUMB_WIDTH = 400;
     private HashMap<Integer, ImageData> fullImageCache = new HashMap<>();

@@ -26,15 +26,8 @@ public class Fotos extends Application {
         ResourceBundle langBundle = null;
         Properties properties = new Properties();
         try {
-            // Lisätty JAR varten
-            File jarPath=new File(Fotos.class.getProtectionDomain().getCodeSource().getLocation().getPath());
-            String propertiesPath=jarPath.getParent();
-            System.out.println(" propertiesPath-"+propertiesPath);
-            properties.load(new FileInputStream(propertiesPath+"/Fotos.properties"));
-
             String configPath = "src/main/resources/otp1/otpr21fotosdemo/Fotos.properties";
-            // Poistettu JAR varten
-//            properties.load(new FileInputStream(configPath));
+            properties.load(new FileInputStream(configPath));
             String lang = properties.getProperty("language");
             String country = properties.getProperty("country");
             curLocale = new Locale(lang,country);
