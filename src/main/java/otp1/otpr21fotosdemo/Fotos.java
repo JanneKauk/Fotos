@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Locale;
@@ -25,8 +26,15 @@ public class Fotos extends Application {
         ResourceBundle langBundle = null;
         Properties properties = new Properties();
         try {
+            // Lisätty JAR varten
+            File jarPath=new File(Fotos.class.getProtectionDomain().getCodeSource().getLocation().getPath());
+            String propertiesPath=jarPath.getParent();
+            System.out.println(" propertiesPath-"+propertiesPath);
+            properties.load(new FileInputStream(propertiesPath+"/Fotos.properties"));
+
             String configPath = "src/main/resources/otp1/otpr21fotosdemo/Fotos.properties";
-            properties.load(new FileInputStream(configPath));
+            // Poistettu JAR varten
+//            properties.load(new FileInputStream(configPath));
             String lang = properties.getProperty("language");
             String country = properties.getProperty("country");
             curLocale = new Locale(lang,country);
